@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Dash app</string>
+    <string name="title_news">News</string>
+    <string name="title_proposals">Proposals</string>
+    <string name="title_prices">Prices</string>
+    <string name="title_portfolio">Portfolio</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="alert_message">Network is not available</string>
+    <string name="alert_title">Error</string>
+    <string name="alert_positive">Ok</string>
+</resources>

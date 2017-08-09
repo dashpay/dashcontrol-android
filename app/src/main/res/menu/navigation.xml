@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_news"
+        android:icon="@drawable/ic_rss_feed_black_24dp"
+        android:title="@string/title_news" />
+
+    <item
+        android:id="@+id/navigation_proposals"
+        android:icon="@drawable/ic_thumbs_up_down_black_24dp"
+        android:title="@string/title_proposals" />
+
+    <item
+        android:id="@+id/navigation_prices"
+        android:icon="@drawable/ic_attach_money_black_24dp"
+        android:title="@string/title_prices" />
+
+    <item
+        android:id="@+id/navigation_portfolio"
+        android:icon="@drawable/ic_account_balance_wallet_black_24dp"
+        android:title="@string/title_portfolio" />
+
+</menu>

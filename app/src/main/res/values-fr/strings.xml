@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dash</string>
+    <string name="title_news">Actu</string>
+    <string name="title_portfolio">Portfolio</string>
+    <string name="title_prices">Prix</string>
+    <string name="title_proposals">Propositions</string>
+    <string name="alert_title">Error</string>
+    <string name="alert_message">Le réseau est indisponible</string>
+    <string name="hello_blank_fragment">Bonjour blanc fragment</string>
+</resources>
