@@ -8,4 +8,13 @@
     <string name="alert_title">Error</string>
     <string name="alert_message">Le réseau est indisponible</string>
     <string name="hello_blank_fragment">Bonjour blanc fragment</string>
+    <string name="eng">Anglais</string>
+    <string name="esp">Espagnol</string>
+    <string name="fr">Français</string>
+    <string name="ru">Russian</string>
+    <string name="kr">Korean</string>
+    <string name="action_search">Rechercher</string>
+    <string name="cn">Chinois</string>
+    <string name="jp">Japonais</string>
+    <string name="pt">Portugais</string>
 </resources>

@@ -101,37 +101,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return news;
     }
 
-    public ArrayList<News> findAllNews(int limit) {
-        Log.d(TAG, "Find list news");
-
-        ArrayList<News> newsList = new ArrayList<>();
-
-        String query = "SELECT * FROM " + TABLE_NEWS + " ORDER BY " + COLUMN_DATE + " ASC LIMIT " + limit + ";";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        if(cursor.moveToFirst()){
-            Log.d(TAG, "Move to first");
-            while (cursor.moveToNext()) {
-                News news = new News();
-                news.setGuid(cursor.getString(1));
-                news.setTitle(cursor.getString(2));
-                news.setThumbnail(cursor.getString(3));
-                news.setPubDate(cursor.getString(4));
-                news.setContent(cursor.getString(5));
-                newsList.add(news);
-            }
-            cursor.close();
-        }
-        db.close();
-        return newsList;
-    }
-
     public ArrayList<News> findAllNews() {
         Log.d(TAG, "Find list news");
 
         ArrayList<News> newsList = new ArrayList<>();
 
-        String query = "SELECT * FROM " + TABLE_NEWS + " ORDER BY " + COLUMN_DATE + " ASC;";
+        String query = "SELECT * FROM " + TABLE_NEWS + " ORDER BY " + COLUMN_DATE + " DESC;";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         if(cursor.moveToFirst()){
@@ -167,6 +142,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
         }
         db.close();
         return result;
+    }
+
+    public void deleteAllNews() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_NEWS);
+        db.close();
     }
 
 }

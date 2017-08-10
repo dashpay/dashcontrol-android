@@ -2,6 +2,7 @@ package com.dash.dashapp.Fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -17,8 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import com.dash.dashapp.Adapters.MyNewsRecyclerViewAdapter;
 import com.dash.dashapp.Adapters.NewsView;
 import com.dash.dashapp.Interface.DatabaseUpdateListener;
 import com.dash.dashapp.Model.News;
@@ -26,24 +27,20 @@ import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.HandleXML;
 import com.dash.dashapp.Utils.LoadMoreView;
 import com.dash.dashapp.Utils.MyDBHandler;
+import com.dash.dashapp.Utils.SharedPreferencesManager;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     private static final String TAG = "NewsFragment";
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
-    private MyNewsRecyclerViewAdapter myNewsRecyclerViewAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
     private HandleXML obj;
-    private final String RSS_LINK = "https://www.dash.org/rss/dash_blog_rss.xml";
     private DatabaseUpdateListener dbListener;
     private WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<News> newsList;
-    private int numberRows = 10;
 
 
     /**
@@ -103,8 +100,12 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
             @Override
             public void onRefresh() {
-                obj = new HandleXML(RSS_LINK);
+                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()));
                 obj.fetchXML(dbListener);
+                // Show Alert
+                Toast.makeText(getContext(),
+                        "Language : " + SharedPreferencesManager.getLanguageRSS(getContext()), Toast.LENGTH_LONG)
+                        .show();
             }
         });
 
@@ -128,28 +129,36 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
             alert.show();
 
         } else if (isNetworkAvailable()) {
-
-            turnWheelOn();
-            loadRSS();
-            turnWheelOff();
+            handleRSS();
         }
     }
 
 
-    public void loadRSS() {
+    public void handleRSS() {
         Log.d(TAG, "Load RSS");
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         newsList = dbHandler.findAllNews();
 
-        /*myNewsRecyclerViewAdapter = new MyNewsRecyclerViewAdapter(newsList);
-        mInfinitePlaceHolderView.setAdapter(myNewsRecyclerViewAdapter);
-        mInfinitePlaceHolderView.addOnScrollListener(mBottomListener);*/
+        if (newsList.size() == 0) {
+            updateRSS();
+        } else {
+            loadRSS();
+        }
+    }
 
-        for(int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++){
+    public void loadRSS() {
+        turnWheelOn();
+        for (int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++) {
             mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
         }
         mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
+        turnWheelOff();
+    }
+
+    public void updateRSS() {
+        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()));
+        obj.fetchXML(dbListener);
     }
 
     public boolean isNetworkAvailable() {
@@ -173,13 +182,13 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     @Override
     public void onUpdateCompleted() {
         Log.d(TAG, "Update completed");
-        mInfinitePlaceHolderView.refresh();
+        mInfinitePlaceHolderView.removeAllViews();
+        // TODO DID NOT INSERT IN DATABASE AT THAT POINT FOR SOME REASONS (WHEN IT SHOULD HAVE)
         loadRSS();
         turnWheelOff();
     }
 
     private void turnWheelOn() {
-        numberRows = 10;
         Log.d(TAG, "Turn wheel on");
         if (!mSwipeRefreshLayout.isRefreshing()) {
             mProgressWheel.setVisibility(View.VISIBLE);
