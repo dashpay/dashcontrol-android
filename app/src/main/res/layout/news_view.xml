@@ -9,6 +9,7 @@
     android:layout_margin="8dp">
 
     <RelativeLayout
+        android:id="@+id/news_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

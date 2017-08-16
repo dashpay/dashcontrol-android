@@ -1,14 +1,10 @@
 package com.dash.dashapp.Activities;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.dash.dashapp.Fragments.NewsFragment;
@@ -23,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements
         PriceFragment.OnFragmentInteractionListener,
         ProposalsFragment.OnListFragmentInteractionListener{
 
+    private static final String TAG = "MainActivity";
     NewsFragment newsFragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -71,14 +68,14 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.top_menu, menu);
         return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -88,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 return true;
 
-            case R.id.action_favorite:
+            case R.id.action_search:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 return true;
@@ -99,5 +96,5 @@ public class MainActivity extends AppCompatActivity implements
                 return super.onOptionsItemSelected(item);
 
         }
-    }
+    }*/
 }

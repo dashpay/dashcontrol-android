@@ -21,7 +21,7 @@ import java.util.Date;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 14;
+    public static final int DATABASE_VERSION = 15;
     private static final String DATABASE_NAME = "dashDB.db";
     public static final String TABLE_NEWS = "news";
     public static final String COLUMN_ID = "_id";
@@ -72,7 +72,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             ex.getMessage();
         }
 
-        SimpleDateFormat sqlFormat =  new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String dateSQL = sqlFormat.format(dateRSS);
 
         values.put(COLUMN_DATE, dateSQL);
@@ -109,19 +109,18 @@ public class MyDBHandler extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NEWS + " ORDER BY " + COLUMN_DATE + " DESC;";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        if(cursor.moveToFirst()){
-            Log.d(TAG, "Move to first");
-            while (cursor.moveToNext()) {
-                News news = new News();
-                news.setGuid(cursor.getString(1));
-                news.setTitle(cursor.getString(2));
-                news.setThumbnail(cursor.getString(3));
-                news.setPubDate(cursor.getString(4));
-                news.setContent(cursor.getString(5));
-                newsList.add(news);
-            }
-            cursor.close();
+        Log.d(TAG, "Move to first");
+        while (cursor.moveToNext()) {
+            News news = new News();
+            news.setGuid(cursor.getString(1));
+            news.setTitle(cursor.getString(2));
+            news.setThumbnail(cursor.getString(3));
+            news.setPubDate(cursor.getString(4));
+            news.setContent(cursor.getString(5));
+            newsList.add(news);
         }
+        cursor.close();
+
         db.close();
         return newsList;
     }
@@ -136,7 +135,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             news.setGuid(cursor.getString(1));
             db.delete(TABLE_NEWS, COLUMN_RSS_GUID + " = ?",
-            new String[]{String.valueOf(news.getGuid())});
+                    new String[]{String.valueOf(news.getGuid())});
             cursor.close();
             result = true;
         }
@@ -146,7 +145,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     public void deleteAllNews() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ TABLE_NEWS);
+        db.execSQL("delete from " + TABLE_NEWS);
         db.close();
     }
 

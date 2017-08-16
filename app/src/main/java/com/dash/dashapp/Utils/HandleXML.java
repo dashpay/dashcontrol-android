@@ -29,7 +29,8 @@ public class HandleXML {
     public volatile boolean parsingComplete = true;
     public Context context = null;
 
-    public HandleXML(String url) {
+    public HandleXML(String url, Context context) {
+        this.context = context;
         this.urlString = url;
     }
 
@@ -72,35 +73,28 @@ public class HandleXML {
                             switch (name) {
                                 case "item":
                                     if (!selectNews(news.getGuid())) {
-                                        Log.d(TAG, "adding news " + news.getTitle());
                                         addNews(news);
                                     }
                                     break;
                                 case "guid":
                                     news.setGuid(text);
-                                    Log.d(TAG, "GUID " + text);
                                     break;
                                 case "title":
                                     news.setTitle(text);
-                                    Log.d(TAG, "title " + text);
                                     break;
                                 case "pubDate":
                                     news.setPubDate(text);
-                                    Log.d(TAG, "pubDate " + text);
                                     break;
-                                case "content":
+                                case "content:encoded":
                                     news.setContent(text);
-                                    Log.d(TAG, "content " + text);
                                     break;
                             }
-
                         }
                         break;
                 }
 
                 event = myParser.next();
             }
-
             parsingComplete = false;
         } catch (Exception e) {
             e.printStackTrace();

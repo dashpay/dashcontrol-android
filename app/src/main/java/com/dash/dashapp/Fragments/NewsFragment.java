@@ -2,24 +2,32 @@ package com.dash.dashapp.Fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.dash.dashapp.Activities.MainActivity;
+import com.dash.dashapp.Activities.SettingsActivity;
 import com.dash.dashapp.Adapters.NewsView;
 import com.dash.dashapp.Interface.DatabaseUpdateListener;
 import com.dash.dashapp.Model.News;
@@ -61,7 +69,6 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreate");
         dbListener = this;
         super.onCreate(savedInstanceState);
     }
@@ -69,7 +76,6 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreateView");
 
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
         Context context = view.getContext();
@@ -87,6 +93,9 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.canChildScrollUp();
+
+        setHasOptionsMenu(true);
+
         return view;
     }
 
@@ -94,18 +103,13 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "OnActivityCreate");
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
             @Override
             public void onRefresh() {
-                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()));
+                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()), getContext());
                 obj.fetchXML(dbListener);
-                // Show Alert
-                Toast.makeText(getContext(),
-                        "Language : " + SharedPreferencesManager.getLanguageRSS(getContext()), Toast.LENGTH_LONG)
-                        .show();
             }
         });
 
@@ -135,7 +139,6 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
 
     public void handleRSS() {
-        Log.d(TAG, "Load RSS");
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         newsList = dbHandler.findAllNews();
@@ -150,14 +153,18 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     public void loadRSS() {
         turnWheelOn();
         for (int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++) {
-            mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
+            try{
+                mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
+            }catch (Exception e){
+                e.getMessage();
+            }
         }
         mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
         turnWheelOff();
     }
 
     public void updateRSS() {
-        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()));
+        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()), getContext());
         obj.fetchXML(dbListener);
     }
 
@@ -175,21 +182,20 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
     @Override
     public void onUpdateStarted() {
-        Log.d(TAG, "Update completed");
         turnWheelOn();
     }
 
     @Override
     public void onUpdateCompleted() {
-        Log.d(TAG, "Update completed");
         mInfinitePlaceHolderView.removeAllViews();
-        // TODO DID NOT INSERT IN DATABASE AT THAT POINT FOR SOME REASONS (WHEN IT SHOULD HAVE)
+
+        MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+        newsList = dbHandler.findAllNews();
         loadRSS();
         turnWheelOff();
     }
 
     private void turnWheelOn() {
-        Log.d(TAG, "Turn wheel on");
         if (!mSwipeRefreshLayout.isRefreshing()) {
             mProgressWheel.setVisibility(View.VISIBLE);
         }
@@ -197,13 +203,10 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     }
 
     private void turnWheelOff() {
-        Log.d(TAG, "Turn wheel off");
         if (mSwipeRefreshLayout.isRefreshing()) {
             mProgressWheel.setVisibility(View.GONE);
         }
         mSwipeRefreshLayout.setRefreshing(false);
-
-        Log.d(TAG, "Turn wheel off : mSwipeRefreshLayout.isRefreshing() " + mSwipeRefreshLayout.isRefreshing());
     }
 
     public class WrapContentLinearLayoutManager extends LinearLayoutManager {
@@ -219,6 +222,50 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
             } catch (IndexOutOfBoundsException e) {
                 Log.e("probe", "meet a IOOBE in RecyclerView");
             }
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.top_menu, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView sv = new SearchView(((MainActivity) getActivity()).getSupportActionBar().getThemedContext());
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setActionView(item, sv);
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Text submit");
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "Text change");
+                return false;
+            }
+        });
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+
+                return true;
+
+            case R.id.action_search:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
