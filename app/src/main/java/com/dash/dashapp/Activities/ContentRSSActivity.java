@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 import com.dash.dashapp.R;
@@ -22,6 +23,7 @@ public class ContentRSSActivity extends AppCompatActivity {
         String contentString = intent.getStringExtra(CONTENT_RSS);
 
         rss_content_view = (TextView) findViewById(R.id.content_view);
+        rss_content_view.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             rss_content_view.setText(Html.fromHtml(contentString,Html.FROM_HTML_MODE_LEGACY));
