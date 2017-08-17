@@ -159,7 +159,10 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
                 e.getMessage();
             }
         }
-        mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
+
+        if (newsList.size() > 10){
+            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
+        }
         turnWheelOff();
     }
 
