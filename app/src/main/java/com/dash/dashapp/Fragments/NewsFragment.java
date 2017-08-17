@@ -38,7 +38,7 @@ import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
 
-public class NewsFragment extends Fragment implements DatabaseUpdateListener {
+public class NewsFragment extends BaseFragment implements DatabaseUpdateListener {
     private static final String TAG = "NewsFragment";
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -106,7 +106,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
             @Override
             public void onRefresh() {
-                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()), getContext());
+                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
                 obj.fetchXML(dbListener);
             }
         });
@@ -138,7 +138,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
 
     public void handleRSS() {
 
-        MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         newsList = dbHandler.findAllNews(null);
 
         if (newsList.size() == 0) {
@@ -165,7 +165,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     }
 
     public void updateRSS() {
-        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getContext()), getContext());
+        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getActivity().getApplicationContext()), getContext());
         obj.fetchXML(dbListener);
     }
 
@@ -190,7 +190,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     public void onUpdateCompleted() {
         mInfinitePlaceHolderView.removeAllViews();
 
-        MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         newsList = dbHandler.findAllNews(null);
         loadRSS();
         turnWheelOff();
@@ -239,7 +239,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
                 Log.d(TAG, "Text submit");
                 mInfinitePlaceHolderView.removeAllViews();
 
-                MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+                MyDBHandler dbHandler = new MyDBHandler(mContext, null);
                 newsList = dbHandler.findAllNews(query);
                 loadRSS();
                 return false;
