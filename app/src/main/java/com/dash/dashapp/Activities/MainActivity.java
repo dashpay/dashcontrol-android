@@ -13,6 +13,10 @@ import com.dash.dashapp.Fragments.PriceFragment;
 import com.dash.dashapp.Fragments.ProposalsFragment;
 import com.dash.dashapp.Fragments.dummy.DummyContent;
 import com.dash.dashapp.R;
+import com.dash.dashapp.Utils.SharedPreferencesManager;
+
+import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements
         PortfolioFragment.OnFragmentInteractionListener,
@@ -50,12 +54,35 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        pickDefaultLanguage();
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         newsFragment = NewsFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
 
+
+    }
+
+    private void pickDefaultLanguage() {
+
+        // if default language is null
+        if (SharedPreferencesManager.getLanguageRSS(this).equals(SettingsActivity.RSS_LINK_DEF)){
+            // if Device's exist in available dash RSS languages
+
+            for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet())
+            {
+                if (Locale.getDefault().getLanguage().equals(entry.getKey())){
+                    // Make default language device's language
+                    SharedPreferencesManager.setLanguageRSS(this, entry.getValue());
+                    return;
+                }
+            }
+            // else english
+            SharedPreferencesManager.setLanguageRSS(this, SettingsActivity.RSS_LINK_EN);
+        }
     }
 
     @Override
