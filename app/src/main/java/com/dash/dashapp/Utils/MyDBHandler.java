@@ -64,7 +64,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_TITLE, news.getTitle());
         values.put(COLUMN_THUMBNAIL, news.getThumbnail());
 
-        SimpleDateFormat rssFormat = new SimpleDateFormat("EEE, ww MMM yyyy hh:mm:ss");
+        SimpleDateFormat rssFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss");
         Date dateRSS = new Date();
         try {
             dateRSS = rssFormat.parse(news.getPubDate());
@@ -120,6 +120,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             news.setTitle(cursor.getString(2));
             news.setThumbnail(cursor.getString(3));
             news.setPubDate(cursor.getString(4));
+            Log.d(TAG, "DATE : " + cursor.getString(4));
             news.setContent(cursor.getString(5));
             newsList.add(news);
         }
