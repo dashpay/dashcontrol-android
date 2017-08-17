@@ -101,15 +101,19 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return news;
     }
 
-    public ArrayList<News> findAllNews() {
+    public ArrayList<News> findAllNews(String filter) {
         Log.d(TAG, "Find list news");
 
         ArrayList<News> newsList = new ArrayList<>();
 
-        String query = "SELECT * FROM " + TABLE_NEWS + " ORDER BY " + COLUMN_DATE + " DESC;";
+        String query = "SELECT * FROM " + TABLE_NEWS;
+        if (filter != null){
+            query += " WHERE " + COLUMN_TITLE + " LIKE '%" + filter + "%'";
+        }
+        query += " ORDER BY " + COLUMN_DATE + " DESC;";
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        Log.d(TAG, "Move to first");
         while (cursor.moveToNext()) {
             News news = new News();
             news.setGuid(cursor.getString(1));

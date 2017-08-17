@@ -141,7 +141,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
     public void handleRSS() {
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
-        newsList = dbHandler.findAllNews();
+        newsList = dbHandler.findAllNews(null);
 
         if (newsList.size() == 0) {
             updateRSS();
@@ -190,7 +190,7 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
         mInfinitePlaceHolderView.removeAllViews();
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
-        newsList = dbHandler.findAllNews();
+        newsList = dbHandler.findAllNews(null);
         loadRSS();
         turnWheelOff();
     }
@@ -236,6 +236,11 @@ public class NewsFragment extends Fragment implements DatabaseUpdateListener {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "Text submit");
+                mInfinitePlaceHolderView.removeAllViews();
+
+                MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+                newsList = dbHandler.findAllNews(query);
+                loadRSS();
                 return false;
             }
 
