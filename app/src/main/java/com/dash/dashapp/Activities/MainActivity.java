@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity implements
         ProposalsFragment.OnListFragmentInteractionListener{
 
     private static final String TAG = "MainActivity";
-    NewsFragment newsFragment;
+    private NewsFragment newsFragment;
+    private ProposalsFragment proposalFragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements
                     getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
                     return true;
                 case R.id.navigation_proposals:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content, ProposalsFragment.newInstance()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content, proposalFragment).commit();
                     return true;
                 case R.id.navigation_prices:
                     getSupportFragmentManager().beginTransaction().replace(R.id.content, PriceFragment.newInstance()).commit();

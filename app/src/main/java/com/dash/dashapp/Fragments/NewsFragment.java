@@ -80,7 +80,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         Context context = view.getContext();
 
         mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
-        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.list);
+        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.news_list);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
 
         mLayoutManager = new WrapContentLinearLayoutManager(context);

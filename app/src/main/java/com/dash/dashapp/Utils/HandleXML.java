@@ -48,7 +48,7 @@ public class HandleXML {
         return description;
     }
 
-    public void parseXMLAndStoreIt(XmlPullParser myParser) {
+    public void parseRSSXMLAndStoreIt(XmlPullParser myParser) {
         int event;
         News news = null;
         String text = null;
@@ -170,7 +170,7 @@ public class HandleXML {
                 myparser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                 myparser.setInput(stream, null);
 
-                parseXMLAndStoreIt(myparser);
+                parseRSSXMLAndStoreIt(myparser);
                 stream.close();
             } catch (Exception e) {
                 e.getMessage();
