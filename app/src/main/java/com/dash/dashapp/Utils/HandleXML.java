@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class HandleXML {
 
     private static final String TAG = "HandleXML";
+    private static final int NUMBER_FIRST_BATCH = 15;
     private String title = "title";
     private String link = "link";
     private String description = "description";
@@ -75,14 +76,15 @@ public class HandleXML {
                         if (news != null) {
                             switch (name) {
                                 case "item":
+                                    // If that news doesn't exist
                                     if (!selectNews(news.getGuid())) {
                                         // Add it to the database
                                         addNews(news);
-                                        // Add it to the first batch of 10
-                                        newsList.add(news);
                                     }
+                                    // Add it to the first batch no matter what
+                                    newsList.add(news);
                                     articleNumber++;
-                                    if (articleNumber == 10){
+                                    if (articleNumber == NUMBER_FIRST_BATCH){
                                         dbListener.onFirstBatchNewsCompleted(newsList);
                                     }
                                     break;

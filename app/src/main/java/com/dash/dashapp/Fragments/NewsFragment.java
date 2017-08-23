@@ -39,6 +39,7 @@ import java.util.ArrayList;
 
 public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private static final String TAG = "NewsFragment";
+    private static final int NUMBER_FIRST_BATCH = 15;
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
@@ -46,6 +47,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private RSSUpdateListener dbListener;
     private WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<News> newsList;
+    private boolean updatePerforming = false;
 
 
     /**
@@ -105,8 +107,10 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
             @Override
             public void onRefresh() {
-                obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
-                obj.fetchXML(dbListener);
+                if (!updatePerforming){
+                    obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
+                    obj.fetchXML(dbListener);
+                }
             }
         });
 
@@ -157,7 +161,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             }
         }
 
-        if (newsList.size() > 10){
+        if (newsList.size() > NUMBER_FIRST_BATCH){
             mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
         }
         turnWheelOff();
@@ -180,45 +184,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         super.onDetach();
     }
 
-    @Override
-    public void onUpdateStarted() {
-        turnWheelOn();
-    }
-
-    @Override
-    public void onFirstBatchNewsCompleted(ArrayList<News> newsList) {
-        this.newsList = newsList;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mInfinitePlaceHolderView.removeAllViews();
-                loadRSS();
-                turnWheelOff();
-            }
-        });
-    }
-
-    @Override
-    public void onDatabaseUpdateCompleted() {
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        newsList = dbHandler.findAllNews(null);
-        loadRSS();
-        turnWheelOff();
-    }
-
-    private void turnWheelOn() {
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.VISIBLE);
-        }
-        mSwipeRefreshLayout.setRefreshing(true);
-    }
-
-    private void turnWheelOff() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.GONE);
-        }
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
 
     public class WrapContentLinearLayoutManager extends LinearLayoutManager {
         public WrapContentLinearLayoutManager(Context context) {
@@ -283,6 +248,56 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    public void onUpdateStarted() {
+        updatePerforming = true;
+        turnWheelOn();
+    }
+
+    @Override
+    public void onFirstBatchNewsCompleted(ArrayList<News> newsList) {
+        Log.d(TAG, "First batch completed");
+        this.newsList = newsList;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mInfinitePlaceHolderView.removeAllViews();
+                loadRSS();
+                turnWheelOff();
+            }
+        });
+    }
+
+    @Override
+    public void onDatabaseUpdateCompleted() {
+        Log.d(TAG, "Database completed");
+        updatePerforming = false;
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
+        ArrayList<News> newsListDb = dbHandler.findAllNews(null);
+        // We remove from the list the item already fed in the first batch
+        for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
+            newsListDb.remove(0);
+        }
+        newsList.addAll(newsListDb);
+
+        loadRSS();
+        turnWheelOff();
+    }
+
+    private void turnWheelOn() {
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mProgressWheel.setVisibility(View.VISIBLE);
+        }
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    private void turnWheelOff() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mProgressWheel.setVisibility(View.GONE);
+        }
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 }

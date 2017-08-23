@@ -20,7 +20,7 @@ import java.util.List;
 @Layout(R.layout.load_more_view)
 public class LoadMoreView {
 
-    public static final int LOAD_VIEW_SET_COUNT = 10;
+    public static final int LOAD_VIEW_SET_COUNT = 15;
 
     private InfinitePlaceHolderView mLoadMoreView;
     private List<News> mNewsList;

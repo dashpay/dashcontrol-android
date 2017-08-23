@@ -118,7 +118,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
             news.setTitle(cursor.getString(2));
             news.setThumbnail(cursor.getString(3));
             news.setPubDate(cursor.getString(4));
-            Log.d(TAG, "DATE : " + cursor.getString(4));
             news.setContent(cursor.getString(5));
             newsList.add(news);
         }
