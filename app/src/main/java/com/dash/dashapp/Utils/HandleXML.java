@@ -2,9 +2,8 @@ package com.dash.dashapp.Utils;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.dash.dashapp.Interface.DatabaseUpdateListener;
+import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -13,6 +12,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by sebas on 8/5/2017.
@@ -28,6 +28,7 @@ public class HandleXML {
     private XmlPullParserFactory xmlFactoryObject;
     public volatile boolean parsingComplete = true;
     public Context context = null;
+    private RSSUpdateListener dbListener;
 
     public HandleXML(String url, Context context) {
         this.context = context;
@@ -50,6 +51,8 @@ public class HandleXML {
         int event;
         News news = null;
         String text = null;
+        int articleNumber = 0;
+        ArrayList<News> newsList = new ArrayList<>();
 
         try {
             event = myParser.getEventType();
@@ -73,7 +76,14 @@ public class HandleXML {
                             switch (name) {
                                 case "item":
                                     if (!selectNews(news.getGuid())) {
+                                        // Add it to the database
                                         addNews(news);
+                                        // Add it to the first batch of 10
+                                        newsList.add(news);
+                                    }
+                                    articleNumber++;
+                                    if (articleNumber == 10){
+                                        dbListener.onFirstBatchNewsCompleted(newsList);
                                     }
                                     break;
                                 case "guid":
@@ -116,15 +126,16 @@ public class HandleXML {
         return isInDb;
     }
 
-    public void fetchXML(DatabaseUpdateListener dbListener) {
+    public void fetchXML(RSSUpdateListener dbListener) {
+        this.dbListener = dbListener;
         UpdateDB updateDB = new UpdateDB(dbListener);
         updateDB.execute();
     }
 
     public class UpdateDB extends AsyncTask<Void, Void, Void> { //change Object to required type
-        private DatabaseUpdateListener dbListener;
+        private RSSUpdateListener dbListener;
 
-        public UpdateDB(DatabaseUpdateListener dbListener) {
+        public UpdateDB(RSSUpdateListener dbListener) {
             this.dbListener = dbListener;
         }
 
@@ -160,13 +171,14 @@ public class HandleXML {
                 parseXMLAndStoreIt(myparser);
                 stream.close();
             } catch (Exception e) {
+                e.getMessage();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            dbListener.onUpdateCompleted();
+            dbListener.onDatabaseUpdateCompleted();
             super.onPostExecute(aVoid);
         }
     }

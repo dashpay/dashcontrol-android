@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -27,7 +26,7 @@ import android.widget.ProgressBar;
 import com.dash.dashapp.Activities.MainActivity;
 import com.dash.dashapp.Activities.SettingsActivity;
 import com.dash.dashapp.Adapters.NewsView;
-import com.dash.dashapp.Interface.DatabaseUpdateListener;
+import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.HandleXML;
@@ -38,13 +37,13 @@ import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
 
-public class NewsFragment extends BaseFragment implements DatabaseUpdateListener {
+public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private static final String TAG = "NewsFragment";
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
     private HandleXML obj;
-    private DatabaseUpdateListener dbListener;
+    private RSSUpdateListener dbListener;
     private WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<News> newsList;
 
@@ -187,9 +186,20 @@ public class NewsFragment extends BaseFragment implements DatabaseUpdateListener
     }
 
     @Override
-    public void onUpdateCompleted() {
-        mInfinitePlaceHolderView.removeAllViews();
+    public void onFirstBatchNewsCompleted(ArrayList<News> newsList) {
+        this.newsList = newsList;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mInfinitePlaceHolderView.removeAllViews();
+                loadRSS();
+                turnWheelOff();
+            }
+        });
+    }
 
+    @Override
+    public void onDatabaseUpdateCompleted() {
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         newsList = dbHandler.findAllNews(null);
         loadRSS();
