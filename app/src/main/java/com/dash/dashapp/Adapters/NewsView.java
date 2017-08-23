@@ -13,6 +13,10 @@ import com.mindorks.placeholderview.annotations.Layout;
 import com.mindorks.placeholderview.annotations.Resolve;
 import com.mindorks.placeholderview.annotations.View;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by sebas on 8/8/2017.
  */
@@ -38,7 +42,19 @@ public class NewsView {
     @Resolve
     private void onResolved() {
         titleTxt.setText(mNews.getTitle());
-        dateTxt.setText(mNews.getPubDate());
+
+        SimpleDateFormat rssFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date dateRSS = new Date();
+        try {
+            dateRSS = rssFormat.parse(mNews.getPubDate());
+        } catch (ParseException ex) {
+            ex.getMessage();
+        }
+
+        SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSQL = sqlFormat.format(dateRSS);
+
+        dateTxt.setText(dateSQL);
         //Glide.with(mContext).load(mInfo.getImageUrl()).into(imageView);
     }
 

@@ -276,24 +276,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             loadRSS();
             turnWheelOff();
         }
-
-        /*ArrayList<News> newsListDb = dbHandler.findAllNews(null);
-
-        if (newsListDb.size() > NUMBER_FIRST_BATCH){
-            // We remove from the list the item already fed in the first batch
-            for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
-                News removedNews = newsListDb.remove(0);
-                Log.d(TAG, "Removed : " + removedNews.getTitle());
-            }
-
-            for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
-                News news = newsListDb.get(i);
-                Log.d(TAG, "Firsts News : " + news.getTitle());
-            }
-
-            newsList.addAll(newsListDb);
-            //loadRSS();
-        }*/
     }
 
     private void turnWheelOn() {
@@ -310,4 +292,14 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
+    @Override
+    public void onStop() {
+        turnWheelOff();
+        if (mSwipeRefreshLayout!=null) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            mSwipeRefreshLayout.destroyDrawingCache();
+            mSwipeRefreshLayout.clearAnimation();
+        }
+        super.onStop();
+    }
 }

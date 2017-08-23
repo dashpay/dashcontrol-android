@@ -29,14 +29,6 @@ public class HTTPDataHandler {
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             if(urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
                 in = new BufferedInputStream(urlConnection.getInputStream());
-
-                /*BufferedReader r = new BufferedReader(new InputStreamReader(in));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = r.readLine()) != null){
-                    sb.append(line);
-                }
-                stream = sb.toString();*/
                 urlConnection.disconnect();
             }
         } catch (IOException e) {
