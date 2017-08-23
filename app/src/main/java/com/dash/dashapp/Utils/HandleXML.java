@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class HandleXML {
 
     private static final String TAG = "HandleXML";
-    private static final int NUMBER_FIRST_BATCH = 15;
+    private static final int NUMBER_FIRST_BATCH = 20;
     private String title = "title";
     private String link = "link";
     private String description = "description";

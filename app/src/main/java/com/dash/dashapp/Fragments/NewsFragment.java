@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private static final String TAG = "NewsFragment";
-    private static final int NUMBER_FIRST_BATCH = 15;
+    private static final int NUMBER_FIRST_BATCH = 10;
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
@@ -156,6 +156,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         for (int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++) {
             try{
                 mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
+                Log.d(TAG, "Add view index + " + i);
             }catch (Exception e){
                 e.getMessage();
             }
@@ -234,12 +235,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
                 // User chose the "Settings" item, show the app settings UI...
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
-
-                return true;
-
-            case R.id.action_search:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 return true;
 
             default:
@@ -275,15 +270,30 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         Log.d(TAG, "Database completed");
         updatePerforming = false;
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        ArrayList<News> newsListDb = dbHandler.findAllNews(null);
-        // We remove from the list the item already fed in the first batch
-        for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
-            newsListDb.remove(0);
-        }
-        newsList.addAll(newsListDb);
+        newsList = dbHandler.findAllNews(null);
 
-        loadRSS();
-        turnWheelOff();
+        if (mInfinitePlaceHolderView.getChildCount() == 0){
+            loadRSS();
+            turnWheelOff();
+        }
+
+        /*ArrayList<News> newsListDb = dbHandler.findAllNews(null);
+
+        if (newsListDb.size() > NUMBER_FIRST_BATCH){
+            // We remove from the list the item already fed in the first batch
+            for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
+                News removedNews = newsListDb.remove(0);
+                Log.d(TAG, "Removed : " + removedNews.getTitle());
+            }
+
+            for (int i = 0; i < NUMBER_FIRST_BATCH; i++){
+                News news = newsListDb.get(i);
+                Log.d(TAG, "Firsts News : " + news.getTitle());
+            }
+
+            newsList.addAll(newsListDb);
+            //loadRSS();
+        }*/
     }
 
     private void turnWheelOn() {

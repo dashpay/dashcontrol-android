@@ -20,7 +20,8 @@ import java.util.List;
 @Layout(R.layout.load_more_view)
 public class LoadMoreView {
 
-    public static final int LOAD_VIEW_SET_COUNT = 15;
+    public static final int LOAD_VIEW_SET_COUNT = 10;
+    private static final String TAG = "LoadMoreView";
 
     private InfinitePlaceHolderView mLoadMoreView;
     private List<News> mNewsList;
@@ -31,12 +32,12 @@ public class LoadMoreView {
     }
 
     @LoadMore
-    private void onLoadMore(){
+    private void onLoadMore() {
         Log.d("DEBUG", "onLoadMore");
         new ForcedWaitedLoading();
     }
 
-    class ForcedWaitedLoading implements Runnable{
+    class ForcedWaitedLoading implements Runnable {
 
         public ForcedWaitedLoading() {
             new Thread(this).start();
@@ -47,7 +48,7 @@ public class LoadMoreView {
 
             try {
                 Thread.currentThread().sleep(2000);
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -58,9 +59,15 @@ public class LoadMoreView {
                     for (int i = count - 1;
                          i < (count - 1 + LoadMoreView.LOAD_VIEW_SET_COUNT) && mNewsList.size() > i;
                          i++) {
-                        mLoadMoreView.addView(new NewsView(mLoadMoreView.getContext(), mNewsList.get(i)));
 
-                        if(i == mNewsList.size() - 1){
+                        /*if (mNewsList.get(i).getGuid().equals(mNewsList.get(i-1).getGuid())){
+                            i++;
+                        }*/
+                        mLoadMoreView.addView(new NewsView(mLoadMoreView.getContext(), mNewsList.get(i + 1)));
+
+                        Log.d(TAG, "Starting with index : " + i);
+
+                        if (i == mNewsList.size() - 1) {
                             mLoadMoreView.noMoreToLoad();
                             break;
                         }
