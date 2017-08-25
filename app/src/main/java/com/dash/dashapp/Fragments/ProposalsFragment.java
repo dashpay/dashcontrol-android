@@ -25,13 +25,12 @@ import android.widget.ProgressBar;
 
 import com.dash.dashapp.Activities.MainActivity;
 import com.dash.dashapp.Activities.SettingsActivity;
-import com.dash.dashapp.Adapters.ProposalsView;
+import com.dash.dashapp.Adapters.ProposalView;
 import com.dash.dashapp.Interface.ProposalUpdateListener;
 import com.dash.dashapp.Model.Proposal;
-import com.dash.dashapp.Model.Proposals;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.HandleXML;
-import com.dash.dashapp.Utils.LoadMoreView;
+import com.dash.dashapp.Utils.LoadMoreProposals;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
@@ -49,6 +48,8 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     private ProposalsFragment.WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<Proposal> ProposalsList;
     private boolean updatePerforming = false;
+    public final static String URL_PROPOSAL = "https://www.dashcentral.org/api/v1/budget";
+
 
 
     /**
@@ -77,11 +78,11 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_Proposals_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_proposals_list, container, false);
         Context context = view.getContext();
 
         mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
-        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.Proposals_list);
+        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.proposals_list);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
 
         mLayoutManager = new ProposalsFragment.WrapContentLinearLayoutManager(context);
@@ -109,8 +110,8 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             @Override
             public void onRefresh() {
                 if (!updatePerforming){
-                    obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
-                    obj.fetchXML(dbListener);
+                    obj = new HandleXML(URL_PROPOSAL, mContext);
+                    obj.fetchProposalXML(dbListener);
                 }
             }
         });
@@ -154,9 +155,9 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
 
     public void loadRSS() {
         turnWheelOn();
-        for (int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++) {
+        for (int i = 0; i < LoadMoreProposals.LOAD_VIEW_SET_COUNT; i++) {
             try{
-                mInfinitePlaceHolderView.addView(new ProposalsView(getContext(), ProposalsList.get(i)));
+                mInfinitePlaceHolderView.addView(new ProposalView(getContext(), ProposalsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
             }catch (Exception e){
                 e.getMessage();
@@ -164,14 +165,14 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         }
 
         if (ProposalsList.size() > NUMBER_FIRST_BATCH){
-            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, ProposalsList));
+            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreProposals(mInfinitePlaceHolderView, ProposalsList));
         }
         turnWheelOff();
     }
 
     public void updateRSS() {
         obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getActivity().getApplicationContext()), getContext());
-        obj.fetchXML(dbListener);
+        obj.fetchProposalXML(dbListener);
     }
 
     public boolean isNetworkAvailable() {

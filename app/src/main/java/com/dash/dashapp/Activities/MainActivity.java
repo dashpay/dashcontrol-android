@@ -11,7 +11,6 @@ import com.dash.dashapp.Fragments.NewsFragment;
 import com.dash.dashapp.Fragments.PortfolioFragment;
 import com.dash.dashapp.Fragments.PriceFragment;
 import com.dash.dashapp.Fragments.ProposalsFragment;
-import com.dash.dashapp.Fragments.dummy.DummyContent;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 
@@ -20,8 +19,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements
         PortfolioFragment.OnFragmentInteractionListener,
-        PriceFragment.OnFragmentInteractionListener,
-        ProposalsFragment.OnListFragmentInteractionListener{
+        PriceFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "MainActivity";
     private NewsFragment newsFragment;
@@ -88,11 +86,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
 
     }
 }

@@ -3,8 +3,10 @@ package com.dash.dashapp.Utils;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.dash.dashapp.Interface.ProposalUpdateListener;
 import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
+import com.dash.dashapp.Model.Proposal;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -29,7 +31,8 @@ public class HandleXML {
     private XmlPullParserFactory xmlFactoryObject;
     public volatile boolean parsingComplete = true;
     public Context context = null;
-    private RSSUpdateListener dbListener;
+    private RSSUpdateListener dbRSSListener;
+    private ProposalUpdateListener dbProposalListener;
 
     public HandleXML(String url, Context context) {
         this.context = context;
@@ -85,7 +88,7 @@ public class HandleXML {
                                     newsList.add(news);
                                     articleNumber++;
                                     if (articleNumber == NUMBER_FIRST_BATCH){
-                                        dbListener.onFirstBatchNewsCompleted(newsList);
+                                        dbRSSListener.onFirstBatchNewsCompleted(newsList);
                                     }
                                     break;
                                 case "guid":
@@ -128,16 +131,16 @@ public class HandleXML {
         return isInDb;
     }
 
-    public void fetchXML(RSSUpdateListener dbListener) {
-        this.dbListener = dbListener;
-        UpdateDB updateDB = new UpdateDB(dbListener);
+    public void fetchRSSXML(RSSUpdateListener dbListener) {
+        this.dbRSSListener = dbListener;
+        UpdateRSSDB updateDB = new UpdateRSSDB(dbListener);
         updateDB.execute();
     }
 
-    public class UpdateDB extends AsyncTask<Void, Void, Void> { //change Object to required type
+    public class UpdateRSSDB extends AsyncTask<Void, Void, Void> { //change Object to required type
         private RSSUpdateListener dbListener;
 
-        public UpdateDB(RSSUpdateListener dbListener) {
+        public UpdateRSSDB(RSSUpdateListener dbListener) {
             this.dbListener = dbListener;
         }
 
@@ -182,6 +185,131 @@ public class HandleXML {
         protected void onPostExecute(Void aVoid) {
             dbListener.onDatabaseUpdateCompleted();
             super.onPostExecute(aVoid);
+        }
+    }
+
+
+
+    public void fetchProposalXML(ProposalUpdateListener dbProposalListener) {
+        this.dbProposalListener = dbProposalListener;
+        UpdateProposalDB updateDB = new UpdateProposalDB(dbProposalListener);
+        updateDB.execute();
+    }
+
+    public class UpdateProposalDB extends AsyncTask<Void, Void, Void> { //change Object to required type
+        private ProposalUpdateListener dbProposalListener;
+
+        public UpdateProposalDB(ProposalUpdateListener dbProposalListener) {
+            this.dbProposalListener = dbProposalListener;
+        }
+
+        // required methods
+
+        @Override
+        protected void onPreExecute() {
+            dbProposalListener.onUpdateStarted();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+
+                // Starts the query
+                conn.connect();
+                InputStream stream = conn.getInputStream();
+
+                xmlFactoryObject = XmlPullParserFactory.newInstance();
+                XmlPullParser myparser = xmlFactoryObject.newPullParser();
+
+                myparser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                myparser.setInput(stream, null);
+
+                parseUpdateXMLAndStoreIt(myparser);
+                stream.close();
+            } catch (Exception e) {
+                e.getMessage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            dbProposalListener.onDatabaseUpdateCompleted();
+            super.onPostExecute(aVoid);
+        }
+    }
+
+
+    public void parseUpdateXMLAndStoreIt(XmlPullParser myParser) {
+        int event;
+        News news = null;
+        String text = null;
+        int articleNumber = 0;
+        ArrayList<News> newsList = new ArrayList<>();
+
+        try {
+            event = myParser.getEventType();
+
+            while (event != XmlPullParser.END_DOCUMENT) {
+                String name = myParser.getName();
+
+                switch (event) {
+                    case XmlPullParser.START_TAG:
+                        if ("item".equals(name)) {
+                            news = new News();
+                        }
+                        break;
+
+                    case XmlPullParser.TEXT:
+                        text = myParser.getText();
+                        break;
+
+                    case XmlPullParser.END_TAG:
+                        if (news != null) {
+                            switch (name) {
+                                case "item":
+                                    // If that news doesn't exist
+                                    if (!selectNews(news.getGuid())) {
+                                        // Add it to the database
+                                        addNews(news);
+                                    }
+                                    // Add it to the first batch no matter what
+                                    newsList.add(news);
+                                    articleNumber++;
+                                    if (articleNumber == NUMBER_FIRST_BATCH){
+                                        dbRSSListener.onFirstBatchNewsCompleted(newsList);
+                                    }
+                                    break;
+                                case "guid":
+                                    news.setGuid(text);
+                                    break;
+                                case "title":
+                                    news.setTitle(text);
+                                    break;
+                                case "pubDate":
+                                    news.setPubDate(text);
+                                    break;
+                                case "content:encoded":
+                                    news.setContent(text);
+                                    break;
+                            }
+                        }
+                        break;
+                }
+
+                event = myParser.next();
+            }
+            parsingComplete = false;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

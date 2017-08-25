@@ -30,7 +30,7 @@ import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.HandleXML;
-import com.dash.dashapp.Utils.LoadMoreView;
+import com.dash.dashapp.Utils.LoadMoreNews;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
@@ -109,7 +109,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             public void onRefresh() {
                 if (!updatePerforming){
                     obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
-                    obj.fetchXML(dbListener);
+                    obj.fetchRSSXML(dbListener);
                 }
             }
         });
@@ -153,7 +153,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
     public void loadRSS() {
         turnWheelOn();
-        for (int i = 0; i < LoadMoreView.LOAD_VIEW_SET_COUNT; i++) {
+        for (int i = 0; i < LoadMoreNews.LOAD_VIEW_SET_COUNT; i++) {
             try{
                 mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
@@ -163,14 +163,14 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         }
 
         if (newsList.size() > NUMBER_FIRST_BATCH){
-            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(mInfinitePlaceHolderView, newsList));
+            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreNews(mInfinitePlaceHolderView, newsList));
         }
         turnWheelOff();
     }
 
     public void updateRSS() {
         obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getActivity().getApplicationContext()), getContext());
-        obj.fetchXML(dbListener);
+        obj.fetchRSSXML(dbListener);
     }
 
     public boolean isNetworkAvailable() {

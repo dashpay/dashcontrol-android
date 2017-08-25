@@ -2,10 +2,12 @@ package com.dash.dashapp.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.dash.dashapp.Activities.ContentRSSActivity;
 import com.dash.dashapp.Model.News;
+import com.dash.dashapp.Model.Proposal;
 import com.dash.dashapp.R;
 import com.mindorks.placeholderview.annotations.Click;
 import com.mindorks.placeholderview.annotations.Layout;
@@ -20,41 +22,34 @@ import java.util.Date;
  * Created by sebas on 8/8/2017.
  */
 
-@Layout(R.layout.news_view)
-public class NewsView {
+@Layout(R.layout.proposal_view)
+public class ProposalView {
 
-    private static final String CONTENT_NEWS = "content_rss";
+    private static final String CONTENT_PROPOSAL = "proposal";
+
+    @View(R.id.approval_progress_bar)
+    private ProgressBar approvalRatePie;
+
+    @View(R.id.approval_rate_textview)
+    private ProgressBar approvalRateTextview;
+
     @View(R.id.title)
     private TextView titleTxt;
 
-    @View(R.id.date)
-    private TextView dateTxt;
-
-    private News mNews;
+    private Proposal mProposal;
     private Context mContext;
 
-    public NewsView(Context context, News news) {
+    public ProposalView(Context context, Proposal proposal) {
         mContext = context;
-        mNews = news;
+        mProposal = proposal;
     }
 
     @Resolve
     private void onResolved() {
-        titleTxt.setText(mNews.getTitle());
-
-        SimpleDateFormat rssFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date dateRSS = new Date();
-        try {
-            dateRSS = rssFormat.parse(mNews.getPubDate());
-        } catch (ParseException ex) {
-            ex.getMessage();
-        }
-
-        SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dateSQL = sqlFormat.format(dateRSS);
-
-        dateTxt.setText(dateSQL);
-        //Glide.with(mContext).load(mInfo.getImageUrl()).into(imageView);
+        titleTxt.setText(mProposal.getTitle());
+        int ratioYes = mProposal.getYes()/mProposal.getNo()*100;
+        approvalRatePie.setProgress(ratioYes);
+        titleTxt.setText(ratioYes);
     }
 
 
@@ -62,7 +57,7 @@ public class NewsView {
     @Click(R.id.news_row)
     private void onClick(){
         Intent intent = new Intent(mContext, ContentRSSActivity.class);
-        intent.putExtra(CONTENT_NEWS, mNews.getContent());
+        intent.putExtra(CONTENT_PROPOSAL, mProposal);
         mContext.startActivity(intent);
     }
 }

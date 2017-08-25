@@ -3,6 +3,7 @@ package com.dash.dashapp.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  */
 
 
-public class Proposal {
+public class Proposal implements Serializable {
 
     @SerializedName("hash")
     @Expose
@@ -38,7 +39,7 @@ public class Proposal {
 
     @SerializedName("date_added")
     @Expose
-    private Date date_added; // date, when the proposal was first seen on the network and has been added to the DashCentral database [datetime, UTC]
+    private String date_added; // date, when the proposal was first seen on the network and has been added to the DashCentral database [datetime, UTC]
 
     @SerializedName("date_added_human")
     @Expose
@@ -46,7 +47,7 @@ public class Proposal {
 
     @SerializedName("date_end")
     @Expose
-    private Date date_end; // date, when proposal payouts are expected to end [datetime, UTC]
+    private String date_end; // date, when proposal payouts are expected to end [datetime, UTC]
 
     @SerializedName("voting_deadline_human")
     @Expose
@@ -147,11 +148,11 @@ public class Proposal {
         this.title = title;
     }
 
-    public Date getDate_added() {
+    public String getDate_added() {
         return date_added;
     }
 
-    public void setDate_added(Date date_added) {
+    public void setDate_added(String date_added) {
         this.date_added = date_added;
     }
 
@@ -163,11 +164,11 @@ public class Proposal {
         this.date_added_human = date_added_human;
     }
 
-    public Date getDate_end() {
+    public String getDate_end() {
         return date_end;
     }
 
-    public void setDate_end(Date date_end) {
+    public void setDate_end(String date_end) {
         this.date_end = date_end;
     }
 
