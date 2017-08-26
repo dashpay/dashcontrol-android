@@ -7,10 +7,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.Utils.HandleXML;
+import com.dash.dashapp.Utils.XmlUtil;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 
@@ -43,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ListView listView;
 
-    private HandleXML obj;
+    private XmlUtil obj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

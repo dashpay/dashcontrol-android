@@ -29,10 +29,10 @@ import com.dash.dashapp.Adapters.ProposalView;
 import com.dash.dashapp.Interface.ProposalUpdateListener;
 import com.dash.dashapp.Model.Proposal;
 import com.dash.dashapp.R;
-import com.dash.dashapp.Utils.HandleXML;
+import com.dash.dashapp.Utils.JsonUtil;
 import com.dash.dashapp.Utils.LoadMoreProposals;
 import com.dash.dashapp.Utils.MyDBHandler;
-import com.dash.dashapp.Utils.SharedPreferencesManager;
+import com.dash.dashapp.Utils.XmlUtil;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
-    private HandleXML obj;
+    private JsonUtil obj;
     private ProposalUpdateListener dbListener;
     private ProposalsFragment.WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<Proposal> ProposalsList;
@@ -110,7 +110,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             @Override
             public void onRefresh() {
                 if (!updatePerforming){
-                    obj = new HandleXML(URL_PROPOSAL, mContext);
+                    obj = new JsonUtil(mContext);
                     obj.fetchProposalXML(dbListener);
                 }
             }
@@ -171,7 +171,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     }
 
     public void updateRSS() {
-        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getActivity().getApplicationContext()), getContext());
+        obj = new JsonUtil(getContext());
         obj.fetchProposalXML(dbListener);
     }
 

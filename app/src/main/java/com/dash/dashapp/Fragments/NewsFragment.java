@@ -29,7 +29,7 @@ import com.dash.dashapp.Adapters.NewsView;
 import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
 import com.dash.dashapp.R;
-import com.dash.dashapp.Utils.HandleXML;
+import com.dash.dashapp.Utils.XmlUtil;
 import com.dash.dashapp.Utils.LoadMoreNews;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
@@ -43,7 +43,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private InfinitePlaceHolderView mInfinitePlaceHolderView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressWheel;
-    private HandleXML obj;
+    private XmlUtil obj;
     private RSSUpdateListener dbListener;
     private WrapContentLinearLayoutManager mLayoutManager;
     private ArrayList<News> newsList;
@@ -108,7 +108,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             @Override
             public void onRefresh() {
                 if (!updatePerforming){
-                    obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(mContext), mContext);
+                    obj = new XmlUtil(mContext);
                     obj.fetchRSSXML(dbListener);
                 }
             }
@@ -169,7 +169,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     public void updateRSS() {
-        obj = new HandleXML(SharedPreferencesManager.getLanguageRSS(getActivity().getApplicationContext()), getContext());
+        obj = new XmlUtil(SharedPreferencesManager.getLanguageRSS(getContext());
         obj.fetchRSSXML(dbListener);
     }
 
