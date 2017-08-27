@@ -32,7 +32,6 @@ import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.JsonUtil;
 import com.dash.dashapp.Utils.LoadMoreProposals;
 import com.dash.dashapp.Utils.MyDBHandler;
-import com.dash.dashapp.Utils.XmlUtil;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     private JsonUtil obj;
     private ProposalUpdateListener dbListener;
     private ProposalsFragment.WrapContentLinearLayoutManager mLayoutManager;
-    private ArrayList<Proposal> ProposalsList;
+    private ArrayList<Proposal> proposalsList;
     private boolean updatePerforming = false;
     public final static String URL_PROPOSAL = "https://www.dashcentral.org/api/v1/budget";
 
@@ -144,9 +143,9 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     public void handleRSS() {
 
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        ProposalsList = dbHandler.findAllProposals(null);
+        proposalsList = dbHandler.findAllProposals(null);
 
-        if (ProposalsList.size() == 0) {
+        if (proposalsList.size() == 0) {
             updateRSS();
         } else {
             loadRSS();
@@ -157,15 +156,15 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         turnWheelOn();
         for (int i = 0; i < LoadMoreProposals.LOAD_VIEW_SET_COUNT; i++) {
             try{
-                mInfinitePlaceHolderView.addView(new ProposalView(getContext(), ProposalsList.get(i)));
+                mInfinitePlaceHolderView.addView(new ProposalView(getContext(), proposalsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
             }catch (Exception e){
                 e.getMessage();
             }
         }
 
-        if (ProposalsList.size() > NUMBER_FIRST_BATCH){
-            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreProposals(mInfinitePlaceHolderView, ProposalsList));
+        if (proposalsList.size() > NUMBER_FIRST_BATCH){
+            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreProposals(mInfinitePlaceHolderView, proposalsList));
         }
         turnWheelOff();
     }
@@ -200,6 +199,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
                 super.onLayoutChildren(recycler, state);
             } catch (IndexOutOfBoundsException e) {
                 Log.e("probe", "meet a IOOBE in RecyclerView");
+                e.getMessage();
             }
         }
     }
@@ -218,7 +218,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
                 mInfinitePlaceHolderView.removeAllViews();
 
                 MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-                ProposalsList = dbHandler.findAllProposals(query);
+                proposalsList = dbHandler.findAllProposals(query);
                 loadRSS();
                 return false;
             }
@@ -256,7 +256,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     @Override
     public void onFirstBatchProposalsCompleted(ArrayList<Proposal> ProposalsList) {
         Log.d(TAG, "First batch completed");
-        this.ProposalsList = ProposalsList;
+        this.proposalsList = ProposalsList;
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -273,7 +273,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         Log.d(TAG, "Database completed");
         updatePerforming = false;
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        ProposalsList = dbHandler.findAllProposals(null);
+        proposalsList = dbHandler.findAllProposals(null);
 
         if (mInfinitePlaceHolderView.getChildCount() == 0){
             loadRSS();

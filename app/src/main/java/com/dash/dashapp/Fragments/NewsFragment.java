@@ -169,7 +169,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     public void updateRSS() {
-        obj = new XmlUtil(SharedPreferencesManager.getLanguageRSS(getContext());
+        obj = new XmlUtil(getContext());
         obj.fetchRSSXML(dbListener);
     }
 
@@ -198,6 +198,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
                 super.onLayoutChildren(recycler, state);
             } catch (IndexOutOfBoundsException e) {
                 Log.e("probe", "meet a IOOBE in RecyclerView");
+                e.getMessage();
             }
         }
     }

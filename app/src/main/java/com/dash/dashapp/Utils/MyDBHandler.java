@@ -20,7 +20,7 @@ import java.util.Date;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 16;
+    public static final int DATABASE_VERSION = 17;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
 
@@ -53,7 +53,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_REMAINING_PAYMENT_COUNT = "remaining_payment_count"; //remaining payment cycles [integer]
     public static final String COLUMN_YES = "yes"; //yes votes on this proposal [integer]
     public static final String COLUMN_NO = "no"; //no votes on this proposal [integer]
-    public static final String COLUMN_ORDER = "order"; //the order value should be used to sort proposals in case the JSON order is not preserved correctly. The order is defined by a reddit like algo covering the time and the upvotes and downvotes on DashCentral [integer]
+    public static final String COLUMN_ORDER = "order_display"; //the order value should be used to sort proposals in case the JSON order is not preserved correctly. The order is defined by a reddit like algo covering the time and the upvotes and downvotes on DashCentral [integer]
     public static final String COLUMN_COMMENT_AMOUNT = "comment_amount"; //amount of proposal comments posted on DashCentral [integer]
     public static final String COLUMN_OWNER_USERNAME = "owner_username"; //username of the proposal owner on DashCentral [string]
 
@@ -89,7 +89,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         COLUMN_URL + " TEXT," +
                         COLUMN_DW_URL + " TEXT," +
                         COLUMN_DW_URL_COMMENTS + " DATE," +
-                        COLUMN_TITLE_PROP + " TEXT" +
+                        COLUMN_TITLE_PROP + " TEXT," +
                         COLUMN_DATE_ADDED + " DATE," +
                         COLUMN_DATE_ADDED_HUMAN + " TEXT," +
                         COLUMN_DATE_END + " DATE," +
@@ -107,7 +107,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         COLUMN_OWNER_USERNAME + " TEXT" +
                         ")";
         db.execSQL(CREATE_PROPOSAL_TABLE);
-
 
     }
 

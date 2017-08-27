@@ -65,7 +65,7 @@ public class LoadMoreProposals {
                         /*if (mNewsList.get(i).getGuid().equals(mNewsList.get(i-1).getGuid())){
                             i++;
                         }*/
-                        mLoadMoreView.addView(new ProposalView(mLoadMoreView.getContext(), mProposalList.get(i + 1)));
+                        mLoadMoreView.addView(new ProposalView(mLoadMoreView.getContext(), mProposalList.get(i)));
 
                         Log.d(TAG, "Starting with index : " + i);
 

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         newsFragment = NewsFragment.newInstance();
+        proposalFragment = ProposalsFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
 
 

@@ -57,10 +57,12 @@ public class JsonUtil {
         protected Void doInBackground(Void... params) {
             try {
 
+                MyDBHandler dbHandler = new MyDBHandler(context, null);
 
                 InputStream jsonContent = HttpUtil.httpRequest(URL_PROPOSAL_LIST);
 
                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(jsonContent, "UTF-8"));
+
                 StringBuilder responseStrBuilder = new StringBuilder();
 
                 String inputStr;
@@ -84,20 +86,21 @@ public class JsonUtil {
                     proposal.setVoting_deadline_human(array.getJSONObject(i).getString("voting_deadline_human"));
                     proposal.setWill_be_funded(array.getJSONObject(i).getBoolean("will_be_funded"));
                     proposal.setRemaining_yes_votes_until_funding(array.getJSONObject(i).getInt("remaining_yes_votes_until_funding"));
-                    proposal.setIn_next_budget(array.getJSONObject(i).getString("in_next_budget"));
-                    proposal.setMonthly_amount(array.getJSONObject(i).getString("monthly_amount"));
-                    proposal.setTotal_payment_count(array.getJSONObject(i).getString("total_payment_count"));
-                    proposal.setRemaining_payment_count(array.getJSONObject(i).getString("remaining_payment_count"));
-                    proposal.setYes(array.getJSONObject(i).getString("yes"));
-                    proposal.setNo(array.getJSONObject(i).getString("no"));
-                    proposal.setOrder(array.getJSONObject(i).getString("order"));
-                    proposal.setComment_amount(array.getJSONObject(i).getString("comment_amount"));
+                    proposal.setIn_next_budget(array.getJSONObject(i).getBoolean("in_next_budget"));
+                    proposal.setMonthly_amount(array.getJSONObject(i).getInt("monthly_amount"));
+                    proposal.setTotal_payment_count(array.getJSONObject(i).getInt("total_payment_count"));
+                    proposal.setRemaining_payment_count(array.getJSONObject(i).getInt("remaining_payment_count"));
+                    proposal.setYes(array.getJSONObject(i).getInt("yes"));
+                    proposal.setNo(array.getJSONObject(i).getInt("no"));
+                    proposal.setOrder(array.getJSONObject(i).getInt("order"));
+                    proposal.setComment_amount(array.getJSONObject(i).getInt("comment_amount"));
                     proposal.setOwner_username(array.getJSONObject(i).getString("owner_username"));
                     list.add(proposal);
+                    dbHandler.addProposal(proposal);
                 }
 
-                parseUpdateProposalAndStoreIt(myparser);
-                stream.close();
+                jsonContent.close();
+
             } catch (Exception e) {
                 e.getMessage();
             }
@@ -108,72 +111,6 @@ public class JsonUtil {
         protected void onPostExecute(Void aVoid) {
             dbProposalListener.onDatabaseUpdateCompleted();
             super.onPostExecute(aVoid);
-        }
-    }
-
-
-    public void parseUpdateProposalAndStoreIt(XmlPullParser myParser) {
-        int event;
-        News news = null;
-        String text = null;
-        int articleNumber = 0;
-        ArrayList<News> newsList = new ArrayList<>();
-
-        try {
-            event = myParser.getEventType();
-
-            while (event != XmlPullParser.END_DOCUMENT) {
-                String name = myParser.getName();
-
-                switch (event) {
-                    case XmlPullParser.START_TAG:
-                        if ("item".equals(name)) {
-                            news = new News();
-                        }
-                        break;
-
-                    case XmlPullParser.TEXT:
-                        text = myParser.getText();
-                        break;
-
-                    case XmlPullParser.END_TAG:
-                        if (news != null) {
-                            switch (name) {
-                                case "item":
-                                    // If that news doesn't exist
-                                    if (!selectNews(news.getGuid())) {
-                                        // Add it to the database
-                                        addNews(news);
-                                    }
-                                    // Add it to the first batch no matter what
-                                    newsList.add(news);
-                                    articleNumber++;
-                                    if (articleNumber == NUMBER_FIRST_BATCH){
-                                        dbRSSListener.onFirstBatchNewsCompleted(newsList);
-                                    }
-                                    break;
-                                case "guid":
-                                    news.setGuid(text);
-                                    break;
-                                case "title":
-                                    news.setTitle(text);
-                                    break;
-                                case "pubDate":
-                                    news.setPubDate(text);
-                                    break;
-                                case "content:encoded":
-                                    news.setContent(text);
-                                    break;
-                            }
-                        }
-                        break;
-                }
-
-                event = myParser.next();
-            }
-            parsingComplete = false;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
