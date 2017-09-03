@@ -4,6 +4,7 @@ import com.dash.dashapp.Model.News;
 import com.dash.dashapp.Model.Proposal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sebas on 8/7/2017.
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 public interface ProposalUpdateListener {
 
     void onUpdateStarted();
-    void onFirstBatchProposalsCompleted(ArrayList<Proposal> newsList);
+    void onFirstBatchProposalsCompleted(List<Proposal> newsList);
     void onDatabaseUpdateCompleted();
 
 

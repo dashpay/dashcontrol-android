@@ -3,6 +3,7 @@ package com.dash.dashapp.Interface;
 import com.dash.dashapp.Model.News;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sebas on 8/7/2017.
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 public interface RSSUpdateListener {
 
     void onUpdateStarted();
-    void onFirstBatchNewsCompleted(ArrayList<News> newsList);
+    void onFirstBatchNewsCompleted(List<News> newsList);
     void onDatabaseUpdateCompleted();
 
 

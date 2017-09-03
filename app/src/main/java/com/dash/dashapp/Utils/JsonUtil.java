@@ -4,13 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.dash.dashapp.Interface.ProposalUpdateListener;
-import com.dash.dashapp.Interface.RSSUpdateListener;
-import com.dash.dashapp.Model.News;
 import com.dash.dashapp.Model.Proposal;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -24,6 +21,7 @@ import java.util.List;
 
 public class JsonUtil {
 
+    private static final int NUMBER_FIRST_BATCH = 10;
     private ProposalUpdateListener dbProposalListener;
     public Context context = null;
 
@@ -73,6 +71,11 @@ public class JsonUtil {
                 List<Proposal> list = new ArrayList<>();
                 JSONArray array = proposalJson.getJSONArray("proposals");
                 for(int i = 0 ; i < array.length() ; i++){
+
+                    if (i == NUMBER_FIRST_BATCH){
+                        dbProposalListener.onFirstBatchProposalsCompleted(list);
+                    }
+
                     Proposal proposal = new Proposal();
                     proposal.setHash(array.getJSONObject(i).getString("hash"));
                     proposal.setName(array.getJSONObject(i).getString("name"));

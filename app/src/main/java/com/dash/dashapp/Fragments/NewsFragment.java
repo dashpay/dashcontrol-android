@@ -36,6 +36,7 @@ import com.dash.dashapp.Utils.SharedPreferencesManager;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private static final String TAG = "NewsFragment";
@@ -46,7 +47,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private XmlUtil obj;
     private RSSUpdateListener dbListener;
     private WrapContentLinearLayoutManager mLayoutManager;
-    private ArrayList<News> newsList;
+    private List<News> newsList;
     private boolean updatePerforming = false;
 
 
@@ -253,7 +254,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     @Override
-    public void onFirstBatchNewsCompleted(ArrayList<News> newsList) {
+    public void onFirstBatchNewsCompleted(List<News> newsList) {
         Log.d(TAG, "First batch completed");
         this.newsList = newsList;
         getActivity().runOnUiThread(new Runnable() {

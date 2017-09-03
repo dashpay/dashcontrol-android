@@ -3,17 +3,13 @@ package com.dash.dashapp.Utils;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.dash.dashapp.Interface.ProposalUpdateListener;
 import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
-import com.dash.dashapp.Model.Proposal;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**

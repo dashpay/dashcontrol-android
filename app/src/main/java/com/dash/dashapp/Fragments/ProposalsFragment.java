@@ -35,6 +35,7 @@ import com.dash.dashapp.Utils.MyDBHandler;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProposalsFragment extends BaseFragment implements ProposalUpdateListener {
     private static final String TAG = "ProposalsFragment";
@@ -45,7 +46,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     private JsonUtil obj;
     private ProposalUpdateListener dbListener;
     private ProposalsFragment.WrapContentLinearLayoutManager mLayoutManager;
-    private ArrayList<Proposal> proposalsList;
+    private List<Proposal> proposalsList;
     private boolean updatePerforming = false;
     public final static String URL_PROPOSAL = "https://www.dashcentral.org/api/v1/budget";
 
@@ -247,6 +248,22 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         }
     }
 
+    private void turnWheelOn() {
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mProgressWheel.setVisibility(View.VISIBLE);
+        }
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    private void turnWheelOff() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mProgressWheel.setVisibility(View.GONE);
+        }
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+
+
     @Override
     public void onUpdateStarted() {
         updatePerforming = true;
@@ -254,7 +271,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     }
 
     @Override
-    public void onFirstBatchProposalsCompleted(ArrayList<Proposal> ProposalsList) {
+    public void onFirstBatchProposalsCompleted(List<Proposal> ProposalsList) {
         Log.d(TAG, "First batch completed");
         this.proposalsList = ProposalsList;
         getActivity().runOnUiThread(new Runnable() {
@@ -279,20 +296,6 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             loadRSS();
             turnWheelOff();
         }
-    }
-
-    private void turnWheelOn() {
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.VISIBLE);
-        }
-        mSwipeRefreshLayout.setRefreshing(true);
-    }
-
-    private void turnWheelOff() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.GONE);
-        }
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
