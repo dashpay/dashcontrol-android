@@ -34,7 +34,6 @@ import com.dash.dashapp.Utils.LoadMoreProposals;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProposalsFragment extends BaseFragment implements ProposalUpdateListener {
@@ -110,8 +109,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             @Override
             public void onRefresh() {
                 if (!updatePerforming){
-                    obj = new JsonUtil(mContext);
-                    obj.fetchProposalXML(dbListener);
+                    updateProposals();
                 }
             }
         });
@@ -136,24 +134,24 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             alert.show();
 
         } else if (isNetworkAvailable()) {
-            handleRSS();
+            handleJson();
         }
     }
 
 
-    public void handleRSS() {
+    public void handleJson() {
 
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         proposalsList = dbHandler.findAllProposals(null);
 
         if (proposalsList.size() == 0) {
-            updateRSS();
+            updateProposals();
         } else {
-            loadRSS();
+            loadJson();
         }
     }
 
-    public void loadRSS() {
+    public void loadJson() {
         turnWheelOn();
         for (int i = 0; i < LoadMoreProposals.LOAD_VIEW_SET_COUNT; i++) {
             try{
@@ -170,9 +168,11 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         turnWheelOff();
     }
 
-    public void updateRSS() {
+    public void updateProposals() {
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
+        dbHandler.deleteAllProposals();
         obj = new JsonUtil(getContext());
-        obj.fetchProposalXML(dbListener);
+        obj.fetchProposalJson(dbListener);
     }
 
     public boolean isNetworkAvailable() {
@@ -220,7 +220,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
 
                 MyDBHandler dbHandler = new MyDBHandler(mContext, null);
                 proposalsList = dbHandler.findAllProposals(query);
-                loadRSS();
+                loadJson();
                 return false;
             }
 
@@ -278,7 +278,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             @Override
             public void run() {
                 mInfinitePlaceHolderView.removeAllViews();
-                loadRSS();
+                loadJson();
                 turnWheelOff();
             }
         });
@@ -293,7 +293,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         proposalsList = dbHandler.findAllProposals(null);
 
         if (mInfinitePlaceHolderView.getChildCount() == 0){
-            loadRSS();
+            loadJson();
             turnWheelOff();
         }
     }

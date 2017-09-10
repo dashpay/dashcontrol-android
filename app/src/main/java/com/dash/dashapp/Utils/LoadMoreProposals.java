@@ -4,9 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.dash.dashapp.Adapters.NewsView;
 import com.dash.dashapp.Adapters.ProposalView;
-import com.dash.dashapp.Model.News;
 import com.dash.dashapp.Model.Proposal;
 import com.dash.dashapp.R;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
@@ -62,9 +60,6 @@ public class LoadMoreProposals {
                          i < (count - 1 + LoadMoreProposals.LOAD_VIEW_SET_COUNT) && mProposalList.size() > i;
                          i++) {
 
-                        /*if (mNewsList.get(i).getGuid().equals(mNewsList.get(i-1).getGuid())){
-                            i++;
-                        }*/
                         mLoadMoreView.addView(new ProposalView(mLoadMoreView.getContext(), mProposalList.get(i)));
 
                         Log.d(TAG, "Starting with index : " + i);

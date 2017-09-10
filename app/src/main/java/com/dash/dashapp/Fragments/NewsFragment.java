@@ -109,8 +109,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             @Override
             public void onRefresh() {
                 if (!updatePerforming){
-                    obj = new XmlUtil(mContext);
-                    obj.fetchRSSXML(dbListener);
+                    updateRSS();
                 }
             }
         });
@@ -170,6 +169,9 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     public void updateRSS() {
+
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
+        dbHandler.deleteAllNews();
         obj = new XmlUtil(getContext());
         obj.fetchRSSXML(dbListener);
     }

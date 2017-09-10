@@ -59,10 +59,6 @@ public class LoadMoreNews {
                     for (int i = count - 1;
                          i < (count - 1 + LoadMoreNews.LOAD_VIEW_SET_COUNT) && mNewsList.size() > i;
                          i++) {
-
-                        /*if (mNewsList.get(i).getGuid().equals(mNewsList.get(i-1).getGuid())){
-                            i++;
-                        }*/
                         mLoadMoreView.addView(new NewsView(mLoadMoreView.getContext(), mNewsList.get(i + 1)));
 
                         Log.d(TAG, "Starting with index : " + i);

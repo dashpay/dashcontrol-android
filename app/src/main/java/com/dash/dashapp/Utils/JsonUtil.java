@@ -29,7 +29,7 @@ public class JsonUtil {
         this.context = context;
     }
 
-    public void fetchProposalXML(ProposalUpdateListener dbProposalListener) {
+    public void fetchProposalJson(ProposalUpdateListener dbProposalListener) {
         this.dbProposalListener = dbProposalListener;
         UpdateProposalDB updateDB = new UpdateProposalDB(dbProposalListener);
         updateDB.execute();
