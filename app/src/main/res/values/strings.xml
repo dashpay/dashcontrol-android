@@ -22,4 +22,23 @@
     <string name="ru">Russian</string>
     <string name="jp">Japanese</string>
     <string name="kr">Korean</string>
+    <string name="button_accept_proposal">Accept proposal</string>
+    <string name="button_abstain">Abstain</string>
+    <string name="button_no">No</string>
+    <string name="title">Title</string>
+    <string name="proposal_description_tag">PROPOSAL DESCRIPTION</string>
+    <string name="textview_completed_payment_tag">Completed payments</string>
+    <string name="textview_one_time_payment">One-time payment</string>
+    <string name="no_id">No id</string>
+    <string name="no_title">No Title</string>
+    <string name="no_owner">No owner</string>
+    <string name="one_time_payment_tag">One-time payment</string>
+    <string name="no_dash">0 DASH</string>
+    <string name="completed_payment_tag">Completed payments</string>
+    <string name="no_month_remaining">No month remaining</string>
+    <string name="no_dash_payment">0 totaling in 0 DASH</string>
+    <string name="no_yes">0 Yes</string>
+    <string name="no_no">0 No</string>
+    <string name="no_abstain">0 Abstain</string>
+    <string name="no_description">No description</string>
 </resources>

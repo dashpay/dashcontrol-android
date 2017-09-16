@@ -30,7 +30,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
         </activity>
-        <activity android:name=".Activities.ContentRSSActivity"></activity>
+        <activity android:name=".Activities.ContentRSSActivity" />
+        <activity android:name=".Activities.ProposalDetailActivity" />
     </application>
 
 </manifest>

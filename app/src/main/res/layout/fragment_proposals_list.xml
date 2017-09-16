@@ -15,7 +15,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/news_view"/>
+        tools:listitem="@layout/proposal_view"/>
 
     <ProgressBar
         android:id="@+id/progress_wheel"

@@ -11,4 +11,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
     </style>
 
+
+    <style name="text_title_small_grey" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textSize">10dp</item>
+    </style>
+
 </resources>
