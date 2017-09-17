@@ -8,5 +8,9 @@
     <color name="primary_dark_material_dark">#e3f2fd</color>
     <color name="accent_material_dark">#bbdefb</color>
     <color name="background_material_dark">#ffffff</color>
-    <color name="grey">#696969</color>
+    <color name="grey">#A0A0A0</color>
+    <color name="lighter_grey">#BEBEBE</color>
+    <color name="lightest_grey">#F0F0F0</color>
+
+
 </resources>

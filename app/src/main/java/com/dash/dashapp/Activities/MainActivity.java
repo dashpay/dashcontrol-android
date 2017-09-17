@@ -63,6 +63,12 @@ public class MainActivity extends AppCompatActivity implements
         proposalFragment = ProposalsFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
 
+        //getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.logo);
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 
     }
 

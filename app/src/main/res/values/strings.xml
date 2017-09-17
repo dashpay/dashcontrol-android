@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dash app</string>
+    <string name="app_name">Dash control</string>
     <string name="title_news">News</string>
     <string name="title_proposals">Proposals</string>
     <string name="title_prices">Prices</string>
@@ -41,4 +41,10 @@
     <string name="no_no">0 No</string>
     <string name="no_abstain">0 Abstain</string>
     <string name="no_description">No description</string>
+    <string name="add_proposal">Add proposal</string>
+    <string name="search">search</string>
+    <string name="default_percentage">0%</string>
+    <string name="no_title_entered_by_proposal_owner">No title entered by proposal owner</string>
+    <string name="textview_no_comments">No comments</string>
+    <string name="per_month">per month</string>
 </resources>

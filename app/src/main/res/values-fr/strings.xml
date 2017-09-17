@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Dash</string>
+    <string name="app_name">Dash control</string>
     <string name="title_news">Actu</string>
     <string name="title_portfolio">Portfolio</string>
     <string name="title_prices">Prix</string>
@@ -25,15 +25,21 @@
     <string name="textview_completed_payment_tag">Completed payments</string>
     <string name="textview_one_time_payment">One-time payment</string>
     <string name="no_id">No id</string>
-    <string name="no_title">No Title</string>
-    <string name="no_owner">No owner</string>
-    <string name="one_time_payment_tag">One-time payment</string>
+    <string name="no_title">Pas de titre</string>
+    <string name="no_owner">Pas d\'auteur</string>
+    <string name="one_time_payment_tag">Payment en 1 fois</string>
     <string name="no_dash">0 DASH</string>
-    <string name="completed_payment_tag">Completed payments</string>
-    <string name="no_month_remaining">No month remaining</string>
+    <string name="completed_payment_tag">Paiements complétés</string>
+    <string name="no_month_remaining">0 mois restant</string>
     <string name="no_dash_payment">0 totaling in 0 DASH</string>
-    <string name="no_yes">0 Yes</string>
-    <string name="no_no">0 No</string>
-    <string name="no_abstain">0 Abstain</string>
-    <string name="no_description">No description</string>
+    <string name="no_yes">0 oui</string>
+    <string name="no_no">0 non</string>
+    <string name="no_abstain">0 abstention</string>
+    <string name="no_description">Pas de description</string>
+    <string name="add_proposal">Ajouter proposition</string>
+    <string name="search">rechercher</string>
+    <string name="default_percentage">0%</string>
+    <string name="no_title_entered_by_proposal_owner">Pas de titre de l\'auteur</string>
+    <string name="textview_no_comments">Pas de commentaires</string>
+    <string name="per_month">par mois</string>
 </resources>

@@ -25,9 +25,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:drawableStart="@drawable/ic_image_black_24dp"
+            android:drawableStart="@drawable/dummy_image"
             android:padding="5dp"
             android:textSize="18sp"
+            android:drawablePadding="6dp"
             android:textStyle="bold" />
 
     </RelativeLayout>

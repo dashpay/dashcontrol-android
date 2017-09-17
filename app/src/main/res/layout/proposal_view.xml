@@ -8,10 +8,18 @@
     app:cardCornerRadius="8dp"
     app:cardElevation="8dp">
 
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/proposal_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="90dp" />
 
         <ProgressBar
             android:id="@+id/approval_progress_bar"
@@ -31,8 +39,10 @@
 
         <TextView
             android:id="@+id/approval_rate_textview"
+            style="@style/text_content_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/default_percentage"
             app:layout_constraintBottom_toBottomOf="@+id/approval_progress_bar"
             app:layout_constraintLeft_toLeftOf="@+id/approval_progress_bar"
             app:layout_constraintRight_toRightOf="@+id/approval_progress_bar"
@@ -40,13 +50,97 @@
 
         <TextView
             android:id="@+id/title_textView"
+            style="@style/text_content_bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/title"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toRightOf="@+id/approval_progress_bar"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/guideline"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_default="wrap" />
+
+        <TextView
+            android:id="@+id/title_owner_textview"
+            style="@style/text_title_small_grey"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/no_title_entered_by_proposal_owner"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toRightOf="@+id/approval_progress_bar"
+            app:layout_constraintRight_toLeftOf="@+id/guideline"
+            app:layout_constraintTop_toBottomOf="@+id/title_textView" />
+
+        <TextView
+            android:id="@+id/textView_month_remaining"
+            style="@style/text_small_lighter_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:drawablePadding="2dp"
+            android:drawableStart="@drawable/icon_attachment"
+            android:text="@string/no_month_remaining"
+            app:layout_constraintLeft_toRightOf="@+id/approval_progress_bar"
+            app:layout_constraintTop_toBottomOf="@+id/title_owner_textview" />
+
+        <TextView
+            android:id="@+id/textView_comments_number"
+            style="@style/text_small_lighter_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:drawablePadding="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:drawableStart="@drawable/icon_reply"
+            android:text="@string/textview_no_comments"
+            app:layout_constraintLeft_toRightOf="@+id/textView_month_remaining"
+            app:layout_constraintTop_toBottomOf="@+id/title_owner_textview"
+            app:layout_constraintRight_toLeftOf="@+id/guideline"
+            android:layout_marginRight="0dp" />
+
+        <TextView
+            android:id="@+id/textview_dash_amount"
+            style="@style/text_content_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_dash"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_per_month"
+            style="@style/text_title_small_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/per_month"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_dash_amount" />
+
+        <TextView
+            android:id="@+id/textView_by_owner"
+            style="@style/text_small_lighter_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="0dp"
+            android:text="@string/no_owner"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_per_month" />
 
     </android.support.constraint.ConstraintLayout>
 

@@ -8,7 +8,8 @@
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="ifRoom|collapseActionView"
         nz.govt.app:actionViewClass="android.support.v7.widget.SearchView"
-        nz.govt.app:showAsAction="ifRoom|collapseActionView" />
+        nz.govt.app:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/search" />
 
     <!-- Settings, should always be in the overflow -->
     <item

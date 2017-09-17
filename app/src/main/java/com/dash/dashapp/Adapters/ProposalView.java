@@ -26,10 +26,25 @@ public class ProposalView {
     private ProgressBar approvalRatePie;
 
     @View(R.id.approval_rate_textview)
-    private TextView approvalRateTextview;
+    private TextView approvalRateTextView;
 
     @View(R.id.title_textView)
     private TextView titleTxt;
+
+    @View(R.id.title_owner_textview)
+    private TextView titleOwnerTextView;
+
+    @View(R.id.textView_month_remaining)
+    private TextView monthRemainingTextView;
+
+    @View(R.id.textView_comments_number)
+    private TextView commentsNumberTextView;
+
+    @View(R.id.textview_dash_amount)
+    private TextView dashAmountTextView;
+
+    @View(R.id.textView_by_owner)
+    private TextView byOwnerTextView;
 
     private Proposal mProposal;
     private Context mContext;
@@ -46,7 +61,19 @@ public class ProposalView {
         double ratioYes = ((double)mProposal.getYes()/(mProposal.getYes() + mProposal.getNo()))*100;
         int ratioYesInt = (int) ratioYes;
         approvalRatePie.setProgress(ratioYesInt);
-        approvalRateTextview.setText(ratioYesInt + "%");
+        approvalRateTextView.setText(ratioYesInt + "%");
+
+        //TODO What's the owner title ?
+        titleOwnerTextView.setText(mProposal.getTitle());
+
+        //TODO calculate the month
+        monthRemainingTextView.setText(mProposal.getDate_end());
+
+        commentsNumberTextView.setText(mProposal.getComment_amount() + " comments");
+
+        dashAmountTextView.setText(mProposal.getMonthly_amount() + " DASH");
+
+        byOwnerTextView.setText("by " + mProposal.getOwner_username());
     }
 
 
