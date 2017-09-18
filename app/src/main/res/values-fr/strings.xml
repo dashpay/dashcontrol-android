@@ -42,4 +42,8 @@
     <string name="no_title_entered_by_proposal_owner">Pas de titre de l\'auteur</string>
     <string name="textview_no_comments">Pas de commentaires</string>
     <string name="per_month">par mois</string>
+    <string name="month_remaining">%1$d mois restant</string>
+    <string name="months_remaining">%1$d mois restant</string>
+    <string name="comments">%1$d commentaires</string>
+    <string name="by">par %1$s</string>
 </resources>

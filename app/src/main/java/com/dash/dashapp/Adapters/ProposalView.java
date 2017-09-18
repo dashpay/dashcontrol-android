@@ -8,10 +8,17 @@ import android.widget.TextView;
 import com.dash.dashapp.Activities.ProposalDetailActivity;
 import com.dash.dashapp.Model.Proposal;
 import com.dash.dashapp.R;
+import com.dash.dashapp.Utils.DateUtil;
 import com.mindorks.placeholderview.annotations.Click;
 import com.mindorks.placeholderview.annotations.Layout;
 import com.mindorks.placeholderview.annotations.Resolve;
 import com.mindorks.placeholderview.annotations.View;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by sebas on 8/8/2017.
@@ -58,28 +65,44 @@ public class ProposalView {
     private void onResolved() {
         titleTxt.setText(mProposal.getTitle());
 
-        double ratioYes = ((double)mProposal.getYes()/(mProposal.getYes() + mProposal.getNo()))*100;
+        double ratioYes = ((double) mProposal.getYes() / (mProposal.getYes() + mProposal.getNo())) * 100;
         int ratioYesInt = (int) ratioYes;
         approvalRatePie.setProgress(ratioYesInt);
         approvalRateTextView.setText(ratioYesInt + "%");
 
         //TODO What's the owner title ?
-        titleOwnerTextView.setText(mProposal.getTitle());
+        if (!mProposal.getTitle().equals("")){
+            titleOwnerTextView.setText(mProposal.getTitle());
+        }
 
         //TODO calculate the month
-        monthRemainingTextView.setText(mProposal.getDate_end());
+        Date startDate = new Date();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        Date endDate = null;
+        try {
+            endDate = format.parse(mProposal.getDate_end());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int monthRemaining = DateUtil.monthDifference(startDate, endDate);
+        if (monthRemaining == 1) {
+            monthRemainingTextView.setText(mContext.getString(R.string.month_remaining, monthRemaining));
+        } else {
+            monthRemainingTextView.setText(mContext.getString(R.string.months_remaining, monthRemaining));
+        }
 
-        commentsNumberTextView.setText(mProposal.getComment_amount() + " comments");
+        commentsNumberTextView.setText(mContext.getString(R.string.comments, mProposal.getComment_amount()));
 
-        dashAmountTextView.setText(mProposal.getMonthly_amount() + " DASH");
+        dashAmountTextView.setText(mContext.getString(R.string.dash, mProposal.getMonthly_amount()));
 
-        byOwnerTextView.setText("by " + mProposal.getOwner_username());
+        if (!mProposal.getOwner_username().equals("")){
+            byOwnerTextView.setText(mContext.getString(R.string.by, mProposal.getOwner_username()));
+        }
     }
 
 
-
     @Click(R.id.proposal_row)
-    private void onClick(){
+    private void onClick() {
         Intent intent = new Intent(mContext, ProposalDetailActivity.class);
         intent.putExtra(CONTENT_PROPOSAL, mProposal);
         mContext.startActivity(intent);

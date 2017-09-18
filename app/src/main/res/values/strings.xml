@@ -47,4 +47,9 @@
     <string name="no_title_entered_by_proposal_owner">No title entered by proposal owner</string>
     <string name="textview_no_comments">No comments</string>
     <string name="per_month">per month</string>
+    <string name="month_remaining">%1$d month remaining</string>
+    <string name="months_remaining">%1$d months remaining</string>
+    <string name="comments">%1$d comments</string>
+    <string name="dash">%1$d DASH</string>
+    <string name="by">by %1$s</string>
 </resources>
