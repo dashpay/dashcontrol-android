@@ -1,11 +1,8 @@
 package com.dash.dashapp.Application;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
 
-import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 
 import java.util.Locale;

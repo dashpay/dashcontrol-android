@@ -42,8 +42,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ListView listView;
 
-    private XmlUtil obj;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

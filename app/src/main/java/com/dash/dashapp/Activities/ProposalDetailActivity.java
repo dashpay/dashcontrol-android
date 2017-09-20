@@ -2,9 +2,11 @@ package com.dash.dashapp.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,6 +30,12 @@ public class ProposalDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_proposal);
+
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar ab = getSupportActionBar();
+
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         Proposal proposal = (Proposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
@@ -77,5 +85,18 @@ public class ProposalDetailActivity extends AppCompatActivity {
         acceptProposalButton = (Button) findViewById(R.id.button_accept_proposal);
         abstainButton = (Button) findViewById(R.id.button_abstain);
         noButton = (Button) findViewById(R.id.button_no);
+    }
+
+
+    public boolean onOptionsItemSelected(final MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
