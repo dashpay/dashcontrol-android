@@ -279,7 +279,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         String query = "SELECT * FROM " + TABLE_PROPOSALS;
         if (filter != null) {
-            query += " WHERE " + COLUMN_TITLE + " LIKE '%" + filter + "%'";
+            query += " WHERE " + COLUMN_TITLE_PROP + " LIKE '%" + filter + "%'";
         }
         query += " ORDER BY " + COLUMN_DATE_END + " ASC;";
 
