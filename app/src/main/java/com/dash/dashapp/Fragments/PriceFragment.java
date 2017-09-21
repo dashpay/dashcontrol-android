@@ -1,6 +1,8 @@
 package com.dash.dashapp.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dash.dashapp.R;
+import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +31,8 @@ import com.dash.dashapp.R;
 public class PriceFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+
+    private CandleStickChart mChart;
 
     public PriceFragment() {
         // Required empty public constructor
@@ -48,8 +60,87 @@ public class PriceFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_price, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_price, container, false);
+        Context context = view.getContext();
+
+        mChart = (CandleStickChart) view.findViewById(R.id.chart1);
+        mChart.setBackgroundColor(Color.WHITE);
+
+        mChart.getDescription().setEnabled(false);
+
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        mChart.setMaxVisibleValueCount(60);
+
+        // scaling can now only be done on x- and y-axis separately
+        mChart.setPinchZoom(false);
+
+        mChart.setDrawGridBackground(false);
+
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+
+        YAxis leftAxis = mChart.getAxisLeft();
+//        leftAxis.setEnabled(false);
+        leftAxis.setLabelCount(7, false);
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setDrawAxisLine(false);
+
+        YAxis rightAxis = mChart.getAxisRight();
+        rightAxis.setEnabled(false);
+
+        mChart.getLegend().setEnabled(false);
+
+
+        //Setting the data
+        mChart.resetTracking();
+
+        ArrayList<CandleEntry> yVals1 = new ArrayList<CandleEntry>();
+
+        for (int i = 0; i < 60; i++) {
+            float mult = (20 + 1);
+            float val = (float) (Math.random() * 40) + mult;
+
+            float high = (float) (Math.random() * 9) + 8f;
+            float low = (float) (Math.random() * 9) + 8f;
+
+            float open = (float) (Math.random() * 6) + 1f;
+            float close = (float) (Math.random() * 6) + 1f;
+
+            boolean even = i % 2 == 0;
+
+            yVals1.add(new CandleEntry(
+                    i, val + high,
+                    val - low,
+                    even ? val + open : val - open,
+                    even ? val - close : val + close,
+                    getResources().getDrawable(R.drawable.star)
+            ));
+        }
+
+        CandleDataSet set1 = new CandleDataSet(yVals1, "Data Set");
+
+        set1.setDrawIcons(false);
+        set1.setAxisDependency(YAxis.AxisDependency.LEFT);
+//        set1.setColor(Color.rgb(80, 80, 80));
+        set1.setShadowColor(Color.DKGRAY);
+        set1.setShadowWidth(0.7f);
+        set1.setDecreasingColor(Color.RED);
+        set1.setDecreasingPaintStyle(Paint.Style.FILL);
+        set1.setIncreasingColor(Color.rgb(122, 242, 84));
+        set1.setIncreasingPaintStyle(Paint.Style.STROKE);
+        set1.setNeutralColor(Color.BLUE);
+        //set1.setHighlightLineWidth(1f);
+
+        CandleData data = new CandleData(set1);
+
+        mChart.setData(data);
+        mChart.invalidate();
+
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
