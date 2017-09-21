@@ -13,7 +13,6 @@
     <string name="fr">Français</string>
     <string name="ru">Russian</string>
     <string name="kr">Korean</string>
-    <string name="action_search">Rechercher</string>
     <string name="cn">Chinois</string>
     <string name="jp">Japonais</string>
     <string name="pt">Portugais</string>
@@ -22,8 +21,6 @@
     <string name="button_no">Non</string>
     <string name="title">Title</string>
     <string name="proposal_description_tag">PROPOSAL DESCRIPTION</string>
-    <string name="textview_completed_payment_tag">Completed payments</string>
-    <string name="textview_one_time_payment">One-time payment</string>
     <string name="no_id">No id</string>
     <string name="no_title">Pas de titre</string>
     <string name="no_owner">Pas d\'auteur</string>
@@ -36,7 +33,6 @@
     <string name="no_no">0 non</string>
     <string name="no_abstain">0 abstention</string>
     <string name="no_description">Pas de description</string>
-    <string name="add_proposal">Ajouter proposition</string>
     <string name="search">rechercher</string>
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">Pas de titre de l\'auteur</string>

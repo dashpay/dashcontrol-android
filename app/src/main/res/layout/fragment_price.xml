@@ -9,11 +9,132 @@
         android:id="@+id/chart1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup_scale"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    
+    <RadioGroup
+        android:id="@+id/radioGroup_scale"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation='horizontal'
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup_gap">
+
+        <RadioButton
+            android:id="@+id/radio6h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_6h" />
+
+        <RadioButton
+            android:id="@+id/radio24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_24h" />
+
+        <RadioButton
+            android:id="@+id/radio2d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_2d" />
+
+        <RadioButton
+            android:id="@+id/radio4d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_4d" />
+
+        <RadioButton
+            android:id="@+id/radio1w"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_1w" />
+
+        <RadioButton
+            android:id="@+id/radio2w"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_2w" />
+
+        <RadioButton
+            android:id="@+id/radio1m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_1m" />
+
+        <RadioButton
+            android:id="@+id/radio3m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_3m" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroup_gap"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation='horizontal'
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <RadioButton
+            android:id="@+id/radio5m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_5m" />
+
+        <RadioButton
+            android:id="@+id/radio15m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_15m" />
+
+        <RadioButton
+            android:id="@+id/radio30m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_30m" />
+
+        <RadioButton
+            android:id="@+id/radio2h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_2h" />
+
+        <RadioButton
+            android:id="@+id/radio4h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:checked="true"
+            android:text="@string/radio_4h" />
+
+        <RadioButton
+            android:id="@+id/radio1d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/scale_selector"
+            android:text="@string/radio_1d" />
+    </RadioGroup>
+
 
 </android.support.constraint.ConstraintLayout>

@@ -10,8 +10,6 @@
     <string name="alert_message">Network is not available</string>
     <string name="alert_title">Error</string>
     <string name="alert_positive">Ok</string>
-    <string name="app_label">Dash android</string>
-    <string name="action_search">Search</string>
     <string name="title_activity_settings">Settings</string>
     <string name="language_preference">language_preference</string>
     <string name="eng">English</string>
@@ -27,8 +25,6 @@
     <string name="button_no">No</string>
     <string name="title">Title</string>
     <string name="proposal_description_tag">PROPOSAL DESCRIPTION</string>
-    <string name="textview_completed_payment_tag">Completed payments</string>
-    <string name="textview_one_time_payment">One-time payment</string>
     <string name="no_id">No id</string>
     <string name="no_title">No Title</string>
     <string name="no_owner">No owner</string>
@@ -41,7 +37,6 @@
     <string name="no_no">0 No</string>
     <string name="no_abstain">0 Abstain</string>
     <string name="no_description">No description</string>
-    <string name="add_proposal">Add proposal</string>
     <string name="search">search</string>
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">No title entered by proposal owner</string>
@@ -52,4 +47,19 @@
     <string name="comments">%1$d comments</string>
     <string name="dash">%1$d DASH</string>
     <string name="by">by %1$s</string>
+
+    <string name="radio_5m">5m</string>
+    <string name="radio_15m">15m</string>
+    <string name="radio_30m">30m</string>
+    <string name="radio_2h">2h</string>
+    <string name="radio_4h">4h</string>
+    <string name="radio_6h">6h</string>
+    <string name="radio_24h">24h</string>
+    <string name="radio_1d">1d</string>
+    <string name="radio_2d">2d</string>
+    <string name="radio_4d">4d</string>
+    <string name="radio_1w">1w</string>
+    <string name="radio_2w">2w</string>
+    <string name="radio_1m">1m</string>
+    <string name="radio_3m">3m</string>
 </resources>
