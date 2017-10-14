@@ -6,17 +6,30 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.dash.dashapp.R;
+import com.dash.dashapp.Utils.MySingleton;
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -30,9 +43,14 @@ import java.util.ArrayList;
  */
 public class PriceFragment extends Fragment {
 
+    private static final String TAG = "PriceFragment";
     private OnFragmentInteractionListener mListener;
 
+    private Context context;
+
     private CandleStickChart mChart;
+
+    private TextView priceTextview;
 
     public PriceFragment() {
         // Required empty public constructor
@@ -62,7 +80,9 @@ public class PriceFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_price, container, false);
-        Context context = view.getContext();
+        context = view.getContext();
+
+        priceTextview = (TextView) view.findViewById(R.id.priceTextview);
 
         mChart = (CandleStickChart) view.findViewById(R.id.chart1);
         mChart.setBackgroundColor(Color.WHITE);
@@ -165,6 +185,40 @@ public class PriceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        String url = "http://dashpay.info/api/v0/prices";
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        int dollarPrice = 0;
+                        try {
+                            JSONObject price = response.getJSONObject("bitfinex");
+                            Log.d(TAG, price.toString());
+                            dollarPrice = price.getInt("DASH_USD");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        priceTextview.setText(dollarPrice + "$");
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+
+        // Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
     }
 
     /**
