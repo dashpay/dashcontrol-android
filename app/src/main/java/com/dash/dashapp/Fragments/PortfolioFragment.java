@@ -1,19 +1,30 @@
 package com.dash.dashapp.Fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
+import com.dash.dashapp.Activities.AddMasternodeActivity;
+import com.dash.dashapp.Activities.AddWalletActivity;
+import com.dash.dashapp.Activities.SettingsActivity;
 import com.dash.dashapp.Adapters.HeadingView;
 import com.dash.dashapp.Adapters.MasternodeView;
 import com.dash.dashapp.Adapters.WalletView;
 import com.dash.dashapp.Model.Masternode;
 import com.dash.dashapp.Model.Wallet;
 import com.dash.dashapp.R;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 
 import java.util.ArrayList;
@@ -59,6 +70,62 @@ public class PortfolioFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
+
+
+        // creating floating button menu
+        final FloatingActionMenu fam = (FloatingActionMenu) view.findViewById(R.id.menu_masternode_wallet);
+        AnimatorSet set = new AnimatorSet();
+
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                fam.getMenuIconView().setImageResource(fam.isOpened()
+                        ? R.drawable.ic_add_white_24px : R.drawable.ic_close_white_24dp);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+
+        fam.setIconToggleAnimatorSet(set);
+
+
+
+        final FloatingActionButton addMasternode = (FloatingActionButton) view.findViewById(R.id.button_add_masternode);
+        addMasternode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddMasternodeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
+        final FloatingActionButton addWallet = (FloatingActionButton) view.findViewById(R.id.button_add_wallet);
+        addWallet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddWalletActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         ArrayList<Masternode> listMasternode = new ArrayList<>();
         Masternode m1 = new Masternode("Masternode 1");

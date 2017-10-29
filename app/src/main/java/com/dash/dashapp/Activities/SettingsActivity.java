@@ -53,6 +53,8 @@ public class SettingsActivity extends AppCompatActivity {
         // Enable the Up button
         ab.setDisplayHomeAsUpEnabled(true);
 
+        ab.setTitle("Settings");
+
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_languages);

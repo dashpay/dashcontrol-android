@@ -1,7 +1,8 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
+    android:id="@+id/rootPortfolio"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.dash.dashapp.Fragments.PortfolioFragment">
@@ -11,19 +12,59 @@
         android:id="@+id/masternodeWalletExpandableView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical" />
 
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/button_add_masternode_wallet"
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu_masternode_wallet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="15dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/ic_add_white_24px"
-        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPrimaryDark"
+        fab:fab_colorRipple="@color/primary_material_dark_1"
+        fab:menu_colorNormal="@color/colorPrimary"
+        fab:menu_colorPressed="@color/colorPrimaryDark"
+        fab:menu_colorRipple="@color/primary_material_dark_1"
+        fab:menu_fab_label="Add Masternode/Wallet"
+        fab:menu_fab_size="normal">
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/button_add_masternode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo"
+            app:backgroundTint="@color/colorPrimary"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark"
+            fab:fab_colorRipple="@color/primary_material_dark_1"
+            fab:fab_label="Add Masternode"
+            fab:fab_size="mini" />
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/button_add_wallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_account_balance_wallet_white_24dp"
+            app:backgroundTint="@color/colorPrimary"
+            fab:fab_colorNormal="@color/colorPrimary"
+            fab:fab_colorPressed="@color/colorPrimaryDark"
+            fab:fab_colorRipple="@color/primary_material_dark_1"
+            fab:fab_label="Add Wallet"
+            fab:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
 
 
 </android.support.constraint.ConstraintLayout>

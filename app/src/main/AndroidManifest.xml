@@ -16,7 +16,8 @@
         <activity
             android:name=".Activities.MainActivity"
             android:configChanges="layoutDirection|locale"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,6 +40,14 @@
         <activity
             android:name=".Activities.ProposalDetailActivity"
             android:configChanges="layoutDirection|locale" />
+        <activity
+            android:name=".Activities.AddWalletActivity"
+            android:configChanges="layoutDirection|locale"
+            android:parentActivityName=".Activities.MainActivity" />
+        <activity
+            android:name=".Activities.AddMasternodeActivity"
+            android:configChanges="layoutDirection|locale"
+            android:parentActivityName=".Activities.MainActivity" ></activity>
     </application>
 
 </manifest>
