@@ -43,4 +43,22 @@
     <string name="comments">%1$d commentaires</string>
     <string name="by">par %1$s</string>
     <string name="add_masternode">Add masternode</string>
+    <string name="alert_positive">Ok</string>
+    <string name="title_activity_settings">Reglages</string>
+    <string name="radio_5m">5m</string>
+    <string name="radio_15m">15m</string>
+    <string name="radio_30m">30m</string>
+    <string name="radio_2h">2h</string>
+    <string name="radio_4h">4h</string>
+    <string name="radio_6h">6h</string>
+    <string name="radio_24h">24h</string>
+    <string name="radio_1d">1j</string>
+    <string name="radio_2d">2j</string>
+    <string name="radio_4d">4j</string>
+    <string name="radio_1w">1s</string>
+    <string name="radio_2w">1s</string>
+    <string name="radio_1m">1m</string>
+    <string name="radio_3m">3m</string>
+    <string name="my_masternode">Mes Masternodes</string>
+    <string name="add_wallet">Ajouter un portefeuille</string>
 </resources>

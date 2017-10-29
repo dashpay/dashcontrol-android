@@ -11,7 +11,7 @@
     <string name="alert_title">Error</string>
     <string name="alert_positive">Ok</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="language_preference">language_preference</string>
+    <string name="language_preference" translatable="false">language_preference</string>
     <string name="eng">English</string>
     <string name="esp">Spanish</string>
     <string name="fr">French</string>
@@ -45,7 +45,7 @@
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
-    <string name="dash">%1$d DASH</string>
+    <string name="dash" translatable="false">%1$d DASH</string>
     <string name="by">by %1$s</string>
 
     <string name="radio_5m">5m</string>

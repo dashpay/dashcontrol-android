@@ -21,6 +21,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+
+    signingConfigs {
+        /*devConfig {
+            keyAlias 'gyde'
+            keyPassword 'gyde1234567890'
+            storeFile file('../keystore/gyde-dev.jks')
+            storePassword 'gyde1234567890'
+        }*/
+        devConfig {
+            keyAlias 'key0'
+            keyPassword 'Dash258Sha'
+            storeFile file('../DashAndroid/keystore-dash-control.jks')
+            storePassword 'Dash258Sha!'
+        }
+        prodConfig {
+            keyAlias 'key0'
+            keyPassword 'Dash258Sha'
+            storeFile file('../DashAndroid/keystore-dash-control.jks')
+            storePassword 'Dash258Sha'
+        }
+    }
 }
 
 dependencies {
