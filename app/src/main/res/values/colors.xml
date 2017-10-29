@@ -11,5 +11,9 @@
     <color name="lightest_grey">#F0F0F0</color>
     <color name="white">#FFFFFF</color>
 
+    <color name="colorAccent">#FF4081</color>
+    <color name="bg_color">#e8edf3</color>
+
+
 
 </resources>

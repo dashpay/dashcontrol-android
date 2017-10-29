@@ -29,13 +29,11 @@ import com.dash.dashapp.Adapters.NewsView;
 import com.dash.dashapp.Interface.RSSUpdateListener;
 import com.dash.dashapp.Model.News;
 import com.dash.dashapp.R;
-import com.dash.dashapp.Utils.XmlUtil;
 import com.dash.dashapp.Utils.LoadMoreNews;
 import com.dash.dashapp.Utils.MyDBHandler;
-import com.dash.dashapp.Utils.SharedPreferencesManager;
+import com.dash.dashapp.Utils.XmlUtil;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NewsFragment extends BaseFragment implements RSSUpdateListener {
@@ -46,7 +44,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private ProgressBar mProgressWheel;
     private XmlUtil obj;
     private RSSUpdateListener dbListener;
-    private WrapContentLinearLayoutManager mLayoutManager;
     private List<News> newsList;
     private boolean updatePerforming = false;
 
@@ -78,18 +75,14 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
-        Context context = view.getContext();
 
         mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
         mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.news_list);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
 
-        mLayoutManager = new WrapContentLinearLayoutManager(context);
-
-        mInfinitePlaceHolderView.setLayoutManager(mLayoutManager);
+        mInfinitePlaceHolderView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
         mInfinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
         mInfinitePlaceHolderView.setHasFixedSize(true);
-
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.canChildScrollUp();

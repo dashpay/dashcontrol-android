@@ -8,7 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.dash.dashapp.Adapters.HeadingView;
+import com.dash.dashapp.Adapters.MasternodeView;
+import com.dash.dashapp.Adapters.WalletView;
+import com.dash.dashapp.Model.Masternode;
+import com.dash.dashapp.Model.Wallet;
 import com.dash.dashapp.R;
+import com.mindorks.placeholderview.ExpandablePlaceHolderView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +29,7 @@ import com.dash.dashapp.R;
 public class PortfolioFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private ExpandablePlaceHolderView mExpandableView;
 
     public PortfolioFragment() {
         // Required empty public constructor
@@ -48,9 +57,38 @@ public class PortfolioFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
+
+        ArrayList<Masternode> listMasternode = new ArrayList<>();
+        Masternode m1 = new Masternode("Masternode 1");
+        Masternode m2 = new Masternode("Masternode 2");
+        listMasternode.add(m1);
+        listMasternode.add(m2);
+
+        ArrayList<Wallet> listWallet = new ArrayList<>();
+        Wallet w1 = new Wallet("Wallet 1");
+        Wallet w2 = new Wallet("Wallet 2");
+        listWallet.add(w1);
+        listWallet.add(w2);
+
+        mExpandableView = (ExpandablePlaceHolderView) view.findViewById(R.id.masternodeWalletExpandableView);
+
+        mExpandableView.addView(new HeadingView(getContext(), "MY MASTERNODES"));
+        for (Masternode masternode : listMasternode) {
+            mExpandableView.addView(new MasternodeView(getContext(), masternode));
+        }
+
+        mExpandableView.addView(new HeadingView(getContext(), "MY WALLETS"));
+        for (Wallet wallet : listWallet) {
+            mExpandableView.addView(new WalletView(getContext(), wallet));
+        }
+
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_portfolio, container, false);
+        return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

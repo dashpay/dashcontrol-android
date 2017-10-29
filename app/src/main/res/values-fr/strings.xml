@@ -42,4 +42,5 @@
     <string name="months_remaining">%1$d mois restant</string>
     <string name="comments">%1$d commentaires</string>
     <string name="by">par %1$s</string>
+    <string name="add_masternode">Add masternode</string>
 </resources>

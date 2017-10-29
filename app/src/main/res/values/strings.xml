@@ -62,4 +62,7 @@
     <string name="radio_2w">2w</string>
     <string name="radio_1m">1m</string>
     <string name="radio_3m">3m</string>
+    <string name="my_masternode">My masternode</string>
+    <string name="add_masternode">Add masternode</string>
+    <string name="add_wallet">Add wallet</string>
 </resources>
