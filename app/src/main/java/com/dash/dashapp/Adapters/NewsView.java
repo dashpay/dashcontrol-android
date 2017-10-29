@@ -23,6 +23,7 @@ import java.util.Date;
 @Layout(R.layout.news_view)
 public class NewsView {
 
+    private static final String TITLE_NEWS = "title_rss";
     private static final String CONTENT_NEWS = "content_rss";
     @View(R.id.title)
     private TextView titleTxt;
@@ -62,6 +63,7 @@ public class NewsView {
     @Click(R.id.news_row)
     private void onClick(){
         Intent intent = new Intent(mContext, ContentRSSActivity.class);
+        intent.putExtra(TITLE_NEWS, mNews.getTitle());
         intent.putExtra(CONTENT_NEWS, mNews.getContent());
         mContext.startActivity(intent);
     }

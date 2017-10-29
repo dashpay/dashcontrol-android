@@ -35,7 +35,7 @@
         fab:menu_colorNormal="@color/colorPrimary"
         fab:menu_colorPressed="@color/colorPrimaryDark"
         fab:menu_colorRipple="@color/primary_material_dark_1"
-        fab:menu_fab_label="Add Masternode/Wallet"
+        fab:menu_fab_label="Cancel"
         fab:menu_fab_size="normal">
 
 
