@@ -198,11 +198,11 @@ public class PriceFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        int dollarPrice = 0;
+                        double dollarPrice = 0;
                         try {
                             JSONObject price = response.getJSONObject("bitfinex");
                             Log.d(TAG, price.toString());
-                            dollarPrice = price.getInt("DASH_USD");
+                            dollarPrice = price.getDouble("DASH_USD");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

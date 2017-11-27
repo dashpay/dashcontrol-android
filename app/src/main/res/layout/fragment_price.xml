@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
+        android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="parent" />
@@ -36,15 +37,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
+            android:textColor="@drawable/color_selector"
             android:checked="true"
-            android:text="@string/radio_6h" />
+            android:text="@string/radio_6h"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio24h"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_24h" />
+            android:text="@string/radio_24h"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio2d"
@@ -52,14 +56,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_2d" />
+            android:text="@string/radio_2d"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio4d"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_4d" />
+            android:text="@string/radio_4d"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio1w"
@@ -67,14 +73,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_1w" />
+            android:text="@string/radio_1w"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio2w"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_2w" />
+            android:text="@string/radio_2w"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio1m"
@@ -82,14 +90,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_1m" />
+            android:text="@string/radio_1m"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio3m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_3m" />
+            android:text="@string/radio_3m"
+            android:button="@android:color/transparent" />
     </RadioGroup>
 
     <RadioGroup
@@ -105,14 +115,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_5m" />
+            android:text="@string/radio_5m"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio15m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_15m" />
+            android:text="@string/radio_15m"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio30m"
@@ -120,14 +132,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_30m" />
+            android:text="@string/radio_30m"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio2h"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_2h" />
+            android:text="@string/radio_2h"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio4h"
@@ -135,14 +149,16 @@
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
             android:checked="true"
-            android:text="@string/radio_4h" />
+            android:text="@string/radio_4h"
+            android:button="@android:color/transparent" />
 
         <RadioButton
             android:id="@+id/radio1d"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/scale_selector"
-            android:text="@string/radio_1d" />
+            android:text="@string/radio_1d"
+            android:button="@android:color/transparent" />
     </RadioGroup>
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/primary_material_dark_1" android:state_pressed="true" />
-    <item android:drawable="@color/primary_material_dark_1" android:state_checked="true" />
-    <item android:drawable="@color/primary_material_dark_1" android:state_focused="true" />
-    <item android:drawable="@color/white" />
+    <item android:drawable="@drawable/activated_radio_button" android:state_pressed="true" />
+    <item android:drawable="@drawable/activated_radio_button" android:state_checked="true" />
+    <item android:drawable="@drawable/activated_radio_button" android:state_focused="true" />
+    <item android:drawable="@drawable/inactive_radio_button"/>
 </selector>
