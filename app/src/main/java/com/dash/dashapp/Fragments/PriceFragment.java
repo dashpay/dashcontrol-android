@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,6 +45,8 @@ import java.util.ArrayList;
 public class PriceFragment extends Fragment {
 
     private static final String TAG = "PriceFragment";
+    private static final String URL_PRICE = "http://dashpay.info/api/v0/prices";
+    private static final String URL_EXCHANGES = "https://dashpay.info/api/v0/markets";
     private OnFragmentInteractionListener mListener;
 
     private Context context;
@@ -191,10 +194,57 @@ public class PriceFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        String url = "http://dashpay.info/api/v0/prices";
 
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        // Getting prices
+        JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
+                (Request.Method.GET, URL_PRICE, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        double dollarPrice = 0;
+                        ArrayList<Exchange>
+                        try {
+
+                            Iterator<String> keys = response.keys();
+
+                            // Getting exchanges
+                            if (keys.hasNext()){
+                                String str_Name=keys.next();
+                                // get the value i care about
+                                String value = response.optString(str_Name);
+                            }
+
+
+
+                            JSONObject price = response.getJSONObject("bitfinex");
+                            Log.d(TAG, price.toString());
+                            dollarPrice = price.getDouble("DASH_USD");
+                            JSONObject price = response.getJSONObject("bitfinex");
+                            Log.d(TAG, price.toString());
+                            dollarPrice = price.getDouble("DASH_USD");
+                            JSONObject price = response.getJSONObject("bitfinex");
+                            Log.d(TAG, price.toString());
+                            dollarPrice = price.getDouble("DASH_USD");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        priceTextview.setText(dollarPrice + "$");
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+
+        // Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(context).addToRequestQueue(jsObjRequestPrice);
+
+        // Getting exchanges
+        JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
+                (Request.Method.GET, URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -218,7 +268,10 @@ public class PriceFragment extends Fragment {
                 });
 
         // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
+        MySingleton.getInstance(context).addToRequestQueue(jsObjRequestExchanges);
+
+
+
     }
 
     /**
