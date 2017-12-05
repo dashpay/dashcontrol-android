@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by sebas on 8/5/2017.
@@ -155,10 +156,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return news;
     }
 
-    public ArrayList<News> findAllNews(String filter) {
+    public List<News> findAllNews(String filter) {
         Log.d(TAG, "Find list news");
 
-        ArrayList<News> newsList = new ArrayList<>();
+        List<News> newsList = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_NEWS;
         if (filter != null) {
@@ -272,10 +273,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return proposal;
     }
 
-    public ArrayList<Proposal> findAllProposals(String filter) {
+    public List<Proposal> findAllProposals(String filter) {
         Log.d(TAG, "Find list proposals");
 
-        ArrayList<Proposal> proposalsList = new ArrayList<>();
+        List<Proposal> proposalsList = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_PROPOSALS;
         if (filter != null) {

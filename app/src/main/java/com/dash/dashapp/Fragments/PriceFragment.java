@@ -10,15 +10,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.dash.dashapp.Model.Exchange;
+import com.dash.dashapp.Model.Market;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.MySingleton;
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -33,11 +34,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PriceFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link PriceFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -47,13 +53,22 @@ public class PriceFragment extends Fragment {
     private static final String TAG = "PriceFragment";
     private static final String URL_PRICE = "http://dashpay.info/api/v0/prices";
     private static final String URL_EXCHANGES = "https://dashpay.info/api/v0/markets";
+    @BindView(R.id.spinnerExchanges)
+    Spinner spinnerExchanges;
+    @BindView(R.id.spinnerMarket)
+    Spinner spinnerMarket;
+    @BindView(R.id.priceTextview)
+    TextView priceTextview;
     private OnFragmentInteractionListener mListener;
 
     private Context context;
 
     private CandleStickChart mChart;
 
-    private TextView priceTextview;
+    private String defaultExchange, defaultMarket;
+
+    private Unbinder unbinder;
+
 
     public PriceFragment() {
         // Required empty public constructor
@@ -84,6 +99,8 @@ public class PriceFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_price, container, false);
         context = view.getContext();
+
+        ButterKnife.bind(this, view);
 
         priceTextview = (TextView) view.findViewById(R.id.priceTextview);
 
@@ -120,7 +137,7 @@ public class PriceFragment extends Fragment {
         //Setting the data
         mChart.resetTracking();
 
-        ArrayList<CandleEntry> yVals1 = new ArrayList<CandleEntry>();
+        List<CandleEntry> yVals1 = new ArrayList<>();
 
         for (int i = 0; i < 60; i++) {
             float mult = (20 + 1);
@@ -194,6 +211,15 @@ public class PriceFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        setDefaultExchanges();
+
+        //setSpinnerAndPrices();
+
+
+    }
+
+    private void setSpinnerAndPrices() {
+
 
         // Getting prices
         JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
@@ -201,76 +227,126 @@ public class PriceFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        double dollarPrice = 0;
-                        ArrayList<Exchange>
+                        List<Exchange> listExchanges = new ArrayList<>();
+                        List<String> listExchangesString = new ArrayList<>();
                         try {
 
-                            Iterator<String> keys = response.keys();
+                            Iterator<String> listExchangesKeys = response.keys();
 
                             // Getting exchanges
-                            if (keys.hasNext()){
-                                String str_Name=keys.next();
+                            while (listExchangesKeys.hasNext()) {
+                                String exchangeName = listExchangesKeys.next();
                                 // get the value i care about
-                                String value = response.optString(str_Name);
+                                String marketString = response.optString(exchangeName);
+
+                                JSONObject marketJson = response.getJSONObject(marketString);
+                                Iterator<String> listMarketKeys = marketJson.keys();
+
+                                Log.d(TAG, exchangeName);
+
+                                //Feeding the available markets for this exchange
+                                List<Market> listMarket = new ArrayList<>();
+                                while (listMarketKeys.hasNext()) {
+                                    String marketName = listExchangesKeys.next();
+                                    Market market = new Market(marketName, marketJson.optDouble(marketName));
+                                    Log.d(TAG, marketName);
+                                    Log.d(TAG, marketJson.optString(marketName));
+
+                                    listMarket.add(market);
+
+                                }
+                                Exchange exchange = new Exchange(exchangeName, listMarket);
+                                listExchanges.add(exchange);
+                                listExchangesString.add(exchange.getName());
+
+                            }
+
+                            ArrayAdapter<String> adapterExchanges = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listExchangesString);
+                            spinnerExchanges.setAdapter(adapterExchanges);
+
+                            int indexDefaultMarket = 0;
+                            for (int i = 0; i < listExchanges.size(); i++) {
+                                Exchange exchange = listExchanges.get(i);
+                                if (exchange.getName().equals(defaultExchange)) {
+                                    spinnerExchanges.setSelection(i);
+                                    List<String> listMarketString = new ArrayList<>();
+
+                                    for (int j = 0; j < exchange.getListMarket().size(); j++) {
+                                        Market market = exchange.getListMarket().get(j);
+                                        listMarketString.add(market.getName());
+                                        if (market.getName().equals(defaultMarket)) {
+                                            indexDefaultMarket = j;
+                                            priceTextview.setText(market.getPrice() + "$");
+                                        } else {
+
+                                        }
+                                    }
+
+                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
+                                    spinnerMarket.setAdapter(adapterMarket);
+                                    spinnerMarket.setSelection(indexDefaultMarket);
+
+                                } else {
+
+                                }
                             }
 
 
-
-                            JSONObject price = response.getJSONObject("bitfinex");
-                            Log.d(TAG, price.toString());
-                            dollarPrice = price.getDouble("DASH_USD");
-                            JSONObject price = response.getJSONObject("bitfinex");
-                            Log.d(TAG, price.toString());
-                            dollarPrice = price.getDouble("DASH_USD");
-                            JSONObject price = response.getJSONObject("bitfinex");
-                            Log.d(TAG, price.toString());
-                            dollarPrice = price.getDouble("DASH_USD");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        priceTextview.setText(dollarPrice + "$");
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
-
+                        error.getMessage();
                     }
                 });
-
         // Access the RequestQueue through your singleton class.
         MySingleton.getInstance(context).addToRequestQueue(jsObjRequestPrice);
+    }
 
-        // Getting exchanges
+    private void setDefaultExchanges() {
+
+        // Getting exchanges (default exchange to display)
         JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
                 (Request.Method.GET, URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        double dollarPrice = 0;
                         try {
-                            JSONObject price = response.getJSONObject("bitfinex");
+                            JSONObject price = response.getJSONObject("default");
                             Log.d(TAG, price.toString());
-                            dollarPrice = price.getDouble("DASH_USD");
+                            defaultExchange = price.getString("exchange");
+                            defaultMarket = price.getString("market");
+
+                            Log.d(TAG, defaultExchange);
+                            Log.d(TAG, defaultMarket);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        priceTextview.setText(dollarPrice + "$");
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
+                        error.getMessage();
 
                     }
                 });
 
         // Access the RequestQueue through your singleton class.
         MySingleton.getInstance(context).addToRequestQueue(jsObjRequestExchanges);
+    }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
 
     }
 

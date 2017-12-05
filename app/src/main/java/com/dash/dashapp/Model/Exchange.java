@@ -1,6 +1,7 @@
 package com.dash.dashapp.Model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sebas on 12/2/2017.
@@ -8,7 +9,11 @@ import java.util.ArrayList;
 
 public class Exchange {
     private String name;
-    private ArrayList<Market> listCurrencies;
+    private List<Market> listMarket;
+    public Exchange(String name, List<Market> listCurrencies) {
+        this.name = name;
+        this.listMarket = listCurrencies;
+    }
 
     public String getName() {
         return name;
@@ -18,11 +23,11 @@ public class Exchange {
         this.name = name;
     }
 
-    public ArrayList<Market> getListCurrencies() {
-        return listCurrencies;
+    public List<Market> getListMarket() {
+        return listMarket;
     }
 
-    public void setListCurrencies(ArrayList<Market> listCurrencies) {
-        this.listCurrencies = listCurrencies;
+    public void setListMarket(List<Market> listCurrencies) {
+        this.listMarket = listCurrencies;
     }
 }

@@ -11,6 +11,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sebas on 8/5/2017.
@@ -100,7 +101,7 @@ public class XmlUtil {
         News news = null;
         String text = null;
         int articleNumber = 0;
-        ArrayList<News> newsList = new ArrayList<>();
+        List<News> newsList = new ArrayList<>();
         MyDBHandler dbHandler = new MyDBHandler(context, null);
 
         try {

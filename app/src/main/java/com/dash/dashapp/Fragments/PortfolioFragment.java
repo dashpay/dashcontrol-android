@@ -28,6 +28,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -127,13 +128,13 @@ public class PortfolioFragment extends Fragment {
 
 
 
-        ArrayList<Masternode> listMasternode = new ArrayList<>();
+        List<Masternode> listMasternode = new ArrayList<>();
         Masternode m1 = new Masternode("Masternode 1");
         Masternode m2 = new Masternode("Masternode 2");
         listMasternode.add(m1);
         listMasternode.add(m2);
 
-        ArrayList<Wallet> listWallet = new ArrayList<>();
+        List<Wallet> listWallet = new ArrayList<>();
         Wallet w1 = new Wallet("Wallet 1");
         Wallet w2 = new Wallet("Wallet 2");
         listWallet.add(w1);
