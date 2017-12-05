@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -100,7 +101,7 @@ public class PriceFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_price, container, false);
         context = view.getContext();
 
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         priceTextview = (TextView) view.findViewById(R.id.priceTextview);
 
@@ -213,13 +214,11 @@ public class PriceFragment extends Fragment {
 
         setDefaultExchanges();
 
-        //setSpinnerAndPrices();
-
+        setSpinnerAndPrices();
 
     }
 
     private void setSpinnerAndPrices() {
-
 
         // Getting prices
         JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
@@ -335,6 +334,7 @@ public class PriceFragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
                         error.getMessage();
+                        Log.d(TAG, "Error : " + error.getMessage());
 
                     }
                 });

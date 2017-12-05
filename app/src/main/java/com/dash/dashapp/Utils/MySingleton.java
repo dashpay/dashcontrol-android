@@ -12,7 +12,6 @@ import com.android.volley.toolbox.Volley;
 /**
  * Created by sebas on 10/14/2017.
  */
-
 public class MySingleton {
     private static MySingleton mInstance;
     private RequestQueue mRequestQueue;
