@@ -1,10 +1,8 @@
 package com.dash.dashapp.Activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,7 +14,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class AddMasternodeActivity extends BaseActivity {
@@ -38,7 +35,6 @@ public class AddMasternodeActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResourceId() {
-        //Make App Full Screen
         return R.layout.activity_add_masternode;
     }
 

@@ -1,22 +1,22 @@
 package com.dash.dashapp.Activities;
 
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.Utils.XmlUtil;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SettingsActivity extends AppCompatActivity {
+import butterknife.BindView;
+
+public class SettingsActivity extends BaseActivity {
 
 
     public static final String RSS_LINK_DEF = "default";
@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static String RSS_LINK_JP = "https://www.dash.org/jp/rss/dash_blog_rss.xml";
     public static String RSS_LINK_KR = "https://www.dash.org/kr/rss/dash_blog_rss.xml";
 
-    public static final Map<String, String> listAvailableLanguage  = new HashMap<String, String>() {{
+    public static final Map<String, String> listAvailableLanguage = new HashMap<String, String>() {{
         put("en", RSS_LINK_EN);
         put("es", RSS_LINK_ES);
         put("fr", RSS_LINK_FR);
@@ -39,13 +39,17 @@ public class SettingsActivity extends AppCompatActivity {
         put("jp", RSS_LINK_JP);
         put("kr", RSS_LINK_KR);
     }};
+    @BindView(R.id.list_languages)
+    ListView listLanguages;
 
-    private ListView listView;
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_settings;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
 
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
@@ -57,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.list_languages);
+        listLanguages = (ListView) findViewById(R.id.list_languages);
 
         // Defined Array values to show in ListView
         String[] languages = new String[]{
@@ -93,16 +97,16 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        listLanguages.setAdapter(adapter);
 
         // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listLanguages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-                if (!SharedPreferencesManager.getLanguageRSS(getApplicationContext()).equals(values[position])){
+                if (!SharedPreferencesManager.getLanguageRSS(getApplicationContext()).equals(values[position])) {
                     SharedPreferencesManager.setLanguageRSS(getApplicationContext(), values[position]);
 
                     MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);

@@ -4,8 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.dash.dashapp.Fragments.NewsFragment;
 import com.dash.dashapp.Fragments.PortfolioFragment;
@@ -17,11 +17,17 @@ import com.dash.dashapp.Utils.SharedPreferencesManager;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements
+import butterknife.BindView;
+
+public class MainActivity extends BaseActivity implements
         PortfolioFragment.OnFragmentInteractionListener,
-        PriceFragment.OnFragmentInteractionListener{
+        PriceFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
+    @BindView(R.id.content)
+    FrameLayout content;
+    @BindView(R.id.navigation)
+    BottomNavigationView navigation;
     private NewsFragment newsFragment;
     private ProposalsFragment proposalFragment;
 
@@ -49,14 +55,18 @@ public class MainActivity extends AppCompatActivity implements
 
     };
 
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_main;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         pickDefaultLanguage();
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         newsFragment = NewsFragment.newInstance();
@@ -75,12 +85,11 @@ public class MainActivity extends AppCompatActivity implements
     private void pickDefaultLanguage() {
 
         // if default language is null
-        if (SharedPreferencesManager.getLanguageRSS(this).equals(SettingsActivity.RSS_LINK_DEF)){
+        if (SharedPreferencesManager.getLanguageRSS(this).equals(SettingsActivity.RSS_LINK_DEF)) {
             // if Device's exist in available dash RSS languages
 
-            for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet())
-            {
-                if (Locale.getDefault().getLanguage().equals(entry.getKey())){
+            for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet()) {
+                if (Locale.getDefault().getLanguage().equals(entry.getKey())) {
                     // Make default language device's language
                     SharedPreferencesManager.setLanguageRSS(this, entry.getValue());
                     return;
