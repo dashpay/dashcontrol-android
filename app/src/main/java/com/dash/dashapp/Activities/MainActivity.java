@@ -13,6 +13,7 @@ import com.dash.dashapp.Fragments.PriceFragment;
 import com.dash.dashapp.Fragments.ProposalsFragment;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
+import com.dash.dashapp.Utils.URLs;
 
 import java.util.Locale;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class MainActivity extends BaseActivity implements
     private void pickDefaultLanguage() {
 
         // if default language is null
-        if (SharedPreferencesManager.getLanguageRSS(this).equals(SettingsActivity.RSS_LINK_DEF)) {
+        if (SharedPreferencesManager.getLanguageRSS(this).equals(URLs.RSS_LINK_DEF)) {
             // if Device's exist in available dash RSS languages
 
             for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet()) {
@@ -96,7 +97,7 @@ public class MainActivity extends BaseActivity implements
                 }
             }
             // else english
-            SharedPreferencesManager.setLanguageRSS(this, SettingsActivity.RSS_LINK_EN);
+            SharedPreferencesManager.setLanguageRSS(this, URLs.RSS_LINK_EN);
         }
     }
 

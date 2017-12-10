@@ -52,12 +52,12 @@ public class HeadingView {
     }
 
     @Expand
-    private void onExpand(){
+    private void onExpand() {
         toggleIcon.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_white_24dp));
     }
 
     @Collapse
-    private void onCollapse(){
+    private void onCollapse() {
         toggleIcon.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_white_24dp));
     }
 }

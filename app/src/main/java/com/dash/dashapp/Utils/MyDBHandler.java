@@ -22,10 +22,6 @@ import java.util.List;
 public class MyDBHandler extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 18;
-    private static final String DATABASE_NAME = "dashDB.db";
-    private static final String TAG = "MyDBHandler";
-
-
     public static final String TABLE_NEWS = "news";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_RSS_GUID = "rss_id";
@@ -33,8 +29,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_THUMBNAIL = "image";
     public static final String COLUMN_DATE = "date_pub";
     public static final String COLUMN_CONTENT = "content";
-
-
     public static final String TABLE_PROPOSALS = "proposal";
     public static final String COLUMN_HASH = "hash"; //proposal hash [string]
     public static final String COLUMN_NAME = "name"; //proposal name [string]
@@ -57,6 +51,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_ORDER = "order_display"; //the order value should be used to sort proposals in case the JSON order is not preserved correctly. The order is defined by a reddit like algo covering the time and the upvotes and downvotes on DashCentral [integer]
     public static final String COLUMN_COMMENT_AMOUNT = "comment_amount"; //amount of proposal comments posted on DashCentral [integer]
     public static final String COLUMN_OWNER_USERNAME = "owner_username"; //username of the proposal owner on DashCentral [string]
+    private static final String DATABASE_NAME = "dashDB.db";
+    private static final String TAG = "MyDBHandler";
 
 
     public MyDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {

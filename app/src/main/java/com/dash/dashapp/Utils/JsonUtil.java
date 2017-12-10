@@ -22,8 +22,8 @@ import java.util.List;
 public class JsonUtil {
 
     private static final int NUMBER_FIRST_BATCH = 10;
-    private ProposalUpdateListener dbProposalListener;
     public Context context = null;
+    private ProposalUpdateListener dbProposalListener;
 
     public JsonUtil(Context context) {
         this.context = context;
@@ -36,7 +36,6 @@ public class JsonUtil {
     }
 
     public class UpdateProposalDB extends AsyncTask<Void, Void, Void> {
-        private static final String URL_PROPOSAL_LIST = "https://www.dashcentral.org/api/v1/budget"; //change Object to required type
         private ProposalUpdateListener dbProposalListener;
 
         public UpdateProposalDB(ProposalUpdateListener dbProposalListener) {
@@ -57,7 +56,7 @@ public class JsonUtil {
 
                 MyDBHandler dbHandler = new MyDBHandler(context, null);
 
-                InputStream jsonContent = HttpUtil.httpRequest(URL_PROPOSAL_LIST);
+                InputStream jsonContent = HttpUtil.httpRequest(URLs.URL_PROPOSAL);
 
                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(jsonContent, "UTF-8"));
 
@@ -70,9 +69,9 @@ public class JsonUtil {
 
                 List<Proposal> list = new ArrayList<>();
                 JSONArray array = proposalJson.getJSONArray("proposals");
-                for(int i = 0 ; i < array.length() ; i++){
+                for (int i = 0; i < array.length(); i++) {
 
-                    if (i == NUMBER_FIRST_BATCH){
+                    if (i == NUMBER_FIRST_BATCH) {
                         dbProposalListener.onFirstBatchProposalsCompleted(list);
                     }
 

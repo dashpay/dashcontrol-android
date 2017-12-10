@@ -6,10 +6,10 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/search"
         app:showAsAction="ifRoom|collapseActionView"
         nz.govt.app:actionViewClass="android.support.v7.widget.SearchView"
-        nz.govt.app:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/search" />
+        nz.govt.app:showAsAction="ifRoom|collapseActionView" />
 
     <!-- Settings, should always be in the overflow -->
     <item

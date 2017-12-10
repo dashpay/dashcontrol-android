@@ -71,7 +71,7 @@ public class ProposalView {
         approvalRateTextView.setText(ratioYesInt + "%");
 
         //TODO What's the owner title ?
-        if (!mProposal.getTitle().equals("")){
+        if (!mProposal.getTitle().equals("")) {
             titleOwnerTextView.setText(mProposal.getTitle());
         }
 
@@ -95,7 +95,7 @@ public class ProposalView {
 
         dashAmountTextView.setText(mContext.getString(R.string.dash, mProposal.getMonthly_amount()));
 
-        if (!mProposal.getOwner_username().equals("")){
+        if (!mProposal.getOwner_username().equals("")) {
             byOwnerTextView.setText(mContext.getString(R.string.by, mProposal.getOwner_username()));
         }
     }

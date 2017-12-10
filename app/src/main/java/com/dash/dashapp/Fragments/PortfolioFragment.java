@@ -16,7 +16,6 @@ import android.view.animation.OvershootInterpolator;
 
 import com.dash.dashapp.Activities.AddMasternodeActivity;
 import com.dash.dashapp.Activities.AddWalletActivity;
-import com.dash.dashapp.Activities.SettingsActivity;
 import com.dash.dashapp.Adapters.HeadingView;
 import com.dash.dashapp.Adapters.MasternodeView;
 import com.dash.dashapp.Adapters.WalletView;
@@ -30,6 +29,8 @@ import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -38,7 +39,7 @@ import java.util.List;
  * Use the {@link PortfolioFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PortfolioFragment extends Fragment {
+public class PortfolioFragment extends BaseFragment {
 
     private OnFragmentInteractionListener mListener;
     private ExpandablePlaceHolderView mExpandableView;
@@ -72,6 +73,8 @@ public class PortfolioFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
 
+        mUnbinder = ButterKnife.bind(this, view);
+
 
         // creating floating button menu
         final FloatingActionMenu fam = (FloatingActionMenu) view.findViewById(R.id.menu_masternode_wallet);
@@ -104,7 +107,6 @@ public class PortfolioFragment extends Fragment {
         fam.setIconToggleAnimatorSet(set);
 
 
-
         final FloatingActionButton addMasternode = (FloatingActionButton) view.findViewById(R.id.button_add_masternode);
         addMasternode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,8 +117,6 @@ public class PortfolioFragment extends Fragment {
         });
 
 
-
-
         final FloatingActionButton addWallet = (FloatingActionButton) view.findViewById(R.id.button_add_wallet);
         addWallet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +125,6 @@ public class PortfolioFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
 
 
         List<Masternode> listMasternode = new ArrayList<>();

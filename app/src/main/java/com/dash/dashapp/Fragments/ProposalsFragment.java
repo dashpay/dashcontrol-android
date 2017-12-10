@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -36,19 +37,25 @@ import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ProposalsFragment extends BaseFragment implements ProposalUpdateListener {
     private static final String TAG = "ProposalsFragment";
     private static final int NUMBER_FIRST_BATCH = 10;
-    private InfinitePlaceHolderView mInfinitePlaceHolderView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar mProgressWheel;
+    @BindView(R.id.proposals_list)
+    InfinitePlaceHolderView mProposalInfinitePlaceHolderView;
+    @BindView(R.id.progress_wheel)
+    ProgressBar mProgressWheel;
+    @BindView(R.id.container)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.button_add_proposal)
+    FloatingActionButton buttonAddProposal;
     private JsonUtil obj;
     private ProposalUpdateListener dbListener;
-    private ProposalsFragment.WrapContentLinearLayoutManager mLayoutManager;
+    private WrapContentLinearLayoutManager mLayoutManager;
     private List<Proposal> proposalsList;
     private boolean updatePerforming = false;
-    public final static String URL_PROPOSAL = "https://www.dashcentral.org/api/v1/budget";
-
 
 
     /**
@@ -78,17 +85,14 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_proposals_list, container, false);
-        Context context = view.getContext();
 
-        mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
-        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.proposals_list);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
+        mUnbinder = ButterKnife.bind(this, view);
 
-        mLayoutManager = new ProposalsFragment.WrapContentLinearLayoutManager(context);
+        mLayoutManager = new WrapContentLinearLayoutManager(mContext);
 
-        mInfinitePlaceHolderView.setLayoutManager(mLayoutManager);
-        mInfinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
-        mInfinitePlaceHolderView.setHasFixedSize(true);
+        mProposalInfinitePlaceHolderView.setLayoutManager(mLayoutManager);
+        mProposalInfinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
+        mProposalInfinitePlaceHolderView.setHasFixedSize(true);
 
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
@@ -108,7 +112,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
 
             @Override
             public void onRefresh() {
-                if (!updatePerforming){
+                if (!updatePerforming) {
                     updateProposals();
                 }
             }
@@ -154,16 +158,16 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     public void loadJson() {
         turnWheelOn();
         for (int i = 0; i < LoadMoreProposals.LOAD_VIEW_SET_COUNT; i++) {
-            try{
-                mInfinitePlaceHolderView.addView(new ProposalView(getContext(), proposalsList.get(i)));
+            try {
+                mProposalInfinitePlaceHolderView.addView(new ProposalView(getContext(), proposalsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.getMessage();
             }
         }
 
-        if (proposalsList.size() > NUMBER_FIRST_BATCH){
-            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreProposals(mInfinitePlaceHolderView, proposalsList));
+        if (proposalsList.size() > NUMBER_FIRST_BATCH) {
+            mProposalInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreProposals(mProposalInfinitePlaceHolderView, proposalsList));
         }
         turnWheelOff();
     }
@@ -187,24 +191,6 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         super.onDetach();
     }
 
-
-    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-        public WrapContentLinearLayoutManager(Context context) {
-            super(context);
-        }
-
-        //... constructor
-        @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            try {
-                super.onLayoutChildren(recycler, state);
-            } catch (IndexOutOfBoundsException e) {
-                Log.e("probe", "meet a IOOBE in RecyclerView");
-                e.getMessage();
-            }
-        }
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.top_menu, menu);
@@ -216,7 +202,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "Text submit");
-                mInfinitePlaceHolderView.removeAllViews();
+                mProposalInfinitePlaceHolderView.removeAllViews();
 
                 MyDBHandler dbHandler = new MyDBHandler(mContext, null);
                 proposalsList = dbHandler.findAllProposals(query);
@@ -262,8 +248,6 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-
-
     @Override
     public void onUpdateStarted() {
         updatePerforming = true;
@@ -277,7 +261,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mInfinitePlaceHolderView.removeAllViews();
+                mProposalInfinitePlaceHolderView.removeAllViews();
                 loadJson();
                 turnWheelOff();
             }
@@ -292,7 +276,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         proposalsList = dbHandler.findAllProposals(null);
 
-        if (mInfinitePlaceHolderView.getChildCount() == 0){
+        if (mProposalInfinitePlaceHolderView.getChildCount() == 0) {
             loadJson();
             turnWheelOff();
         }
@@ -301,11 +285,28 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     @Override
     public void onStop() {
         turnWheelOff();
-        if (mSwipeRefreshLayout!=null) {
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(false);
             mSwipeRefreshLayout.destroyDrawingCache();
             mSwipeRefreshLayout.clearAnimation();
         }
         super.onStop();
+    }
+
+    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
+        public WrapContentLinearLayoutManager(Context context) {
+            super(context);
+        }
+
+        //... constructor
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                Log.e("probe", "meet a IOOBE in RecyclerView");
+                e.getMessage();
+            }
+        }
     }
 }

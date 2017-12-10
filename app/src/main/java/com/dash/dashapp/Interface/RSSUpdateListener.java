@@ -2,7 +2,6 @@ package com.dash.dashapp.Interface;
 
 import com.dash.dashapp.Model.News;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +11,9 @@ import java.util.List;
 public interface RSSUpdateListener {
 
     void onUpdateStarted();
+
     void onFirstBatchNewsCompleted(List<News> newsList);
+
     void onDatabaseUpdateCompleted();
 
 

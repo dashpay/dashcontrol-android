@@ -36,6 +36,8 @@ import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
+
 public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private static final String TAG = "NewsFragment";
     private static final int NUMBER_FIRST_BATCH = 10;
@@ -76,6 +78,8 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
 
+        mUnbinder = ButterKnife.bind(this, view);
+
         mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
         mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.news_list);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
@@ -101,7 +105,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
             @Override
             public void onRefresh() {
-                if (!updatePerforming){
+                if (!updatePerforming) {
                     updateRSS();
                 }
             }
@@ -147,15 +151,15 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     public void loadRSS() {
         turnWheelOn();
         for (int i = 0; i < LoadMoreNews.LOAD_VIEW_SET_COUNT; i++) {
-            try{
+            try {
                 mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.getMessage();
             }
         }
 
-        if (newsList.size() > NUMBER_FIRST_BATCH){
+        if (newsList.size() > NUMBER_FIRST_BATCH) {
             mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreNews(mInfinitePlaceHolderView, newsList));
         }
         turnWheelOff();
@@ -179,24 +183,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-
-    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-        public WrapContentLinearLayoutManager(Context context) {
-            super(context);
-        }
-
-        //... constructor
-        @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            try {
-                super.onLayoutChildren(recycler, state);
-            } catch (IndexOutOfBoundsException e) {
-                Log.e("probe", "meet a IOOBE in RecyclerView");
-                e.getMessage();
-            }
-        }
     }
 
     @Override
@@ -269,7 +255,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         newsList = dbHandler.findAllNews(null);
 
-        if (mInfinitePlaceHolderView.getChildCount() == 0){
+        if (mInfinitePlaceHolderView.getChildCount() == 0) {
             loadRSS();
             turnWheelOff();
         }
@@ -292,11 +278,28 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     @Override
     public void onStop() {
         turnWheelOff();
-        if (mSwipeRefreshLayout!=null) {
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(false);
             mSwipeRefreshLayout.destroyDrawingCache();
             mSwipeRefreshLayout.clearAnimation();
         }
         super.onStop();
+    }
+
+    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
+        public WrapContentLinearLayoutManager(Context context) {
+            super(context);
+        }
+
+        //... constructor
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                Log.e("probe", "meet a IOOBE in RecyclerView");
+                e.getMessage();
+            }
+        }
     }
 }

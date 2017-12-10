@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:padding="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="8dp"
-    android:layout_margin="8dp">
+    app:cardElevation="8dp">
 
     <RelativeLayout
         android:id="@+id/news_row"
@@ -25,10 +25,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
+            android:drawablePadding="6dp"
             android:drawableStart="@drawable/dummy_image"
             android:padding="5dp"
             android:textSize="18sp"
-            android:drawablePadding="6dp"
             android:textStyle="bold" />
 
     </RelativeLayout>
