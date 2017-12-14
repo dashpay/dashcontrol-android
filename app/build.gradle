@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
 
-    def mVersionCode = 1
+    def mVersionCode = 2
     def mVersionName = "DashControl-" + mVersionCode
 
     def BOOLEAN = "boolean"
@@ -46,54 +46,43 @@ android {
 
 
     signingConfigs {
-        /*devConfig {
-            keyAlias 'gyde'
-            keyPassword 'gyde1234567890'
-            storeFile file('../keystore/gyde-dev.jks')
-            storePassword 'gyde1234567890'
-        }*/
         devConfig {
-            keyAlias 'key0'
-            keyPassword 'Dash258Sha'
-            storeFile file('../DashAndroid/keystore-dash-control.jks')
+            keyAlias 'dashKey'
+            keyPassword 'Dash258Sha!'
+            storeFile file('../keystore-dash-control.jks')
             storePassword 'Dash258Sha!'
         }
         prodConfig {
-            keyAlias 'key0'
-            keyPassword 'Dash258Sha'
-            storeFile file('../DashAndroid/keystore-dash-control.jks')
-            storePassword 'Dash258Sha'
+            keyAlias 'dashKey'
+            keyPassword 'Dash258Sha!'
+            storeFile file('../keystore-dash-control.jks')
+            storePassword 'Dash258Sha!'
         }
     }
 
 
     productFlavors {
         dev {
-
             applicationId 'com.dash.dashapp.dev'
-            signingConfig signingConfigs.devConfig
             versionName mVersionName + "-DEV"
+            signingConfig signingConfigs.devConfig
             buildConfigField BOOLEAN, DEVELOP, TRUE
             buildConfigField BOOLEAN, PRODUCTION, FALSE
             buildConfigField STRING, BASE_URL, URL_DEV
-
-
         }
         prod {
-
             applicationId 'com.dash.dashapp.prod'
-            signingConfig signingConfigs.prodConfig
             versionName mVersionName + "-PROD"
+            signingConfig signingConfigs.prodConfig
             buildConfigField BOOLEAN, DEVELOP, FALSE
             buildConfigField BOOLEAN, PRODUCTION, TRUE
             buildConfigField STRING, BASE_URL, URL_PROD
-
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })

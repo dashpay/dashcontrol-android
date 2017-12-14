@@ -68,8 +68,8 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        dbListener = this;
         super.onCreate(savedInstanceState);
+        dbListener = this;
     }
 
     @Override
