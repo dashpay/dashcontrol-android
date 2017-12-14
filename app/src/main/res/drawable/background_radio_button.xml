@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/primary_material_dark_1" android:state_pressed="true">
-        <shape
-            android:shape="rectangle">
+    <item
+        android:drawable="@color/primary_material_dark_1"
+        android:state_pressed="true">
+        <shape android:shape="rectangle">
             <stroke
                 android:width="1px"
-                android:color="@android:color/black"/>
+                android:color="@android:color/black" />
         </shape>
     </item>
 </layer-list>

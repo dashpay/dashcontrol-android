@@ -21,11 +21,7 @@ import java.util.List;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 18;
-    private static final String DATABASE_NAME = "dashDB.db";
-    private static final String TAG = "MyDBHandler";
-
-
+    public static final int DATABASE_VERSION = 21;
     public static final String TABLE_NEWS = "news";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_RSS_GUID = "rss_id";
@@ -33,8 +29,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_THUMBNAIL = "image";
     public static final String COLUMN_DATE = "date_pub";
     public static final String COLUMN_CONTENT = "content";
-
-
     public static final String TABLE_PROPOSALS = "proposal";
     public static final String COLUMN_HASH = "hash"; //proposal hash [string]
     public static final String COLUMN_NAME = "name"; //proposal name [string]
@@ -57,6 +51,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_ORDER = "order_display"; //the order value should be used to sort proposals in case the JSON order is not preserved correctly. The order is defined by a reddit like algo covering the time and the upvotes and downvotes on DashCentral [integer]
     public static final String COLUMN_COMMENT_AMOUNT = "comment_amount"; //amount of proposal comments posted on DashCentral [integer]
     public static final String COLUMN_OWNER_USERNAME = "owner_username"; //username of the proposal owner on DashCentral [string]
+    private static final String DATABASE_NAME = "dashDB.db";
+    private static final String TAG = "MyDBHandler";
 
 
     public MyDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {
@@ -159,6 +155,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public List<News> findAllNews(String filter) {
         Log.d(TAG, "Find list news");
 
+
         List<News> newsList = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_NEWS;
@@ -168,19 +165,25 @@ public class MyDBHandler extends SQLiteOpenHelper {
         query += " ORDER BY " + COLUMN_DATE + " DESC;";
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            News news = new News();
-            news.setGuid(cursor.getString(1));
-            news.setTitle(cursor.getString(2));
-            news.setThumbnail(cursor.getString(3));
-            news.setPubDate(cursor.getString(4));
-            news.setContent(cursor.getString(5));
-            newsList.add(news);
-        }
-        cursor.close();
 
-        db.close();
+        Cursor cursor = db.rawQuery(query, null);
+
+
+        try {
+            while (cursor.moveToNext()) {
+                News news = new News();
+                news.setGuid(cursor.getString(1));
+                news.setTitle(cursor.getString(2));
+                news.setThumbnail(cursor.getString(3));
+                news.setPubDate(cursor.getString(4));
+                news.setContent(cursor.getString(5));
+                newsList.add(news);
+            }
+        } finally {
+            cursor.close();
+            db.close();
+        }
+
         return newsList;
     }
 
@@ -189,16 +192,22 @@ public class MyDBHandler extends SQLiteOpenHelper {
         boolean result = false;
         String query = "SELECT * FROM " + TABLE_NEWS + " WHERE " + COLUMN_RSS_GUID + " =  '" + newsId + "';";
         SQLiteDatabase db = this.getWritableDatabase();
+
         Cursor cursor = db.rawQuery(query, null);
-        News news = new News();
-        if (cursor.moveToFirst()) {
-            news.setGuid(cursor.getString(1));
-            db.delete(TABLE_NEWS, COLUMN_RSS_GUID + " = ?",
-                    new String[]{String.valueOf(news.getGuid())});
+
+        try {
+
+            News news = new News();
+            if (cursor.moveToFirst()) {
+                news.setGuid(cursor.getString(1));
+                db.delete(TABLE_NEWS, COLUMN_RSS_GUID + " = ?",
+                        new String[]{String.valueOf(news.getGuid())});
+                result = true;
+            }
+        } finally {
             cursor.close();
-            result = true;
+            db.close();
         }
-        db.close();
         return result;
     }
 
@@ -243,33 +252,39 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         Proposal proposal = new Proposal();
-        if (cursor.moveToFirst()) {
-            proposal.setHash(cursor.getString(0));
-            proposal.setName(cursor.getString(1));
-            proposal.setUrl(cursor.getString(2));
-            proposal.setDw_url(cursor.getString(3));
-            proposal.setDw_url_comments(cursor.getString(4));
-            proposal.setTitle(cursor.getString(5));
-            proposal.setDate_added(cursor.getString(6));
-            proposal.setDate_added_human(cursor.getString(7));
-            proposal.setDate_end(cursor.getString(8));
-            proposal.setVoting_deadline_human(cursor.getString(9));
-            proposal.setWill_be_funded(cursor.getInt(10) != 0);
-            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
-            proposal.setIn_next_budget(cursor.getInt(12) != 0);
-            proposal.setMonthly_amount(cursor.getInt(13));
-            proposal.setTotal_payment_count(cursor.getInt(14));
-            proposal.setRemaining_payment_count(cursor.getInt(15));
-            proposal.setYes(cursor.getInt(16));
-            proposal.setNo(cursor.getInt(17));
-            proposal.setOrder(cursor.getInt(18));
-            proposal.setComment_amount(cursor.getInt(19));
-            proposal.setOwner_username(cursor.getString(20));
+
+        try {
+
+            if (cursor.moveToFirst()) {
+                proposal.setHash(cursor.getString(0));
+                proposal.setName(cursor.getString(1));
+                proposal.setUrl(cursor.getString(2));
+                proposal.setDw_url(cursor.getString(3));
+                proposal.setDw_url_comments(cursor.getString(4));
+                proposal.setTitle(cursor.getString(5));
+                proposal.setDate_added(cursor.getString(6));
+                proposal.setDate_added_human(cursor.getString(7));
+                proposal.setDate_end(cursor.getString(8));
+                proposal.setVoting_deadline_human(cursor.getString(9));
+                proposal.setWill_be_funded(cursor.getInt(10) != 0);
+                proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
+                proposal.setIn_next_budget(cursor.getInt(12) != 0);
+                proposal.setMonthly_amount(cursor.getInt(13));
+                proposal.setTotal_payment_count(cursor.getInt(14));
+                proposal.setRemaining_payment_count(cursor.getInt(15));
+                proposal.setYes(cursor.getInt(16));
+                proposal.setNo(cursor.getInt(17));
+                proposal.setOrder(cursor.getInt(18));
+                proposal.setComment_amount(cursor.getInt(19));
+                proposal.setOwner_username(cursor.getString(20));
+            } else {
+                proposal = null;
+            }
+
+        } finally {
             cursor.close();
-        } else {
-            proposal = null;
+            db.close();
         }
-        db.close();
         return proposal;
     }
 
@@ -286,33 +301,40 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            Proposal proposal = new Proposal();
-            proposal.setHash(cursor.getString(0));
-            proposal.setName(cursor.getString(1));
-            proposal.setUrl(cursor.getString(2));
-            proposal.setDw_url(cursor.getString(3));
-            proposal.setDw_url_comments(cursor.getString(4));
-            proposal.setTitle(cursor.getString(5));
-            proposal.setDate_added(cursor.getString(6));
-            proposal.setDate_added_human(cursor.getString(7));
-            proposal.setDate_end(cursor.getString(8));
-            proposal.setVoting_deadline_human(cursor.getString(9));
-            proposal.setWill_be_funded(cursor.getInt(10) != 0);
-            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
-            proposal.setIn_next_budget(cursor.getInt(12) != 0);
-            proposal.setMonthly_amount(cursor.getInt(13));
-            proposal.setTotal_payment_count(cursor.getInt(14));
-            proposal.setRemaining_payment_count(cursor.getInt(15));
-            proposal.setYes(cursor.getInt(16));
-            proposal.setNo(cursor.getInt(17));
-            proposal.setOrder(cursor.getInt(18));
-            proposal.setComment_amount(cursor.getInt(19));
-            proposal.setOwner_username(cursor.getString(20));
-            proposalsList.add(proposal);
+
+        try {
+
+
+            while (cursor.moveToNext()) {
+                Proposal proposal = new Proposal();
+                proposal.setHash(cursor.getString(0));
+                proposal.setName(cursor.getString(1));
+                proposal.setUrl(cursor.getString(2));
+                proposal.setDw_url(cursor.getString(3));
+                proposal.setDw_url_comments(cursor.getString(4));
+                proposal.setTitle(cursor.getString(5));
+                proposal.setDate_added(cursor.getString(6));
+                proposal.setDate_added_human(cursor.getString(7));
+                proposal.setDate_end(cursor.getString(8));
+                proposal.setVoting_deadline_human(cursor.getString(9));
+                proposal.setWill_be_funded(cursor.getInt(10) != 0);
+                proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
+                proposal.setIn_next_budget(cursor.getInt(12) != 0);
+                proposal.setMonthly_amount(cursor.getInt(13));
+                proposal.setTotal_payment_count(cursor.getInt(14));
+                proposal.setRemaining_payment_count(cursor.getInt(15));
+                proposal.setYes(cursor.getInt(16));
+                proposal.setNo(cursor.getInt(17));
+                proposal.setOrder(cursor.getInt(18));
+                proposal.setComment_amount(cursor.getInt(19));
+                proposal.setOwner_username(cursor.getString(20));
+                proposalsList.add(proposal);
+            }
+        } finally {
+
+            cursor.close();
+            db.close();
         }
-        cursor.close();
-        db.close();
         return proposalsList;
     }
 
@@ -323,14 +345,19 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         Proposal proposal = new Proposal();
-        if (cursor.moveToFirst()) {
-            proposal.setHash(cursor.getString(0));
-            db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
-                    new String[]{String.valueOf(proposal.getHash())});
+
+        try {
+
+            if (cursor.moveToFirst()) {
+                proposal.setHash(cursor.getString(0));
+                db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
+                        new String[]{String.valueOf(proposal.getHash())});
+                result = true;
+            }
+        } finally {
             cursor.close();
-            result = true;
+            db.close();
         }
-        db.close();
         return result;
     }
 

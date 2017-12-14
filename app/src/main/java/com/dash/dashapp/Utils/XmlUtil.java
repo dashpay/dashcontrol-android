@@ -21,12 +21,12 @@ public class XmlUtil {
 
     private static final String TAG = "XmlUtil";
     private static final int NUMBER_FIRST_BATCH = 20;
+    public volatile boolean parsingComplete = true;
+    public Context context = null;
     private String title = "title";
     private String link = "link";
     private String description = "description";
     private XmlPullParserFactory xmlFactoryObject;
-    public volatile boolean parsingComplete = true;
-    public Context context = null;
     private RSSUpdateListener dbRSSListener;
 
     public XmlUtil(Context context) {
@@ -49,6 +49,72 @@ public class XmlUtil {
         this.dbRSSListener = dbListener;
         UpdateRSSDB updateDB = new UpdateRSSDB(dbListener);
         updateDB.execute();
+    }
+
+    public void parseRSSXMLAndStoreIt(XmlPullParser myParser) {
+        int event;
+        News news = null;
+        String text = null;
+        int articleNumber = 0;
+        List<News> newsList = new ArrayList<>();
+        MyDBHandler dbHandler = new MyDBHandler(context, null);
+
+        try {
+            event = myParser.getEventType();
+
+            while (event != XmlPullParser.END_DOCUMENT) {
+                String name = myParser.getName();
+
+                switch (event) {
+                    case XmlPullParser.START_TAG:
+                        if ("item".equals(name)) {
+                            news = new News();
+                        }
+                        break;
+
+                    case XmlPullParser.TEXT:
+                        text = myParser.getText();
+                        break;
+
+                    case XmlPullParser.END_TAG:
+                        if (news != null) {
+                            switch (name) {
+                                case "item":
+                                    // If that news doesn't exist
+                                    if (dbHandler.findNews(news.getGuid()) == null) {
+                                        // Add it to the database
+                                        dbHandler.addNews(news);
+                                    }
+                                    // Add it to the first batch no matter what
+                                    newsList.add(news);
+                                    articleNumber++;
+                                    if (articleNumber == NUMBER_FIRST_BATCH) {
+                                        dbRSSListener.onFirstBatchNewsCompleted(newsList);
+                                    }
+                                    break;
+                                case "guid":
+                                    news.setGuid(text);
+                                    break;
+                                case "title":
+                                    news.setTitle(text);
+                                    break;
+                                case "pubDate":
+                                    news.setPubDate(text);
+                                    break;
+                                case "content:encoded":
+                                    news.setContent(text);
+                                    break;
+                            }
+                        }
+                        break;
+                }
+
+                event = myParser.next();
+            }
+            parsingComplete = false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public class UpdateRSSDB extends AsyncTask<Void, Void, Void> { //change Object to required type
@@ -91,74 +157,6 @@ public class XmlUtil {
         protected void onPostExecute(Void aVoid) {
             dbListener.onDatabaseUpdateCompleted();
             super.onPostExecute(aVoid);
-        }
-    }
-
-
-
-    public void parseRSSXMLAndStoreIt(XmlPullParser myParser) {
-        int event;
-        News news = null;
-        String text = null;
-        int articleNumber = 0;
-        List<News> newsList = new ArrayList<>();
-        MyDBHandler dbHandler = new MyDBHandler(context, null);
-
-        try {
-            event = myParser.getEventType();
-
-            while (event != XmlPullParser.END_DOCUMENT) {
-                String name = myParser.getName();
-
-                switch (event) {
-                    case XmlPullParser.START_TAG:
-                        if ("item".equals(name)) {
-                            news = new News();
-                        }
-                        break;
-
-                    case XmlPullParser.TEXT:
-                        text = myParser.getText();
-                        break;
-
-                    case XmlPullParser.END_TAG:
-                        if (news != null) {
-                            switch (name) {
-                                case "item":
-                                    // If that news doesn't exist
-                                    if (dbHandler.findNews(news.getGuid()) == null) {
-                                        // Add it to the database
-                                        dbHandler.addNews(news);
-                                    }
-                                    // Add it to the first batch no matter what
-                                    newsList.add(news);
-                                    articleNumber++;
-                                    if (articleNumber == NUMBER_FIRST_BATCH){
-                                        dbRSSListener.onFirstBatchNewsCompleted(newsList);
-                                    }
-                                    break;
-                                case "guid":
-                                    news.setGuid(text);
-                                    break;
-                                case "title":
-                                    news.setTitle(text);
-                                    break;
-                                case "pubDate":
-                                    news.setPubDate(text);
-                                    break;
-                                case "content:encoded":
-                                    news.setContent(text);
-                                    break;
-                            }
-                        }
-                        break;
-                }
-
-                event = myParser.next();
-            }
-            parsingComplete = false;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

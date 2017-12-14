@@ -73,8 +73,8 @@
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:layout_marginTop="2dp"
-            android:maxLines="1"
             android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/no_title_entered_by_proposal_owner"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toRightOf="@+id/approval_progress_bar"
@@ -88,9 +88,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:drawablePadding="2dp"
-            android:maxLines="1"
-            android:ellipsize="end"
             android:drawableStart="@drawable/icon_attachment"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/no_month_remaining"
             app:layout_constraintLeft_toRightOf="@+id/approval_progress_bar"
             app:layout_constraintTop_toBottomOf="@+id/title_owner_textview" />
@@ -102,13 +102,13 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:drawablePadding="2dp"
+            android:drawableStart="@drawable/icon_reply"
             android:ellipsize="end"
             android:maxLines="1"
-            android:drawableStart="@drawable/icon_reply"
             android:text="@string/textview_no_comments"
             app:layout_constraintLeft_toRightOf="@+id/textView_month_remaining"
-            app:layout_constraintTop_toBottomOf="@+id/title_owner_textview"
-            app:layout_constraintRight_toLeftOf="@+id/guideline" />
+            app:layout_constraintRight_toLeftOf="@+id/guideline"
+            app:layout_constraintTop_toBottomOf="@+id/title_owner_textview" />
 
         <TextView
             android:id="@+id/textview_dash_amount"

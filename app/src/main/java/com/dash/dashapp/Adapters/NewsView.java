@@ -59,9 +59,8 @@ public class NewsView {
     }
 
 
-
     @Click(R.id.news_row)
-    private void onClick(){
+    private void onClick() {
         Intent intent = new Intent(mContext, ContentRSSActivity.class);
         intent.putExtra(TITLE_NEWS, mNews.getTitle());
         intent.putExtra(CONTENT_NEWS, mNews.getContent());
