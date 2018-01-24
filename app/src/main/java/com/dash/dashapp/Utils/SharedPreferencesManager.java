@@ -16,14 +16,15 @@ public class SharedPreferencesManager {
     // other properties...
 
 
-    private SharedPreferencesManager() {}
+    private SharedPreferencesManager() {
+    }
 
     private static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
     }
 
     public static String getLanguageRSS(Context context) {
-        return getSharedPreferences(context).getString(context.getString(R.string.language_preference), SettingsActivity.RSS_LINK_DEF);
+        return getSharedPreferences(context).getString(context.getString(R.string.language_preference), URLs.RSS_LINK_DEF);
     }
 
     public static void setLanguageRSS(Context context, String languageValue) {

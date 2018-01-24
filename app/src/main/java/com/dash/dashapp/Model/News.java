@@ -11,46 +11,37 @@ import java.util.List;
 
 
 public class News {
+    public List<Object> categories;
     @SerializedName("title")
     @Expose
     private String title;
-
     @SerializedName("pubDate")
     @Expose
     private String pubDate;
-
     @SerializedName("link")
     @Expose
     private String link;
-
     @SerializedName("guid")
     @Expose
     private String guid;
-
     @SerializedName("author")
     @Expose
     private String author;
-
     @SerializedName("thumbnail")
     @Expose
     private String thumbnail;
-
     @SerializedName("description")
     @Expose
     private String description;
-
     @SerializedName("content")
     @Expose
     private String content;
-
     @SerializedName("description")
     @Expose
     private List<Object> enclosure;
 
     public News() {
     }
-
-    public List<Object> categories;
 
     public String getTitle() {
         return title;

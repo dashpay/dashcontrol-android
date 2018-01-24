@@ -1,21 +1,40 @@
 package com.dash.dashapp.Activities;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.dash.dashapp.R;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
-public class AddWalletActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.OnClick;
+
+public class AddWalletActivity extends BaseActivity {
+
+    @BindView(R.id.adressWalletEditText)
+    EditText adressWalletEditText;
+    @BindView(R.id.paymentNotificationToggle)
+    ToggleButton paymentNotificationToggle;
+    @BindView(R.id.qrCodeImport)
+    TextView qrCodeImport;
+
+    private String scanContent, scanFormat;
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_add_wallet;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_wallet);
 
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
@@ -25,40 +44,49 @@ public class AddWalletActivity extends AppCompatActivity {
 
         ab.setTitle("Add Wallet");
 
-
-        TextView qrCodeImportButton = (TextView) findViewById(R.id.qrCodeImport);
-
-
-        qrCodeImportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
-
-                    startActivityForResult(intent, 0);
-                } catch (Exception e) {
-                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                    startActivity(marketIntent);
-                }
-            }
-        });
-
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
+        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (scanningResult != null) {
+            if (scanningResult.getContents() != null) {
+                scanContent = scanningResult.getContents().toString();
+                scanFormat = scanningResult.getFormatName().toString();
+            }
 
-            if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT");
-            }
-            if (resultCode == RESULT_CANCELED) {
-                //handle cancel
-            }
+            Toast.makeText(this, scanContent + "   type:" + scanFormat, Toast.LENGTH_SHORT).show();
+
+        } else {
+            Toast.makeText(this, "Nothing scanned", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    @OnClick({
+            R.id.qrCodeImport
+    })
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.qrCodeImport:
+                initiateQrCodeScanner();
+                break;
         }
 
+    }
+
+    private void initiateQrCodeScanner() {
+        IntentIntegrator scanIntegrator = new IntentIntegrator(this);
+        scanIntegrator.setPrompt("Scan");
+        scanIntegrator.setBeepEnabled(false);
+        //The following line if you want QR code
+        scanIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+        scanIntegrator.setCameraId(0);
+        //scanIntegrator.setOrientationLocked(true);
+        scanIntegrator.setBarcodeImageEnabled(false);
+        scanIntegrator.initiateScan();
     }
 }

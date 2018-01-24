@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Dash_theme" parent="@style/Theme.AppCompat.Light.DarkActionBar" >
+    <style name="Dash_theme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/primary_material_dark_1</item>
         <item name="android:colorAccent">@color/primary_material_dark_1</item>

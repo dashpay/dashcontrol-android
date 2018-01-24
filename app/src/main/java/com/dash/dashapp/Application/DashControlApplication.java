@@ -10,16 +10,13 @@ import java.util.Locale;
 /**
  * Created by sebas on 9/18/2017.
  */
-public class MyApplication extends Application
-{
+public class DashControlApplication extends Application {
     private Locale locale = null;
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (locale != null)
-        {
+        if (locale != null) {
             newConfig.locale = locale;
             Locale.setDefault(locale);
             getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
@@ -27,8 +24,7 @@ public class MyApplication extends Application
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
         Configuration config = getBaseContext().getResources().getConfiguration();
@@ -36,8 +32,7 @@ public class MyApplication extends Application
         config = new Configuration(config);
 
         String lang = SharedPreferencesManager.getLanguageRSS(this);
-        if (! "".equals(lang) && ! config.locale.getLanguage().equals(lang))
-        {
+        if (!"".equals(lang) && !config.locale.getLanguage().equals(lang)) {
             locale = new Locale(lang);
             Locale.setDefault(locale);
             config.locale = locale;

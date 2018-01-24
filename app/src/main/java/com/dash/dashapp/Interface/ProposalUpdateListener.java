@@ -1,9 +1,7 @@
 package com.dash.dashapp.Interface;
 
-import com.dash.dashapp.Model.News;
 import com.dash.dashapp.Model.Proposal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +11,9 @@ import java.util.List;
 public interface ProposalUpdateListener {
 
     void onUpdateStarted();
+
     void onFirstBatchProposalsCompleted(List<Proposal> newsList);
+
     void onDatabaseUpdateCompleted();
 
 

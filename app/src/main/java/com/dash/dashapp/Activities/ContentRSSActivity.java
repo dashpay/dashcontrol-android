@@ -1,26 +1,36 @@
 package com.dash.dashapp.Activities;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.dash.dashapp.R;
 
-public class ContentRSSActivity extends AppCompatActivity {
+import butterknife.BindView;
+
+public class ContentRSSActivity extends BaseActivity {
 
     private static final String TITLE_NEWS = "title_rss";
     private static final String CONTENT_RSS = "content_rss";
-    private TextView rss_content_view;
+    @BindView(R.id.content_view)
+    TextView contentView;
+    @BindView(R.id.SCROLLER_ID)
+    ScrollView SCROLLERID;
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_content_rss;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_rss);
 
         Intent intent = getIntent();
         String titleString = intent.getStringExtra(TITLE_NEWS);
@@ -34,13 +44,12 @@ public class ContentRSSActivity extends AppCompatActivity {
         ab.setTitle(titleString);
         String contentString = intent.getStringExtra(CONTENT_RSS);
 
-        rss_content_view = (TextView) findViewById(R.id.content_view);
-        rss_content_view.setMovementMethod(LinkMovementMethod.getInstance());
+        contentView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            rss_content_view.setText(Html.fromHtml(contentString,Html.FROM_HTML_MODE_LEGACY));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            contentView.setText(Html.fromHtml(contentString, Html.FROM_HTML_MODE_LEGACY));
         } else {
-            rss_content_view.setText(Html.fromHtml(contentString));
+            contentView.setText(Html.fromHtml(contentString));
         }
     }
 

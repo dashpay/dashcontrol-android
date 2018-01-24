@@ -3,9 +3,6 @@ package com.dash.dashapp.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -14,22 +11,52 @@ import android.widget.TextView;
 import com.dash.dashapp.Model.Proposal;
 import com.dash.dashapp.R;
 
-public class ProposalDetailActivity extends AppCompatActivity {
+import butterknife.BindView;
+
+public class ProposalDetailActivity extends BaseActivity {
 
     private static final String CONTENT_PROPOSAL = "proposal";
+    @BindView(R.id.pie_yes_no)
+    ProgressBar pieYesNo;
+    @BindView(R.id.approval_rate_textview)
+    TextView approvalRateTextview;
+    @BindView(R.id.textView_id_proposal)
+    TextView textViewIdProposal;
+    @BindView(R.id.textView_title_proposal)
+    TextView textViewTitleProposal;
+    @BindView(R.id.textView_owner)
+    TextView textViewOwner;
+    @BindView(R.id.textView_title)
+    TextView textViewTitle;
+    @BindView(R.id.textView_one_time_payment)
+    TextView textViewOneTimePayment;
+    @BindView(R.id.textView_month_remaining)
+    TextView textViewMonthRemaining;
+    @BindView(R.id.textView_completed_payments)
+    TextView textViewCompletedPayments;
+    @BindView(R.id.textView_yes)
+    TextView textViewYes;
+    @BindView(R.id.textView_no)
+    TextView textViewNo;
+    @BindView(R.id.textView_abstain)
+    TextView textViewAbstain;
+    @BindView(R.id.textView_proposal_description)
+    TextView textViewProposalDescription;
+    @BindView(R.id.button_accept_proposal)
+    Button buttonAcceptProposal;
+    @BindView(R.id.button_abstain)
+    Button buttonAbstain;
+    @BindView(R.id.button_no)
+    Button buttonNo;
 
-    private ProgressBar pieYesNo;
-
-    private TextView approvalRateTextview, idProposalTextview, titleProposalTextview, ownerTextview, titleTextview,
-    oneTimePaymentTextview, monthRemainingTextview, completedPaymentsTextview, yesTextview, noTextview,
-    abstaintextview, proposalDescriptionTextview, acceptProposalTextview;
-
-    private Button acceptProposalButton, abstainButton, noButton;
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_content_proposal;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_proposal);
 
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
@@ -40,51 +67,33 @@ public class ProposalDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Proposal proposal = (Proposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
 
-        pieYesNo = (ProgressBar) findViewById(R.id.pie_yes_no);
-        approvalRateTextview = (TextView) findViewById(R.id.approval_rate_textview);
-
-        double ratioYes = ((double)proposal.getYes()/(proposal.getYes() + proposal.getNo()))*100;
+        double ratioYes = ((double) proposal.getYes() / (proposal.getYes() + proposal.getNo())) * 100;
         int ratioYesInt = (int) ratioYes;
         pieYesNo.setProgress(ratioYesInt);
         approvalRateTextview.setText(ratioYesInt + "%");
 
-        idProposalTextview = (TextView) findViewById(R.id.textView_id_proposal);
-        idProposalTextview.setText(proposal.getTitle());
+        textViewIdProposal.setText(proposal.getTitle());
 
-        titleProposalTextview = (TextView) findViewById(R.id.textView_title_proposal);
-        titleProposalTextview.setText(proposal.getTitle());
+        textViewTitleProposal.setText(proposal.getTitle());
 
-        ownerTextview = (TextView) findViewById(R.id.textView_owner);
-        ownerTextview.setText("Owned by " + proposal.getOwner_username());
+        textViewOwner.setText("Owned by " + proposal.getOwner_username());
 
-        titleTextview = (TextView) findViewById(R.id.textView_title);
-        titleTextview.setText(proposal.getTitle());
+        textViewTitle.setText(proposal.getTitle());
 
-        oneTimePaymentTextview = (TextView) findViewById(R.id.textView_one_time_payment);
-        // TODO oneTimePaymentTextview.setText("TODO");
+        // TODO textViewOneTimePayment.setText("TODO");
 
-        monthRemainingTextview = (TextView) findViewById(R.id.textView_month_remaining);
-        //TODO monthRemainingTextview.setText(proposal.getVoting_deadline_human());
+        //TODO textViewMonthRemaining.setText(proposal.getVoting_deadline_human());
 
-        completedPaymentsTextview = (TextView) findViewById(R.id.textView_completed_payments);
-        completedPaymentsTextview.setText(proposal.getTotal_payment_count() + "");
+        textViewCompletedPayments.setText(proposal.getTotal_payment_count() + "");
 
-        yesTextview = (TextView) findViewById(R.id.textView_yes);
-        yesTextview.setText(proposal.getYes() + " Yes");
+        textViewYes.setText(proposal.getYes() + " Yes");
 
-        noTextview = (TextView) findViewById(R.id.textView_no);
-        noTextview.setText(proposal.getNo() + " No");
+        textViewNo.setText(proposal.getNo() + " No");
 
-        abstaintextview = (TextView) findViewById(R.id.textView_abstain);
-        // TODO abstaintextview.setText(proposal.getTitle());
+        // TODO textViewAbstain.setText(proposal.getTitle());
 
-        proposalDescriptionTextview = (TextView) findViewById(R.id.textView_proposal_description);
-        // TODO RECUPERER LA PROP : proposalDescriptionTextview.setText(proposal.getTitle());
+        // TODO RECUPERER LA PROP : textViewProposalDescription.setText(proposal.getTitle());
 
-
-        acceptProposalButton = (Button) findViewById(R.id.button_accept_proposal);
-        abstainButton = (Button) findViewById(R.id.button_abstain);
-        noButton = (Button) findViewById(R.id.button_no);
     }
 
 
