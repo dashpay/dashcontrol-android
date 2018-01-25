@@ -22,6 +22,7 @@ import com.dash.dashapp.Model.Exchange;
 import com.dash.dashapp.Model.Market;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.MySingleton;
+import com.dash.dashapp.Utils.URLs;
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,7 +39,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,26 +48,20 @@ import butterknife.Unbinder;
  * Use the {@link PriceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PriceFragment extends Fragment {
+public class PriceFragment extends BaseFragment {
 
     private static final String TAG = "PriceFragment";
-    private static final String URL_PRICE = "http://dashpay.info/api/v0/prices";
-    private static final String URL_EXCHANGES = "https://dashpay.info/api/v0/markets";
     @BindView(R.id.spinnerExchanges)
     Spinner spinnerExchanges;
     @BindView(R.id.spinnerMarket)
     Spinner spinnerMarket;
     @BindView(R.id.priceTextview)
     TextView priceTextview;
+    @BindView(R.id.chart1)
+    CandleStickChart mChart;
     private OnFragmentInteractionListener mListener;
 
-    private Context context;
-
-    private CandleStickChart mChart;
-
     private String defaultExchange, defaultMarket;
-
-    private Unbinder unbinder;
 
 
     public PriceFragment() {
@@ -98,13 +92,10 @@ public class PriceFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_price, container, false);
-        context = view.getContext();
 
-        unbinder = ButterKnife.bind(this, view);
+        ButterKnife.bind(this, view);
 
-        priceTextview = (TextView) view.findViewById(R.id.priceTextview);
 
-        mChart = (CandleStickChart) view.findViewById(R.id.chart1);
         mChart.setBackgroundColor(Color.WHITE);
 
         mChart.getDescription().setEnabled(false);
@@ -221,7 +212,7 @@ public class PriceFragment extends Fragment {
 
         // Getting prices
         JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
-                (Request.Method.GET, URL_PRICE, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URLs.URL_PRICE, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -303,14 +294,14 @@ public class PriceFragment extends Fragment {
                     }
                 });
         // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(context).addToRequestQueue(jsObjRequestPrice);
+        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestPrice);
     }
 
     private void setDefaultExchanges() {
 
         // Getting exchanges (default exchange to display)
         JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
-                (Request.Method.GET, URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URLs.URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -339,14 +330,7 @@ public class PriceFragment extends Fragment {
                 });
 
         // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(context).addToRequestQueue(jsObjRequestExchanges);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-
+        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestExchanges);
     }
 
     /**
