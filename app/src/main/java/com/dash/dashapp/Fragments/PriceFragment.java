@@ -202,9 +202,9 @@ public class PriceFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        setDefaultExchanges();
+        //setDefaultExchanges();
 
-        setSpinnerAndPrices();
+        //setSpinnerAndPrices();
 
     }
 

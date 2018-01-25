@@ -8,7 +8,8 @@ import com.dash.dashapp.BuildConfig;
 
 public class URLs {
 
-    private final static String BASE_URL_DASH_CONTROL = BuildConfig.BASE_URL;
+    private final static String BASE_URL_DASH_CONTROL = "https://www.dashcentral.org/api/v1/"
+    ;
     private final static String BASE_DASH_URL = "https://www.dash.org/";
 
     public static final String RSS_LINK_DEF = "default";
@@ -24,5 +25,7 @@ public class URLs {
     public static final String URL_PRICE = BASE_URL_DASH_CONTROL + "prices";
     public static final String URL_EXCHANGES = BASE_URL_DASH_CONTROL + "markets";
     public final static String URL_PROPOSAL = BASE_URL_DASH_CONTROL + "budget";
+    public static final String URL_GRAPH = BASE_URL_DASH_CONTROL + "https://dashpay.info/api/v0/chart_data?";
+
 
 }
