@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -61,7 +62,8 @@ public class PriceFragment extends BaseFragment {
     CandleStickChart mChart;
     private OnFragmentInteractionListener mListener;
 
-    private String defaultExchange, defaultMarket;
+    private Exchange currentExchange = new Exchange();
+    private Market currentMarket = new Market();
 
     private List<Exchange> listExchanges;
 
@@ -233,14 +235,14 @@ public class PriceFragment extends BaseFragment {
                                 JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
 
                                 try{
-                                    int dash_btc = exchangeJson.getInt("DASH_BTC");
+                                    double dash_btc = exchangeJson.getDouble("DASH_BTC");
                                     Market market = new Market("DASH_BTC", dash_btc);
                                     listMarket.add(market);
                                 }catch (Exception e){
                                     e.getMessage();
                                 }
                                 try{
-                                    int dash_usd = exchangeJson.getInt("DASH_USD");
+                                    double dash_usd = exchangeJson.getDouble("DASH_USD");
                                     Market market = new Market("DASH_USD", dash_usd);
                                     listMarket.add(market);
                                 }catch (Exception e){
@@ -286,16 +288,17 @@ public class PriceFragment extends BaseFragment {
                             List<String> listMarketString = new ArrayList<>();
 
                             JSONObject price = response.getJSONObject("default");
-                            defaultExchange = price.getString("exchange");
-                            defaultMarket = price.getString("market");
+                            currentExchange.setName(price.getString("exchange"));
+                            currentMarket.setName(price.getString("market"));
                             int indexDefaultMarket = 0;
 
                             for(int i = 0; i < listExchanges.size(); i++){
-                                if(listExchanges.get(i).getName().equals(defaultExchange)){
+                                if(listExchanges.get(i).getName().equals(currentExchange.getName())){
                                     spinnerExchanges.setSelection(i);
+                                    currentExchange = listExchanges.get(i);
                                     for(int j = 0; j < listExchanges.get(i).getListMarket().size(); j++){
                                         listMarketString.add(listExchanges.get(i).getListMarket().get(j).getName());
-                                        if(listExchanges.get(i).getListMarket().get(j).getName().equals(defaultMarket)){
+                                        if(listExchanges.get(i).getListMarket().get(j).getName().equals(currentMarket.getName())){
                                             indexDefaultMarket = j;
                                         }
                                     }
@@ -303,10 +306,54 @@ public class PriceFragment extends BaseFragment {
                                     ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
                                     spinnerMarket.setAdapter(adapterMarket);
                                     spinnerMarket.setSelection(indexDefaultMarket);
-                                    priceTextview.setText(listExchanges.get(i).getListMarket().get(indexDefaultMarket).getPrice() + "");
+                                    priceTextview.setText(currentExchange.getListMarket().get(indexDefaultMarket).getPrice() + "");
 
                                 }
                             }
+
+                            spinnerExchanges.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                                    // your code here
+                                    currentExchange = listExchanges.get(position);
+
+                                    List<String> listMarketString = new ArrayList<>();
+
+                                    for(int j = 0; j < currentExchange.getListMarket().size(); j++){
+                                        listMarketString.add(currentExchange.getListMarket().get(j).getName());
+                                    }
+
+                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
+
+                                    spinnerMarket.setAdapter(adapterMarket);
+                                    spinnerMarket.setSelection(0);
+                                    currentMarket = currentExchange.getListMarket().get(0);
+                                    priceTextview.setText(currentMarket.getPrice() + "");
+
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parentView) {
+                                    // your code here
+                                }
+
+                            });
+
+
+
+                            spinnerMarket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                                    currentMarket = currentExchange.getListMarket().get(position);
+                                    priceTextview.setText(currentMarket.getPrice() + "");
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parentView) {
+                                    // your code here
+                                }
+
+                            });
 
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -15,6 +15,10 @@ public class Exchange {
         this.listMarket = listCurrencies;
     }
 
+    public Exchange() {
+
+    }
+
     public String getName() {
         return name;
     }

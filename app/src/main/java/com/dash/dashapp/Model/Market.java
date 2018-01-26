@@ -13,6 +13,10 @@ public class Market {
         this.price = price;
     }
 
+    public Market() {
+
+    }
+
     public String getName() {
         return name;
     }
