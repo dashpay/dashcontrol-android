@@ -63,6 +63,8 @@ public class PriceFragment extends BaseFragment {
 
     private String defaultExchange, defaultMarket;
 
+    private List<Exchange> listExchanges;
+
 
     public PriceFragment() {
         // Required empty public constructor
@@ -95,9 +97,7 @@ public class PriceFragment extends BaseFragment {
 
         ButterKnife.bind(this, view);
 
-
         mChart.setBackgroundColor(Color.WHITE);
-
         mChart.getDescription().setEnabled(false);
 
         // if more than 60 entries are displayed in the chart, no values will be
@@ -202,8 +202,6 @@ public class PriceFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        setDefaultExchanges();
-
         setSpinnerAndPrices();
 
     }
@@ -216,34 +214,39 @@ public class PriceFragment extends BaseFragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        List<Exchange> listExchanges = new ArrayList<>();
+                        listExchanges = new ArrayList<>();
                         List<String> listExchangesString = new ArrayList<>();
+
                         try {
 
                             Iterator<String> listExchangesKeys = response.keys();
 
                             // Getting exchanges
                             while (listExchangesKeys.hasNext()) {
+
+                                //Foreach exchange getting the market
+                                List<Market> listMarket = new ArrayList<>();
+
+
                                 String exchangeName = listExchangesKeys.next();
                                 // get the value i care about
-                                String marketString = response.optString(exchangeName);
+                                JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
 
-                                JSONObject marketJson = response.getJSONObject(marketString);
-                                Iterator<String> listMarketKeys = marketJson.keys();
-
-                                Log.d(TAG, exchangeName);
-
-                                //Feeding the available markets for this exchange
-                                List<Market> listMarket = new ArrayList<>();
-                                while (listMarketKeys.hasNext()) {
-                                    String marketName = listExchangesKeys.next();
-                                    Market market = new Market(marketName, marketJson.optDouble(marketName));
-                                    Log.d(TAG, marketName);
-                                    Log.d(TAG, marketJson.optString(marketName));
-
+                                try{
+                                    int dash_btc = exchangeJson.getInt("DASH_BTC");
+                                    Market market = new Market("DASH_BTC", dash_btc);
                                     listMarket.add(market);
-
+                                }catch (Exception e){
+                                    e.getMessage();
                                 }
+                                try{
+                                    int dash_usd = exchangeJson.getInt("DASH_USD");
+                                    Market market = new Market("DASH_USD", dash_usd);
+                                    listMarket.add(market);
+                                }catch (Exception e){
+                                    e.getMessage();
+                                }
+
                                 Exchange exchange = new Exchange(exchangeName, listMarket);
                                 listExchanges.add(exchange);
                                 listExchangesString.add(exchange.getName());
@@ -253,33 +256,7 @@ public class PriceFragment extends BaseFragment {
                             ArrayAdapter<String> adapterExchanges = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listExchangesString);
                             spinnerExchanges.setAdapter(adapterExchanges);
 
-                            int indexDefaultMarket = 0;
-                            for (int i = 0; i < listExchanges.size(); i++) {
-                                Exchange exchange = listExchanges.get(i);
-                                if (exchange.getName().equals(defaultExchange)) {
-                                    spinnerExchanges.setSelection(i);
-                                    List<String> listMarketString = new ArrayList<>();
-
-                                    for (int j = 0; j < exchange.getListMarket().size(); j++) {
-                                        Market market = exchange.getListMarket().get(j);
-                                        listMarketString.add(market.getName());
-                                        if (market.getName().equals(defaultMarket)) {
-                                            indexDefaultMarket = j;
-                                            priceTextview.setText(market.getPrice() + "$");
-                                        } else {
-
-                                        }
-                                    }
-
-                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
-                                    spinnerMarket.setAdapter(adapterMarket);
-                                    spinnerMarket.setSelection(indexDefaultMarket);
-
-                                } else {
-
-                                }
-                            }
-
+                            setDefaultExchanges();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -306,13 +283,30 @@ public class PriceFragment extends BaseFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            List<String> listMarketString = new ArrayList<>();
+
                             JSONObject price = response.getJSONObject("default");
-                            Log.d(TAG, price.toString());
                             defaultExchange = price.getString("exchange");
                             defaultMarket = price.getString("market");
+                            int indexDefaultMarket = 0;
 
-                            Log.d(TAG, defaultExchange);
-                            Log.d(TAG, defaultMarket);
+                            for(int i = 0; i < listExchanges.size(); i++){
+                                if(listExchanges.get(i).getName().equals(defaultExchange)){
+                                    spinnerExchanges.setSelection(i);
+                                    for(int j = 0; j < listExchanges.get(i).getListMarket().size(); j++){
+                                        listMarketString.add(listExchanges.get(i).getListMarket().get(j).getName());
+                                        if(listExchanges.get(i).getListMarket().get(j).getName().equals(defaultMarket)){
+                                            indexDefaultMarket = j;
+                                        }
+                                    }
+
+                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
+                                    spinnerMarket.setAdapter(adapterMarket);
+                                    spinnerMarket.setSelection(indexDefaultMarket);
+                                    priceTextview.setText(listExchanges.get(i).getListMarket().get(indexDefaultMarket).getPrice() + "");
+
+                                }
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
