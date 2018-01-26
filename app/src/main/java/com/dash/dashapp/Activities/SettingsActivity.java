@@ -10,6 +10,7 @@ import android.widget.ListView;
 import com.dash.dashapp.R;
 import com.dash.dashapp.Utils.MyDBHandler;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
+import com.dash.dashapp.Utils.URLs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,26 +19,15 @@ import butterknife.BindView;
 
 public class SettingsActivity extends BaseActivity {
 
-
-    public static final String RSS_LINK_DEF = "default";
-    public static final String RSS_LINK_EN = "https://www.dash.org/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_ES = "https://www.dash.org/es/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_FR = "https://www.dash.org/fr/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_PT = "https://www.dash.org/pt/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_CN = "https://www.dash.org/cn/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_RU = "https://www.dash.org/ru/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_JP = "https://www.dash.org/jp/rss/dash_blog_rss.xml";
-    public static String RSS_LINK_KR = "https://www.dash.org/kr/rss/dash_blog_rss.xml";
-
     public static final Map<String, String> listAvailableLanguage = new HashMap<String, String>() {{
-        put("en", RSS_LINK_EN);
-        put("es", RSS_LINK_ES);
-        put("fr", RSS_LINK_FR);
-        put("pt", RSS_LINK_PT);
-        put("cn", RSS_LINK_CN);
-        put("ru", RSS_LINK_RU);
-        put("jp", RSS_LINK_JP);
-        put("kr", RSS_LINK_KR);
+        put("en", URLs.RSS_LINK_EN);
+        put("es", URLs.RSS_LINK_ES);
+        put("fr", URLs.RSS_LINK_FR);
+        put("pt", URLs.RSS_LINK_PT);
+        put("cn", URLs.RSS_LINK_CN);
+        put("ru", URLs.RSS_LINK_RU);
+        put("jp", URLs.RSS_LINK_JP);
+        put("kr", URLs.RSS_LINK_KR);
     }};
     @BindView(R.id.list_languages)
     ListView listLanguages;
@@ -76,14 +66,14 @@ public class SettingsActivity extends BaseActivity {
         };
 
         final String[] values = new String[]{
-                RSS_LINK_EN,
-                RSS_LINK_ES,
-                RSS_LINK_FR,
-                RSS_LINK_PT,
-                RSS_LINK_CN,
-                RSS_LINK_RU,
-                RSS_LINK_JP,
-                RSS_LINK_KR
+                URLs.RSS_LINK_EN,
+                URLs.RSS_LINK_ES,
+                URLs.RSS_LINK_FR,
+                URLs.RSS_LINK_PT,
+                URLs.RSS_LINK_CN,
+                URLs.RSS_LINK_RU,
+                URLs.RSS_LINK_JP,
+                URLs.RSS_LINK_KR
         };
 
         // Define a new Adapter

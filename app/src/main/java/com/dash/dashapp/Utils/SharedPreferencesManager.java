@@ -23,7 +23,7 @@ public class SharedPreferencesManager {
     }
 
     public static String getLanguageRSS(Context context) {
-        return getSharedPreferences(context).getString(context.getString(R.string.language_preference), SettingsActivity.RSS_LINK_DEF);
+        return getSharedPreferences(context).getString(context.getString(R.string.language_preference), URLs.RSS_LINK_DEF);
     }
 
     public static void setLanguageRSS(Context context, String languageValue) {

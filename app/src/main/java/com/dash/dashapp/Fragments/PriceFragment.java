@@ -204,7 +204,12 @@ public class PriceFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        setSpinnerAndPrices();
+        try{
+            setSpinnerAndPrices();
+        }catch(Exception e){
+            e.getMessage();
+        }
+
 
     }
 
