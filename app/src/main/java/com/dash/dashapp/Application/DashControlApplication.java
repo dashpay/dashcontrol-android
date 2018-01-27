@@ -74,10 +74,13 @@ public class DashControlApplication extends Application {
 
         String startDateString = "start=" + startDate;
         String endDateString = "&end=" + endDate;
-        String marketString = "&market=poloniex";
-        String exchangeString = "&exchange=DASH_USDT";
+        String marketString = "&market=DASH_USDT";
+        String exchangeString = "&exchange=poloniex";
 
         String URLGraph = URLs.URL_GRAPH + startDateString + endDateString + marketString + exchangeString;
+
+
+        Log.d(TAG, "Retrieving price data : " + URLGraph);
 
         // Getting exchanges (default exchange to display)
         JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
@@ -90,6 +93,7 @@ public class DashControlApplication extends Application {
                             // ...
                             JSONArray json = new JSONArray(response);
                             // ...
+                            Log.d(TAG, "Json response : " + json.toString());
 
                             for(int i=0;i<json.length();i++){
                                 HashMap<String, String> map = new HashMap<String, String>();
