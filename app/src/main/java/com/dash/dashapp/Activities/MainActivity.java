@@ -66,8 +66,6 @@ public class MainActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pickDefaultLanguage();
-
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         newsFragment = NewsFragment.newInstance();
@@ -81,24 +79,6 @@ public class MainActivity extends BaseActivity implements
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-    }
-
-    private void pickDefaultLanguage() {
-
-        // if default language is null
-        if (SharedPreferencesManager.getLanguageRSS(this).equals(URLs.RSS_LINK_DEF)) {
-            // if Device's exist in available dash RSS languages
-
-            for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet()) {
-                if (Locale.getDefault().getLanguage().equals(entry.getKey())) {
-                    // Make default language device's language
-                    SharedPreferencesManager.setLanguageRSS(this, entry.getValue());
-                    return;
-                }
-            }
-            // else english
-            SharedPreferencesManager.setLanguageRSS(this, URLs.RSS_LINK_EN);
-        }
     }
 
     @Override

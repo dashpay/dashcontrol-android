@@ -1,13 +1,15 @@
-package com.dash.dashapp.Application;
+package com.dash.dashapp.application;
 
 import android.app.Application;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.dash.dashapp.Activities.SettingsActivity;
 import com.dash.dashapp.Utils.MySingleton;
 import com.dash.dashapp.Utils.SharedPreferencesManager;
 import com.dash.dashapp.Utils.URLs;
@@ -20,12 +22,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by sebas on 9/18/2017.
  */
-public class DashControlApplication extends Application {
-    private static final String TAG = "DashControlApplication";
+public class MyApplication extends Application {
+    private static final String TAG = "MyApplication";
     private Locale locale = null;
 
     private static final long SIX_HOURS_INTERVAL = 1000 * 60 * 60;
@@ -41,9 +44,8 @@ public class DashControlApplication extends Application {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (locale != null) {
-            newConfig.locale = locale;
-            Locale.setDefault(locale);
-            getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
+            newConfig.setLocale(locale);
+            getApplicationContext().createConfigurationContext(newConfig);
         }
     }
 
@@ -51,18 +53,37 @@ public class DashControlApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Configuration config = getBaseContext().getResources().getConfiguration();
+        //pickDefaultLanguage();
 
-        config = new Configuration(config);
+        importChartData();
+    }
+
+
+
+    private void pickDefaultLanguage() {
+
+        // if default language is null
+        if (SharedPreferencesManager.getLanguageRSS(this).equals(URLs.RSS_LINK_DEF)) {
+            // if Device's exist in available dash RSS languages
+
+            for (Map.Entry<String, String> entry : SettingsActivity.listAvailableLanguage.entrySet()) {
+                if (Locale.getDefault().getLanguage().equals(entry.getKey())) {
+                    // Make default language device's language
+                    SharedPreferencesManager.setLanguageRSS(this, entry.getValue());
+                    return;
+                }
+            }
+            // else english
+            SharedPreferencesManager.setLanguageRSS(this, URLs.RSS_LINK_EN);
+        }
 
         String lang = SharedPreferencesManager.getLanguageRSS(this);
-        if (!"".equals(lang) && !config.locale.getLanguage().equals(lang)) {
-            locale = new Locale(lang);
-            Locale.setDefault(locale);
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-        }
-        importChartData();
+        locale = new Locale(lang);
+
+        Resources resources = getResources();
+        Configuration configuration = resources.getConfiguration();
+        //configuration.setLocale(locale);
+        getApplicationContext().createConfigurationContext(configuration);
     }
 
     private void importChartData() {
@@ -95,10 +116,9 @@ public class DashControlApplication extends Application {
                             // ...
                             Log.d(TAG, "Json response : " + json.toString());
 
-                            for(int i=0;i<json.length();i++){
+                            for (int i = 0; i < json.length(); i++) {
                                 HashMap<String, String> map = new HashMap<String, String>();
                                 JSONObject e = json.getJSONObject(i);
-
 
 
                                 Log.d(TAG, "time : " + e.getString("time"));
