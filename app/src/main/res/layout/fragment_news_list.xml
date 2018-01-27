@@ -6,7 +6,7 @@
     android:name="com.dash.dashapp.fragments.NewsFragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.dash.dashapp.Fragments.NewsFragment">
+    tools:context="com.dash.dashapp.fragments.NewsFragment">
 
     <com.mindorks.placeholderview.InfinitePlaceHolderView
         android:id="@+id/news_list"

@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context="com.dash.dashapp.Fragments.ProposalsFragment">
+        tools:context="com.dash.dashapp.fragments.ProposalsFragment">
 
         <com.mindorks.placeholderview.InfinitePlaceHolderView
             android:id="@+id/proposals_list"

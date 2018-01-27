@@ -5,7 +5,7 @@
     android:id="@+id/rootPortfolio"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dash.dashapp.Fragments.PortfolioFragment">
+    tools:context="com.dash.dashapp.fragments.PortfolioFragment">
 
 
     <com.mindorks.placeholderview.ExpandablePlaceHolderView
