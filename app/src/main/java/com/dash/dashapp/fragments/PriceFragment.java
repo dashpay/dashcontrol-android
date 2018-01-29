@@ -22,6 +22,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.R;
+import com.dash.dashapp.models.PriceChartData;
+import com.dash.dashapp.utils.DateUtil;
+import com.dash.dashapp.utils.MyDBHandler;
 import com.dash.dashapp.utils.MySingleton;
 import com.dash.dashapp.utils.URLs;
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -35,6 +38,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -132,15 +137,28 @@ public class PriceFragment extends BaseFragment {
 
         List<CandleEntry> yVals1 = new ArrayList<>();
 
-        for (int i = 0; i < 60; i++) {
-            float mult = (20 + 1);
-            float val = (float) (Math.random() * 40) + mult;
 
-            float high = (float) (Math.random() * 9) + 8f;
-            float low = (float) (Math.random() * 9) + 8f;
 
-            float open = (float) (Math.random() * 6) + 1f;
-            float close = (float) (Math.random() * 6) + 1f;
+        Date currentTime = Calendar.getInstance().getTime();
+
+        long startDate = currentTime.getTime() - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+        long endDate = currentTime.getTime();
+
+
+        MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
+        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate);
+
+        for (int i = 0; i < priceChartDataList.size(); i++){
+
+            PriceChartData pcd = priceChartDataList.get(i);
+
+            float val = (float) pcd.getVolume();
+
+            float high = (float) pcd.getHigh();
+            float low = (float) pcd.getLow();
+
+            float open = (float) pcd.getOpen();
+            float close = (float) pcd.getClose();
 
             boolean even = i % 2 == 0;
 

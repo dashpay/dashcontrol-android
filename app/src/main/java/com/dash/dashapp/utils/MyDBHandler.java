@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.dash.dashapp.models.News;
+import com.dash.dashapp.models.PriceChartData;
 import com.dash.dashapp.models.Proposal;
 
 import java.text.ParseException;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 20;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
 
@@ -59,6 +60,18 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_OWNER_USERNAME = "owner_username"; //username of the proposal owner on DashCentral [string]
 
 
+    public static final String TABLE_PRICE_CHART = "price_chart";
+    public static final String COLUMN_TIME = "time";
+    public static final String COLUMN_CLOSE = "close";
+    public static final String COLUMN_HIGH = "high";
+    public static final String COLUMN_LOW = "low";
+    public static final String COLUMN_OPEN = "open";
+    public static final String COLUMN_PAIR_VOLUME = "pairVolume";
+    public static final String COLUMN_TRADES = "trades";
+    public static final String COLUMN_VOLUME = "volume";
+
+
+
     public MyDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
     }
@@ -67,6 +80,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROPOSALS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRICE_CHART);
         onCreate(db);
     }
 
@@ -109,6 +124,19 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         ")";
         db.execSQL(CREATE_PROPOSAL_TABLE);
 
+        String CREATE_PRICE_CHART_TABLE =
+                "CREATE TABLE " + TABLE_PRICE_CHART + "(" +
+                        COLUMN_TIME + " REAL," +
+                        COLUMN_CLOSE + " REAL," +
+                        COLUMN_HIGH + " REAL," +
+                        COLUMN_LOW + " REAL," +
+                        COLUMN_OPEN + " REAL," +
+                        COLUMN_PAIR_VOLUME + " REAL," +
+                        COLUMN_TRADES + " REAL," +
+                        COLUMN_VOLUME + " REAL" +
+                        ")";
+        db.execSQL(CREATE_PRICE_CHART_TABLE);
+
     }
 
 
@@ -135,6 +163,52 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_NEWS, null, values);
         db.close();
+    }
+
+    // NEWS
+    public void addPriceChart(PriceChartData priceChartData) {
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TIME, DateUtil.dateStringToMillisecond(priceChartData.getTime()));
+        values.put(COLUMN_CLOSE, priceChartData.getClose());
+        values.put(COLUMN_HIGH, priceChartData.getHigh());
+        values.put(COLUMN_LOW, priceChartData.getLow());
+        values.put(COLUMN_OPEN, priceChartData.getOpen());
+        values.put(COLUMN_PAIR_VOLUME, priceChartData.getPairVolume());
+        values.put(COLUMN_TRADES, priceChartData.getTrades());
+        values.put(COLUMN_VOLUME, priceChartData.getVolume());
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_PRICE_CHART, null, values);
+        db.close();
+    }
+
+
+    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd) {
+        Log.d(TAG, "Find list news");
+
+        List<PriceChartData> priceChartList = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_PRICE_CHART + " WHERE " + COLUMN_TIME + " > " + dateStart +
+                " AND " + COLUMN_TIME + " < " + dateEnd + " ORDER BY " + COLUMN_TIME + " DESC;";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            PriceChartData priceChartData = new PriceChartData();
+            priceChartData.setTime(cursor.getString(1));
+            priceChartData.setClose(cursor.getDouble(2));
+            priceChartData.setHigh(cursor.getDouble(3));
+            priceChartData.setLow(cursor.getDouble(4));
+            priceChartData.setOpen(cursor.getDouble(5));
+            priceChartData.setPairVolume(cursor.getDouble(6));
+            priceChartData.setTrades(cursor.getDouble(7));
+            priceChartData.setVolume(cursor.getDouble(8));
+            priceChartList.add(priceChartData);
+        }
+        cursor.close();
+
+        db.close();
+        return priceChartList;
     }
 
     public News findNews(String newsId) {
