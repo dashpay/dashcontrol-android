@@ -14,14 +14,14 @@ public class DateUtil {
 
 
 
-    public static final long SIX_HOURS_INTERVAL = 1000 * 60 * 60;
-    public static final long TWENTY_FOUR_HOURS_INTERVAL = 1000 * 60 * 60 * 24;
-    public static final long TWO_DAYS_INTERVAL = 1000 * 60 * 60 * 24 * 2;
-    public static final long FOUR_DAYS_INTERVAL = 1000 * 60 * 60 * 24 * 4;
-    public static final long ONE_WEEK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
-    public static final long TWO_WEEKS_INTERVAL = 1000 * 60 * 60 * 24 * 14;
-    public static final long ONE_MONTH_INTERVAL = 1000 * 60 * 60 * 24 * 30;
-    public static final long THREE_MONTHS_INTERVAL = 1000 * 60 * 60 * 24 * 90;
+    public static final long SIX_HOURS_INTERVAL = 60 * 60 * 6;
+    public static final long TWENTY_FOUR_HOURS_INTERVAL = 60 * 60 * 24;
+    public static final long TWO_DAYS_INTERVAL = 60 * 60 * 24 * 2;
+    public static final long FOUR_DAYS_INTERVAL = 60 * 60 * 24 * 4;
+    public static final long ONE_WEEK_INTERVAL = 60 * 60 * 24 * 7;
+    public static final long TWO_WEEKS_INTERVAL = 60 * 60 * 24 * 14;
+    public static final long ONE_MONTH_INTERVAL = 60 * 60 * 24 * 30;
+    public static final long THREE_MONTHS_INTERVAL = 60 * 60 * 24 * 90;
 
     public static long[] intervalArray = {
             SIX_HOURS_INTERVAL,
@@ -46,7 +46,7 @@ public class DateUtil {
         return diffMonth;
     }
 
-    public static double dateStringToMillisecond(String dateAndTime){
+    public static double dateStringToSecond(String dateAndTime){
 
         Timestamp timestamp = null;
 
@@ -64,6 +64,10 @@ public class DateUtil {
             e.getMessage();
         }
 
-        return timestamp.getTime();
+        return timestamp.getTime()/1000;
+    }
+
+    public static long timestampMilliToSec(){
+        return System.currentTimeMillis()/1000;
     }
 }

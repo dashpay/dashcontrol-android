@@ -169,7 +169,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public void addPriceChart(PriceChartData priceChartData) {
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_TIME, DateUtil.dateStringToMillisecond(priceChartData.getTime()));
+        values.put(COLUMN_TIME, DateUtil.dateStringToSecond(priceChartData.getTime()));
         values.put(COLUMN_CLOSE, priceChartData.getClose());
         values.put(COLUMN_HIGH, priceChartData.getHigh());
         values.put(COLUMN_LOW, priceChartData.getLow());

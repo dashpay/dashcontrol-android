@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -53,10 +52,8 @@ public class DashControlApplication extends Application {
 
         i = 0;
 
-        currentTime = Calendar.getInstance().getTime();
-
-        long startDate = currentTime.getTime() - DateUtil.SIX_HOURS_INTERVAL;
-        long endDate = currentTime.getTime();
+        long startDate = DateUtil.timestampMilliToSec() - DateUtil.SIX_HOURS_INTERVAL;
+        long endDate = DateUtil.timestampMilliToSec();
 
         importChartData(startDate, endDate);
 
@@ -108,10 +105,12 @@ public class DashControlApplication extends Application {
 
                             if (i < DateUtil.intervalArray.length) {
 
-                                long startDate = currentTime.getTime() - DateUtil.intervalArray[i];
-                                long endDate = currentTime.getTime() - DateUtil.intervalArray[i - 1];
+                                long startDate = DateUtil.timestampMilliToSec() - DateUtil.intervalArray[i];
+                                long endDate = DateUtil.timestampMilliToSec() - DateUtil.intervalArray[i - 1];
 
                                 importChartData(startDate, endDate);
+                            }else{
+                                i = 0;
                             }
 
                         } catch (JSONException e) {

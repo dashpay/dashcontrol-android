@@ -19,9 +19,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.dash.dashapp.R;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
-import com.dash.dashapp.R;
 import com.dash.dashapp.models.PriceChartData;
 import com.dash.dashapp.utils.DateUtil;
 import com.dash.dashapp.utils.MyDBHandler;
@@ -38,8 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -104,6 +102,16 @@ public class PriceFragment extends BaseFragment {
 
         ButterKnife.bind(this, view);
 
+        long period = 0;
+        long delay = 0;
+
+        drawChart(period, delay);
+
+        return view;
+    }
+
+    private void drawChart(long period, long delay) {
+
         mChart.setBackgroundColor(Color.WHITE);
         mChart.getDescription().setEnabled(false);
 
@@ -137,18 +145,13 @@ public class PriceFragment extends BaseFragment {
 
         List<CandleEntry> yVals1 = new ArrayList<>();
 
-
-
-        Date currentTime = Calendar.getInstance().getTime();
-
-        long startDate = currentTime.getTime() - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
-        long endDate = currentTime.getTime();
-
+        long startDate = DateUtil.timestampMilliToSec() - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+        long endDate = DateUtil.timestampMilliToSec();
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate);
 
-        for (int i = 0; i < priceChartDataList.size(); i++){
+        for (int i = 0; i < priceChartDataList.size(); i++) {
 
             PriceChartData pcd = priceChartDataList.get(i);
 
@@ -189,9 +192,6 @@ public class PriceFragment extends BaseFragment {
 
         mChart.setData(data);
         mChart.invalidate();
-
-
-        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -222,9 +222,9 @@ public class PriceFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        try{
+        try {
             setSpinnerAndPrices();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.getMessage();
         }
 
@@ -257,18 +257,18 @@ public class PriceFragment extends BaseFragment {
                                 // get the value i care about
                                 JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
 
-                                try{
+                                try {
                                     double dash_btc = exchangeJson.getDouble("DASH_BTC");
                                     Market market = new Market("DASH_BTC", dash_btc);
                                     listMarket.add(market);
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     e.getMessage();
                                 }
-                                try{
+                                try {
                                     double dash_usd = exchangeJson.getDouble("DASH_USD");
                                     Market market = new Market("DASH_USD", dash_usd);
                                     listMarket.add(market);
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     e.getMessage();
                                 }
 
@@ -315,13 +315,13 @@ public class PriceFragment extends BaseFragment {
                             currentMarket.setName(price.getString("market"));
                             int indexDefaultMarket = 0;
 
-                            for(int i = 0; i < listExchanges.size(); i++){
-                                if(listExchanges.get(i).getName().equals(currentExchange.getName())){
+                            for (int i = 0; i < listExchanges.size(); i++) {
+                                if (listExchanges.get(i).getName().equals(currentExchange.getName())) {
                                     spinnerExchanges.setSelection(i);
                                     currentExchange = listExchanges.get(i);
-                                    for(int j = 0; j < listExchanges.get(i).getListMarket().size(); j++){
+                                    for (int j = 0; j < listExchanges.get(i).getListMarket().size(); j++) {
                                         listMarketString.add(listExchanges.get(i).getListMarket().get(j).getName());
-                                        if(listExchanges.get(i).getListMarket().get(j).getName().equals(currentMarket.getName())){
+                                        if (listExchanges.get(i).getListMarket().get(j).getName().equals(currentMarket.getName())) {
                                             indexDefaultMarket = j;
                                         }
                                     }
@@ -342,7 +342,7 @@ public class PriceFragment extends BaseFragment {
 
                                     List<String> listMarketString = new ArrayList<>();
 
-                                    for(int j = 0; j < currentExchange.getListMarket().size(); j++){
+                                    for (int j = 0; j < currentExchange.getListMarket().size(); j++) {
                                         listMarketString.add(currentExchange.getListMarket().get(j).getName());
                                     }
 
@@ -361,7 +361,6 @@ public class PriceFragment extends BaseFragment {
                                 }
 
                             });
-
 
 
                             spinnerMarket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
