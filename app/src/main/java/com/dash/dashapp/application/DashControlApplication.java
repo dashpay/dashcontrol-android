@@ -33,7 +33,7 @@ public class DashControlApplication extends Application {
     private Locale locale = null;
 
     private int i;
-    private Date currentTime;
+    private long currentDate;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -52,8 +52,13 @@ public class DashControlApplication extends Application {
 
         i = 0;
 
-        long startDate = DateUtil.timestampMilliToSec() - DateUtil.SIX_HOURS_INTERVAL;
-        long endDate = DateUtil.timestampMilliToSec();
+        MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
+        dbHandler.deleteAllPriceChart(0, 0);
+
+        currentDate = DateUtil.timestampMilliToSec();
+
+        long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
+        long endDate = currentDate;
 
         importChartData(startDate, endDate);
 
@@ -105,8 +110,8 @@ public class DashControlApplication extends Application {
 
                             if (i < DateUtil.intervalArray.length) {
 
-                                long startDate = DateUtil.timestampMilliToSec() - DateUtil.intervalArray[i];
-                                long endDate = DateUtil.timestampMilliToSec() - DateUtil.intervalArray[i - 1];
+                                long startDate = currentDate - DateUtil.intervalArray[i];
+                                long endDate = currentDate - DateUtil.intervalArray[i - 1];
 
                                 importChartData(startDate, endDate);
                             }else{

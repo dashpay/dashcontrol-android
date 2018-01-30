@@ -167,6 +167,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     // NEWS
     public void addPriceChart(PriceChartData priceChartData) {
+        Log.d(TAG, "Add price chart");
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_TIME, DateUtil.dateStringToSecond(priceChartData.getTime()));
@@ -177,6 +178,17 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_PAIR_VOLUME, priceChartData.getPairVolume());
         values.put(COLUMN_TRADES, priceChartData.getTrades());
         values.put(COLUMN_VOLUME, priceChartData.getVolume());
+
+        Log.d(TAG, "Current priceChartData : " +
+                priceChartData.getVolume() + " " +
+                priceChartData.getClose() + " " +
+                priceChartData.getOpen() + " " +
+                priceChartData.getLow() + " " +
+                priceChartData.getHigh() + " " +
+                priceChartData.getPairVolume() + " " +
+                priceChartData.getTrades() + " " +
+                DateUtil.dateStringToSecond(priceChartData.getTime()));
+
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_PRICE_CHART, null, values);
         db.close();
@@ -184,7 +196,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
 
     public List<PriceChartData> findPriceChart(long dateStart, long dateEnd) {
-        Log.d(TAG, "Find list news");
+        Log.d(TAG, "Find list Price chart");
+        Log.d(TAG, "Start date : " + dateStart);
+        Log.d(TAG, "End date : " + dateEnd);
 
         List<PriceChartData> priceChartList = new ArrayList<>();
 
@@ -203,12 +217,34 @@ public class MyDBHandler extends SQLiteOpenHelper {
             priceChartData.setPairVolume(cursor.getDouble(6));
             priceChartData.setTrades(cursor.getDouble(7));
             priceChartData.setVolume(cursor.getDouble(8));
+
+            Log.d(TAG, "Current priceChartData : " +
+                    priceChartData.getVolume() + " " +
+                    priceChartData.getClose() + " " +
+                    priceChartData.getOpen() + " " +
+                    priceChartData.getLow() + " " +
+                    priceChartData.getHigh() + " " +
+                    priceChartData.getPairVolume() + " " +
+                    priceChartData.getTrades() + " " +
+                    priceChartData.getTime());
+
             priceChartList.add(priceChartData);
         }
         cursor.close();
 
         db.close();
         return priceChartList;
+    }
+
+    public void deleteAllPriceChart(long dateStart, long dateEnd) {
+
+        Log.d(TAG, "Delete all price chart");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        if (dateStart == 0 && dateEnd == 0){
+            db.execSQL("delete from " + TABLE_PRICE_CHART);
+        }
+        db.close();
     }
 
     public News findNews(String newsId) {
@@ -277,6 +313,14 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
     public void deleteAllNews() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_NEWS);
+        db.close();
+    }
+
+
+
+    public void deletePriceChart() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from " + TABLE_NEWS);
         db.close();
@@ -413,6 +457,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL("delete from " + TABLE_PROPOSALS);
         db.close();
     }
+
+
 
 }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -145,8 +146,11 @@ public class PriceFragment extends BaseFragment {
 
         List<CandleEntry> yVals1 = new ArrayList<>();
 
-        long startDate = DateUtil.timestampMilliToSec() - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
-        long endDate = DateUtil.timestampMilliToSec();
+        long currentDate = DateUtil.timestampMilliToSec();
+
+        long startDate = currentDate - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+        long endDate = currentDate;
+
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate);
@@ -155,7 +159,11 @@ public class PriceFragment extends BaseFragment {
 
             PriceChartData pcd = priceChartDataList.get(i);
 
-            float val = (float) pcd.getVolume();
+            float mult = (20 + 1);
+            float val = (float) (Math.random() * 40) + mult;
+
+
+            //float val = (float) pcd.getVolume();
 
             float high = (float) pcd.getHigh();
             float low = (float) pcd.getLow();
