@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -83,44 +82,50 @@ public class DashControlApplication extends Application {
                 (Request.Method.GET, URLGraph, null, new Response.Listener<JSONArray>() {
 
                     @Override
-                    public void onResponse(JSONArray response) {
-                        try {
+                    public void onResponse(final JSONArray response) {
 
-                            for (int i = 0; i < response.length(); i++) {
+                        new Thread(new Runnable() {
+                            public void run() {
+                                try {
 
-                                JSONObject jsonobj = response.getJSONObject(i);
+                                    for (int i = 0; i < response.length(); i++) {
 
-                                PriceChartData priceChartData = new PriceChartData();
+                                        JSONObject jsonobj = response.getJSONObject(i);
 
-                                priceChartData.setTime(jsonobj.getString("time"));
-                                priceChartData.setClose(jsonobj.getInt("close"));
-                                priceChartData.setHigh(jsonobj.getInt("high"));
-                                priceChartData.setLow(jsonobj.getInt("low"));
-                                priceChartData.setOpen(jsonobj.getInt("open"));
-                                priceChartData.setPairVolume(jsonobj.getInt("pairVolume"));
-                                priceChartData.setTrades(jsonobj.getInt("trades"));
-                                priceChartData.setVolume(jsonobj.getInt("volume"));
+                                        PriceChartData priceChartData = new PriceChartData();
 
-                                MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
-                                dbHandler.addPriceChart(priceChartData);
+                                        priceChartData.setTime(jsonobj.getString("time"));
+                                        priceChartData.setClose(jsonobj.getInt("close"));
+                                        priceChartData.setHigh(jsonobj.getInt("high"));
+                                        priceChartData.setLow(jsonobj.getInt("low"));
+                                        priceChartData.setOpen(jsonobj.getInt("open"));
+                                        priceChartData.setPairVolume(jsonobj.getInt("pairVolume"));
+                                        priceChartData.setTrades(jsonobj.getInt("trades"));
+                                        priceChartData.setVolume(jsonobj.getInt("volume"));
+
+                                        MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
+                                        dbHandler.addPriceChart(priceChartData);
+                                    }
+
+
+                                    i++;
+
+                                    if (i < DateUtil.intervalArray.length) {
+
+                                        long startDate = currentDate - DateUtil.intervalArray[i];
+                                        long endDate = currentDate - DateUtil.intervalArray[i - 1];
+
+                                        importChartData(startDate, endDate);
+                                    } else {
+                                        i = 0;
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
+                        }).start();
 
-
-                            i++;
-
-                            if (i < DateUtil.intervalArray.length) {
-
-                                long startDate = currentDate - DateUtil.intervalArray[i];
-                                long endDate = currentDate - DateUtil.intervalArray[i - 1];
-
-                                importChartData(startDate, endDate);
-                            }else{
-                                i = 0;
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     }
                 }, new Response.ErrorListener() {
 
