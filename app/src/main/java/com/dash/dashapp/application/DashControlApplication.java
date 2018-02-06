@@ -21,6 +21,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -77,6 +79,9 @@ public class DashControlApplication extends Application {
 
         String URLGraph = URLs.URL_GRAPH + startDateString + endDateString + marketString + exchangeString + noLimit;
 
+
+        Log.d(TAG, "URLGraph : " + URLGraph);
+
         // Getting exchanges (default exchange to display)
         JsonArrayRequest jsObjRequestExchanges = new JsonArrayRequest
                 (Request.Method.GET, URLGraph, null, new Response.Listener<JSONArray>() {
@@ -110,6 +115,8 @@ public class DashControlApplication extends Application {
 
                                     i++;
 
+                                    Log.e(TAG, "i  : " + i);
+
                                     if (i < DateUtil.intervalArray.length) {
 
                                         long startDate = currentDate - DateUtil.intervalArray[i];
@@ -132,8 +139,26 @@ public class DashControlApplication extends Application {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
-                        error.getMessage();
-                        Log.d(TAG, "Error : " + error.getMessage());
+                        Log.e(TAG, "Error : " + error.getMessage());
+                        Log.e(TAG, "Error StackTrace: \t" + Arrays.toString(error.getStackTrace()));
+
+                        if (error == null || error.networkResponse == null) {
+                            return;
+                        }
+
+                        String body;
+                        //get status code here
+                        final String statusCode = String.valueOf(error.networkResponse.statusCode);
+                        Log.e(TAG, "statusCode : " + statusCode);
+                        //get response body and parse with appropriate encoding
+                        try {
+                            body = new String(error.networkResponse.data,"UTF-8");
+                            Log.e(TAG, "body : " + body);
+                        } catch (UnsupportedEncodingException e) {
+                            // exception
+                            Log.e(TAG, "e : " + e.getMessage());
+
+                        }
 
                     }
                 });
