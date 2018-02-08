@@ -197,7 +197,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
 
-    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd) {
+    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd, long gap) {
+
+        // TODO AGGREGATE GAP WITH SQL
         Log.d(TAG, "Find list Price chart");
         Log.d(TAG, "Start date : " + dateStart);
         Log.d(TAG, "End date : " + dateEnd);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,8 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -64,12 +66,21 @@ public class PriceFragment extends BaseFragment {
     TextView priceTextview;
     @BindView(R.id.chart1)
     CandleStickChart mChart;
+    @BindView(R.id.radioGroup_scale)
+    RadioGroup timeFrameRadioGroup;
+    @BindView(R.id.radioGroup_gap)
+    RadioGroup gapRadioGroup;
+
+
     private OnFragmentInteractionListener mListener;
 
     private Exchange currentExchange = new Exchange();
     private Market currentMarket = new Market();
 
     private List<Exchange> listExchanges;
+
+    private long timeFrame = 0;
+    private long gap = 0;
 
 
     public PriceFragment() {
@@ -103,15 +114,108 @@ public class PriceFragment extends BaseFragment {
 
         ButterKnife.bind(this, view);
 
-        long period = 0;
-        long delay = 0;
+        timeFrame = DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
 
-        drawChart(period, delay);
+        drawChart(timeFrame, gap);
+
+        setRadioGroupListeners();
 
         return view;
     }
 
-    private void drawChart(long period, long delay) {
+    private void setRadioGroupListeners() {
+
+        // This overrides the radiogroup onCheckListener
+        timeFrameRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // This will get the radiobutton that has changed in its check state
+                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                // This puts the value (true/false) into the variable
+                boolean isChecked = checkedRadioButton.isChecked();
+                // If the radiobutton that has changed in check state is now checked...
+                if (isChecked) {
+                    // Changes the textview's text to "Checked: example radiobutton text"
+
+                    Log.d(TAG, checkedRadioButton.getText() + "");
+
+                    String selectedtimeFrame = checkedRadioButton.getText() + "";
+
+                    switch (selectedtimeFrame) {
+                        case DateUtil.SIX_HOURS_INTERVAL_STRING:
+                            timeFrame = DateUtil.SIX_HOURS_INTERVAL;
+                            break;
+                        case DateUtil.TWENTY_FOUR_HOURS_INTERVAL_STRING:
+                            timeFrame = DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+                            break;
+                        case DateUtil.TWO_DAYS_INTERVAL_STRING:
+                            timeFrame = DateUtil.TWO_DAYS_INTERVAL;
+                            break;
+                        case DateUtil.FOUR_DAYS_INTERVAL_STRING:
+                            timeFrame = DateUtil.FOUR_DAYS_INTERVAL;
+                            break;
+                        case DateUtil.ONE_WEEK_INTERVAL_STRING:
+                            timeFrame = DateUtil.ONE_WEEK_INTERVAL;
+                            break;
+                        case DateUtil.TWO_WEEKS_INTERVAL_STRING:
+                            timeFrame = DateUtil.TWO_WEEKS_INTERVAL;
+                            break;
+                        case DateUtil.ONE_MONTH_INTERVAL_STRING:
+                            timeFrame = DateUtil.ONE_MONTH_INTERVAL;
+                            break;
+                        case DateUtil.THREE_MONTHS_INTERVAL_STRING:
+                            timeFrame = DateUtil.THREE_MONTHS_INTERVAL;
+                            break;
+                        default:
+                            break;
+                    }
+                    drawChart(timeFrame, gap);
+                }
+            }
+        });
+
+        // This overrides the radiogroup onCheckListener
+        gapRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // This will get the radiobutton that has changed in its check state
+                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                // This puts the value (true/false) into the variable
+                boolean isChecked = checkedRadioButton.isChecked();
+                // If the radiobutton that has changed in check state is now checked...
+                if (isChecked) {
+                    // Changes the textview's text to "Checked: example radiobutton text"
+                    Log.d(TAG, checkedRadioButton.getText() + "");
+
+                    String selectedtimeFrame = checkedRadioButton.getText() + "";
+
+                    switch (selectedtimeFrame) {
+                        case DateUtil.FIVE_MINUTES_GAP_STRING:
+                            timeFrame = DateUtil.FIVE_MINUTES_GAP;
+                            break;
+                        case DateUtil.FIFTEEN_MINUTES_GAP_STRING:
+                            timeFrame = DateUtil.FIFTEEN_MINUTES_GAP;
+                            break;
+                        case DateUtil.THIRTY_MINUTES_GAP_STRING:
+                            timeFrame = DateUtil.THIRTY_MINUTES_GAP;
+                            break;
+                        case DateUtil.TWO_HOURS_GAP_STRING:
+                            timeFrame = DateUtil.TWO_HOURS_GAP;
+                            break;
+                        case DateUtil.FOUR_HOURS_GAP_STRING:
+                            timeFrame = DateUtil.FOUR_HOURS_GAP;
+                            break;
+                        case DateUtil.TWENTY_FOUR_HOURS_GAP_STRING:
+                            timeFrame = DateUtil.TWENTY_FOUR_HOURS_GAP;
+                            break;
+                        default:
+                            break;
+                    }
+                    drawChart(timeFrame, gap);
+                }
+            }
+        });
+    }
+
+    private void drawChart(long timeframe, long gap) {
 
         mChart.setBackgroundColor(Color.WHITE);
         mChart.getDescription().setEnabled(false);
@@ -148,12 +252,12 @@ public class PriceFragment extends BaseFragment {
 
         long currentDate = DateUtil.timestampMilliToSec();
 
-        long startDate = currentDate - DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+        long startDate = currentDate - timeframe;
         long endDate = currentDate;
 
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
-        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate);
+        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap);
 
         Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate * 1000));
         Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate * 1000));
@@ -161,10 +265,6 @@ public class PriceFragment extends BaseFragment {
         for (int i = 0; i < priceChartDataList.size(); i++) {
 
             PriceChartData pcd = priceChartDataList.get(i);
-
-            float mult = (20 + 1);
-            float val = (float) (Math.random() * 40) + mult;
-
 
             //float val = (float) pcd.getVolume();
 
@@ -177,10 +277,11 @@ public class PriceFragment extends BaseFragment {
             boolean even = i % 2 == 0;
 
             yVals1.add(new CandleEntry(
-                    i, val + high,
-                    val - low,
-                    even ? val + open : val - open,
-                    even ? val - close : val + close,
+                    i,
+                    high,
+                    low,
+                    open,
+                    close,
                     getResources().getDrawable(R.drawable.star)
             ));
         }

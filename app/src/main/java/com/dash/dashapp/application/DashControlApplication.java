@@ -121,7 +121,7 @@ public class DashControlApplication extends Application {
 
 
 
-                                    /*i++;
+                                    i++;
 
                                     Log.e(TAG, "i  : " + i);
 
@@ -133,7 +133,7 @@ public class DashControlApplication extends Application {
                                         importChartData(startDate, endDate);
                                     } else {
                                         i = 0;
-                                    }*/
+                                    }
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
