@@ -6,20 +6,20 @@ package com.dash.dashapp.models;
 
 public class PriceChartData {
 
-    private String time;
-    private double close;
-    private double high;
-    private double low;
-    private double open;
-    private double pairVolume;
-    private double trades;
-    private double volume;
+    private long time;
+    private long close;
+    private long high;
+    private long low;
+    private long open;
+    private long pairVolume;
+    private long trades;
+    private long volume;
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
@@ -27,7 +27,7 @@ public class PriceChartData {
         return close;
     }
 
-    public void setClose(double close) {
+    public void setClose(long close) {
         this.close = close;
     }
 
@@ -35,7 +35,7 @@ public class PriceChartData {
         return high;
     }
 
-    public void setHigh(double high) {
+    public void setHigh(long high) {
         this.high = high;
     }
 
@@ -43,7 +43,7 @@ public class PriceChartData {
         return low;
     }
 
-    public void setLow(double low) {
+    public void setLow(long low) {
         this.low = low;
     }
 
@@ -51,7 +51,7 @@ public class PriceChartData {
         return open;
     }
 
-    public void setOpen(double open) {
+    public void setOpen(long open) {
         this.open = open;
     }
 
@@ -59,7 +59,7 @@ public class PriceChartData {
         return pairVolume;
     }
 
-    public void setPairVolume(double pairVolume) {
+    public void setPairVolume(long pairVolume) {
         this.pairVolume = pairVolume;
     }
 
@@ -67,7 +67,7 @@ public class PriceChartData {
         return trades;
     }
 
-    public void setTrades(double trades) {
+    public void setTrades(long trades) {
         this.trades = trades;
     }
 
@@ -75,7 +75,7 @@ public class PriceChartData {
         return volume;
     }
 
-    public void setVolume(double volume) {
+    public void setVolume(long volume) {
         this.volume = volume;
     }
 }

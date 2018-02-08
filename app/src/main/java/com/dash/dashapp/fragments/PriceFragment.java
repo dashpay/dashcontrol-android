@@ -155,6 +155,9 @@ public class PriceFragment extends BaseFragment {
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate);
 
+        Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate * 1000));
+        Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate * 1000));
+
         for (int i = 0; i < priceChartDataList.size(); i++) {
 
             PriceChartData pcd = priceChartDataList.get(i);

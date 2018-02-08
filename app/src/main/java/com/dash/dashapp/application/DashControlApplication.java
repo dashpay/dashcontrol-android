@@ -61,6 +61,9 @@ public class DashControlApplication extends Application {
         long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
         long endDate = currentDate;
 
+        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate*1000));
+        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate*1000));
+
         importChartData(startDate, endDate);
 
     }
@@ -68,6 +71,10 @@ public class DashControlApplication extends Application {
     private void importChartData(long startDate, long endDate) {
 
         Log.d(TAG, "Intervale : " + DateUtil.intervalArray[i]);
+
+
+        Log.d("DateDebug", "Postman test startDate : " + startDate
+                + " endDate : " + endDate);
 
         String startDateString = "start=" + startDate;
         String endDateString = "&end=" + endDate;
@@ -99,7 +106,7 @@ public class DashControlApplication extends Application {
 
                                         PriceChartData priceChartData = new PriceChartData();
 
-                                        priceChartData.setTime(jsonobj.getString("time"));
+                                        priceChartData.setTime(DateUtil.dateStringToSecond(jsonobj.getString("time")));
                                         priceChartData.setClose(jsonobj.getInt("close"));
                                         priceChartData.setHigh(jsonobj.getInt("high"));
                                         priceChartData.setLow(jsonobj.getInt("low"));
@@ -113,7 +120,8 @@ public class DashControlApplication extends Application {
                                     }
 
 
-                                    i++;
+
+                                    /*i++;
 
                                     Log.e(TAG, "i  : " + i);
 
@@ -125,7 +133,7 @@ public class DashControlApplication extends Application {
                                         importChartData(startDate, endDate);
                                     } else {
                                         i = 0;
-                                    }
+                                    }*/
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();

@@ -46,11 +46,11 @@ public class DateUtil {
         return diffMonth;
     }
 
-    public static double dateStringToSecond(String dateAndTime){
+    public static long dateStringToSecond(String dateAndTime){
 
         Timestamp timestamp = null;
 
-        String date = dateAndTime.substring(0, dateAndTime.indexOf("T") - 1);
+        String date = dateAndTime.substring(0, dateAndTime.indexOf("T"));
         String time = dateAndTime.substring(dateAndTime.indexOf("T") + 1, dateAndTime.indexOf("Z") - 1);
 
         dateAndTime = date + " " + time;
@@ -65,6 +65,18 @@ public class DateUtil {
         }
 
         return timestamp.getTime()/1000;
+    }
+
+    public static String getDate(long timeStamp){
+
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate);
+        }
+        catch(Exception ex){
+            return "xx";
+        }
     }
 
     public static long timestampMilliToSec(){
