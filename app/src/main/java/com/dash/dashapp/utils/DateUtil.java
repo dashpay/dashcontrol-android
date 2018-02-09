@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sebas on 9/18/2017.
@@ -14,6 +16,13 @@ public class DateUtil {
 
 
 
+    public static final long FIVE_MINUTES_GAP = 60 * 60 * 6;
+    public static final long FIFTEEN_MINUTES_GAP = 60 * 60 * 6;
+    public static final long THIRTY_MINUTES_GAP = 60 * 60 * 6;
+    public static final long TWO_HOURS_GAP = 60 * 60 * 6;
+    public static final long FOUR_HOURS_GAP = 60 * 60 * 6;
+    public static final long TWENTY_FOUR_HOURS_GAP = 60 * 60 * 6;
+
     public static final long SIX_HOURS_INTERVAL = 60 * 60 * 6;
     public static final long TWENTY_FOUR_HOURS_INTERVAL = 60 * 60 * 24;
     public static final long TWO_DAYS_INTERVAL = 60 * 60 * 24 * 2;
@@ -22,6 +31,32 @@ public class DateUtil {
     public static final long TWO_WEEKS_INTERVAL = 60 * 60 * 24 * 14;
     public static final long ONE_MONTH_INTERVAL = 60 * 60 * 24 * 30;
     public static final long THREE_MONTHS_INTERVAL = 60 * 60 * 24 * 90;
+
+
+    public static final String FIVE_MINUTES_GAP_STRING = "5m";
+    public static final String FIFTEEN_MINUTES_GAP_STRING = "15m";
+    public static final String THIRTY_MINUTES_GAP_STRING = "30m";
+    public static final String TWO_HOURS_GAP_STRING = "2h";
+    public static final String FOUR_HOURS_GAP_STRING = "4h";
+    public static final String TWENTY_FOUR_HOURS_GAP_STRING = "1d";
+
+    public static final String SIX_HOURS_INTERVAL_STRING = "6h";
+    public static final String TWENTY_FOUR_HOURS_INTERVAL_STRING = "24h";
+    public static final String TWO_DAYS_INTERVAL_STRING = "2d";
+    public static final String FOUR_DAYS_INTERVAL_STRING = "4d";
+    public static final String ONE_WEEK_INTERVAL_STRING = "1w";
+    public static final String TWO_WEEKS_INTERVAL_STRING = "2w";
+    public static final String ONE_MONTH_INTERVAL_STRING = "1m";
+    public static final String THREE_MONTHS_INTERVAL_STRING = "3m";
+
+    public static long[] gapArray = {
+            FIVE_MINUTES_GAP,
+            FIFTEEN_MINUTES_GAP,
+            THIRTY_MINUTES_GAP,
+            TWO_HOURS_GAP,
+            FOUR_HOURS_GAP,
+            TWENTY_FOUR_HOURS_GAP
+    };
 
     public static long[] intervalArray = {
             SIX_HOURS_INTERVAL,
@@ -46,11 +81,11 @@ public class DateUtil {
         return diffMonth;
     }
 
-    public static double dateStringToSecond(String dateAndTime){
+    public static long dateStringToSecond(String dateAndTime){
 
         Timestamp timestamp = null;
 
-        String date = dateAndTime.substring(0, dateAndTime.indexOf("T") - 1);
+        String date = dateAndTime.substring(0, dateAndTime.indexOf("T"));
         String time = dateAndTime.substring(dateAndTime.indexOf("T") + 1, dateAndTime.indexOf("Z") - 1);
 
         dateAndTime = date + " " + time;
@@ -65,6 +100,18 @@ public class DateUtil {
         }
 
         return timestamp.getTime()/1000;
+    }
+
+    public static String getDate(long timeStamp){
+
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate);
+        }
+        catch(Exception ex){
+            return "xx";
+        }
     }
 
     public static long timestampMilliToSec(){

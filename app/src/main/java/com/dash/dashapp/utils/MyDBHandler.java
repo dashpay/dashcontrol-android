@@ -170,7 +170,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Add price chart");
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_TIME, DateUtil.dateStringToSecond(priceChartData.getTime()));
+        Log.d("DateDebug", "Inserting in database : " + DateUtil.getDate(priceChartData.getTime()*1000));
+        values.put(COLUMN_TIME, priceChartData.getTime());
         values.put(COLUMN_CLOSE, priceChartData.getClose());
         values.put(COLUMN_HIGH, priceChartData.getHigh());
         values.put(COLUMN_LOW, priceChartData.getLow());
@@ -178,6 +179,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_PAIR_VOLUME, priceChartData.getPairVolume());
         values.put(COLUMN_TRADES, priceChartData.getTrades());
         values.put(COLUMN_VOLUME, priceChartData.getVolume());
+
 
         Log.d(TAG, "Current priceChartData : " +
                 priceChartData.getVolume() + " " +
@@ -187,7 +189,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 priceChartData.getHigh() + " " +
                 priceChartData.getPairVolume() + " " +
                 priceChartData.getTrades() + " " +
-                DateUtil.dateStringToSecond(priceChartData.getTime()));
+                priceChartData.getTime());
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_PRICE_CHART, null, values);
@@ -195,7 +197,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
 
-    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd) {
+    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd, long gap) {
+
+        // TODO AGGREGATE GAP WITH SQL
         Log.d(TAG, "Find list Price chart");
         Log.d(TAG, "Start date : " + dateStart);
         Log.d(TAG, "End date : " + dateEnd);
@@ -205,18 +209,21 @@ public class MyDBHandler extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_PRICE_CHART + " WHERE " + COLUMN_TIME + " > " + dateStart +
                 " AND " + COLUMN_TIME + " < " + dateEnd + " ORDER BY " + COLUMN_TIME + " DESC;";
 
+
+        Log.d(TAG, "Query : " + query);
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
             PriceChartData priceChartData = new PriceChartData();
-            priceChartData.setTime(cursor.getString(1));
-            priceChartData.setClose(cursor.getDouble(2));
-            priceChartData.setHigh(cursor.getDouble(3));
-            priceChartData.setLow(cursor.getDouble(4));
-            priceChartData.setOpen(cursor.getDouble(5));
-            priceChartData.setPairVolume(cursor.getDouble(6));
-            priceChartData.setTrades(cursor.getDouble(7));
-            priceChartData.setVolume(cursor.getDouble(8));
+            priceChartData.setTime(cursor.getLong(0));
+            priceChartData.setClose(cursor.getLong(1));
+            priceChartData.setHigh(cursor.getLong(2));
+            priceChartData.setLow(cursor.getLong(3));
+            priceChartData.setOpen(cursor.getLong(4));
+            priceChartData.setPairVolume(cursor.getLong(5));
+            priceChartData.setTrades(cursor.getLong(6));
+            priceChartData.setVolume(cursor.getLong(7));
 
             Log.d(TAG, "Current priceChartData : " +
                     priceChartData.getVolume() + " " +
