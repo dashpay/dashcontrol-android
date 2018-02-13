@@ -16,21 +16,21 @@ public class DateUtil {
 
 
 
-    public static final long FIVE_MINUTES_GAP = 60 * 60 * 6;
-    public static final long FIFTEEN_MINUTES_GAP = 60 * 60 * 6;
-    public static final long THIRTY_MINUTES_GAP = 60 * 60 * 6;
-    public static final long TWO_HOURS_GAP = 60 * 60 * 6;
-    public static final long FOUR_HOURS_GAP = 60 * 60 * 6;
-    public static final long TWENTY_FOUR_HOURS_GAP = 60 * 60 * 6;
+    public static final long FIVE_MINUTES_GAP = 1000 * 60 * 5;
+    public static final long FIFTEEN_MINUTES_GAP = 1000 * 60 * 15;
+    public static final long THIRTY_MINUTES_GAP = 1000 * 60 * 30;
+    public static final long TWO_HOURS_GAP = 1000 * 60 * 60 * 2;
+    public static final long FOUR_HOURS_GAP = 1000 * 60 * 60 * 4;
+    public static final long TWENTY_FOUR_HOURS_GAP = 1000 * 60 * 60 * 24;
 
-    public static final long SIX_HOURS_INTERVAL = 60 * 60 * 6;
-    public static final long TWENTY_FOUR_HOURS_INTERVAL = 60 * 60 * 24;
-    public static final long TWO_DAYS_INTERVAL = 60 * 60 * 24 * 2;
-    public static final long FOUR_DAYS_INTERVAL = 60 * 60 * 24 * 4;
-    public static final long ONE_WEEK_INTERVAL = 60 * 60 * 24 * 7;
-    public static final long TWO_WEEKS_INTERVAL = 60 * 60 * 24 * 14;
-    public static final long ONE_MONTH_INTERVAL = 60 * 60 * 24 * 30;
-    public static final long THREE_MONTHS_INTERVAL = 60 * 60 * 24 * 90;
+    public static final long SIX_HOURS_INTERVAL = 1000 *60 * 60 * 6;
+    public static final long TWENTY_FOUR_HOURS_INTERVAL = 1000 * 60 * 60 * 24;
+    public static final long TWO_DAYS_INTERVAL = 1000 * 60 * 60 * 24 * 2;
+    public static final long FOUR_DAYS_INTERVAL = 1000 * 60 * 60 * 24 * 4;
+    public static final long ONE_WEEK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
+    public static final long TWO_WEEKS_INTERVAL = 1000 * 60 * 60 * 24 * 14;
+    public static final long ONE_MONTH_INTERVAL = 1000L * 60L * 60L * 24L * 30L;
+    public static final long THREE_MONTHS_INTERVAL = 1000L * 60L * 60L * 24L * 90L;
 
 
     public static final String FIVE_MINUTES_GAP_STRING = "5m";
@@ -81,17 +81,17 @@ public class DateUtil {
         return diffMonth;
     }
 
-    public static long dateStringToSecond(String dateAndTime){
+    public static long dateStringToMilliseconds(String dateAndTime){
 
         Timestamp timestamp = null;
 
-        String date = dateAndTime.substring(0, dateAndTime.indexOf("T"));
+        /*String date = dateAndTime.substring(0, dateAndTime.indexOf("T"));
         String time = dateAndTime.substring(dateAndTime.indexOf("T") + 1, dateAndTime.indexOf("Z") - 1);
 
-        dateAndTime = date + " " + time;
+        dateAndTime = date + " " + time;*/
 
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             Date parsedDate = dateFormat.parse(dateAndTime);
             timestamp = new java.sql.Timestamp(parsedDate.getTime());
         } catch(Exception e) { //this generic but you can control another types of exception
@@ -99,7 +99,7 @@ public class DateUtil {
             e.getMessage();
         }
 
-        return timestamp.getTime()/1000;
+        return timestamp.getTime();
     }
 
     public static String getDate(long timeStamp){

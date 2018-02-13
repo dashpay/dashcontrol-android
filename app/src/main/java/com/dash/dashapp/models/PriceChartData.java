@@ -7,13 +7,16 @@ package com.dash.dashapp.models;
 public class PriceChartData {
 
     private long time;
-    private long close;
-    private long high;
-    private long low;
-    private long open;
-    private long pairVolume;
-    private long trades;
-    private long volume;
+    private long startGap;
+    private long endGap;
+    private long gap;
+    private double close;
+    private double high;
+    private double low;
+    private double open;
+    private double pairVolume;
+    private double trades;
+    private double volume;
 
     public long getTime() {
         return time;
@@ -27,7 +30,7 @@ public class PriceChartData {
         return close;
     }
 
-    public void setClose(long close) {
+    public void setClose(double close) {
         this.close = close;
     }
 
@@ -35,7 +38,7 @@ public class PriceChartData {
         return high;
     }
 
-    public void setHigh(long high) {
+    public void setHigh(double high) {
         this.high = high;
     }
 
@@ -43,7 +46,7 @@ public class PriceChartData {
         return low;
     }
 
-    public void setLow(long low) {
+    public void setLow(double low) {
         this.low = low;
     }
 
@@ -51,7 +54,7 @@ public class PriceChartData {
         return open;
     }
 
-    public void setOpen(long open) {
+    public void setOpen(double open) {
         this.open = open;
     }
 
@@ -59,7 +62,7 @@ public class PriceChartData {
         return pairVolume;
     }
 
-    public void setPairVolume(long pairVolume) {
+    public void setPairVolume(double pairVolume) {
         this.pairVolume = pairVolume;
     }
 
@@ -67,7 +70,7 @@ public class PriceChartData {
         return trades;
     }
 
-    public void setTrades(long trades) {
+    public void setTrades(double trades) {
         this.trades = trades;
     }
 
@@ -75,7 +78,31 @@ public class PriceChartData {
         return volume;
     }
 
-    public void setVolume(long volume) {
+    public void setVolume(double volume) {
         this.volume = volume;
+    }
+
+    public long getStartGap() {
+        return startGap;
+    }
+
+    public void setStartGap(long startGap) {
+        this.startGap = startGap;
+    }
+
+    public long getEndGap() {
+        return endGap;
+    }
+
+    public void setEndGap(long endGap) {
+        this.endGap = endGap;
+    }
+
+    public long getGap() {
+        return gap;
+    }
+
+    public void setGap(long gap) {
+        this.gap = gap;
     }
 }

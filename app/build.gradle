@@ -64,6 +64,7 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.jakewharton:butterknife:8.8.1'
+    compile 'com.facebook.stetho:stetho:1.5.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     testCompile 'junit:junit:4.12'
 }
