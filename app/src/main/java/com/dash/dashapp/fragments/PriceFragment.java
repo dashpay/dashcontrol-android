@@ -1,6 +1,9 @@
 package com.dash.dashapp.fragments;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -16,13 +19,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.R;
+import com.dash.dashapp.activities.MainActivity;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PriceChartData;
@@ -219,44 +222,10 @@ public class PriceFragment extends BaseFragment {
 
     private void drawChart(long timeframe, long gap) {
 
-        mChart.setBackgroundColor(Color.WHITE);
-        mChart.getDescription().setEnabled(false);
-
-        // if more than 60 entries are displayed in the chart, no values will be
-        // drawn
-        mChart.setMaxVisibleValueCount(60);
-
-        // scaling can now only be done on x- and y-axis separately
-        mChart.setPinchZoom(false);
-
-        mChart.setDrawGridBackground(false);
-
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-
-        YAxis leftAxis = mChart.getAxisLeft();
-//        leftAxis.setEnabled(false);
-        leftAxis.setLabelCount(7, false);
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setDrawAxisLine(false);
-
-        YAxis rightAxis = mChart.getAxisRight();
-        rightAxis.setEnabled(false);
-
-        mChart.getLegend().setEnabled(false);
-
-
-        //Setting the data
-        mChart.resetTracking();
-
-        List<CandleEntry> yVals1 = new ArrayList<>();
-
         long currentDate = System.currentTimeMillis();
 
         long startDate = currentDate - timeframe;
         long endDate = currentDate;
-
 
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap);
@@ -264,46 +233,93 @@ public class PriceFragment extends BaseFragment {
         Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate));
         Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate));
 
-        for (int i = 0; i < priceChartDataList.size(); i++) {
+        if (priceChartDataList.size() != 0) {
 
-            PriceChartData pcd = priceChartDataList.get(i);
+            mChart.setBackgroundColor(Color.WHITE);
+            mChart.getDescription().setEnabled(false);
 
-            //float val = (float) pcd.getVolume();
+            // if more than 60 entries are displayed in the chart, no values will be
+            // drawn
+            mChart.setMaxVisibleValueCount(60);
 
-            float high = (float) pcd.getHigh();
-            float low = (float) pcd.getLow();
+            // scaling can now only be done on x- and y-axis separately
+            mChart.setPinchZoom(false);
 
-            float open = (float) pcd.getOpen();
-            float close = (float) pcd.getClose();
+            mChart.setDrawGridBackground(false);
 
-            yVals1.add(new CandleEntry(
-                    i,
-                    high,
-                    low,
-                    open,
-                    close,
-                    getResources().getDrawable(R.drawable.star)
-            ));
-        }
+            XAxis xAxis = mChart.getXAxis();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setDrawGridLines(false);
 
-        CandleDataSet set1 = new CandleDataSet(yVals1, "Data Set");
+            YAxis leftAxis = mChart.getAxisLeft();
+//        leftAxis.setEnabled(false);
+            leftAxis.setLabelCount(7, false);
+            leftAxis.setDrawGridLines(false);
+            leftAxis.setDrawAxisLine(false);
 
-        set1.setDrawIcons(false);
-        set1.setAxisDependency(YAxis.AxisDependency.LEFT);
+            YAxis rightAxis = mChart.getAxisRight();
+            rightAxis.setEnabled(false);
+
+            mChart.getLegend().setEnabled(false);
+
+
+            //Setting the data
+            mChart.resetTracking();
+
+            List<CandleEntry> yVals1 = new ArrayList<>();
+
+            for (int i = 0; i < priceChartDataList.size(); i++) {
+
+                PriceChartData pcd = priceChartDataList.get(i);
+
+                //float val = (float) pcd.getVolume();
+
+                float high = (float) pcd.getHigh();
+                float low = (float) pcd.getLow();
+
+                float open = (float) pcd.getOpen();
+                float close = (float) pcd.getClose();
+
+                yVals1.add(new CandleEntry(
+                        i,
+                        high,
+                        low,
+                        open,
+                        close,
+                        getResources().getDrawable(R.drawable.star)
+                ));
+            }
+
+            CandleDataSet set1 = new CandleDataSet(yVals1, "Data Set");
+
+            set1.setDrawIcons(false);
+            set1.setAxisDependency(YAxis.AxisDependency.LEFT);
 //        set1.setColor(Color.rgb(80, 80, 80));
-        set1.setShadowColor(Color.DKGRAY);
-        set1.setShadowWidth(0.7f);
-        set1.setDecreasingColor(Color.RED);
-        set1.setDecreasingPaintStyle(Paint.Style.FILL);
-        set1.setIncreasingColor(Color.rgb(122, 242, 84));
-        set1.setIncreasingPaintStyle(Paint.Style.STROKE);
-        set1.setNeutralColor(Color.BLUE);
-        //set1.setHighlightLineWidth(1f);
+            set1.setShadowColor(Color.DKGRAY);
+            set1.setShadowWidth(0.7f);
+            set1.setDecreasingColor(Color.RED);
+            set1.setDecreasingPaintStyle(Paint.Style.FILL);
+            set1.setIncreasingColor(Color.rgb(122, 242, 84));
+            set1.setIncreasingPaintStyle(Paint.Style.STROKE);
+            set1.setNeutralColor(Color.BLUE);
+            //set1.setHighlightLineWidth(1f);
 
-        CandleData data = new CandleData(set1);
+            CandleData data = new CandleData(set1);
 
-        mChart.setData(data);
-        mChart.invalidate();
+            mChart.setData(data);
+            mChart.invalidate();
+
+        }else{
+            AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+            alertDialog.setTitle("Error");
+            alertDialog.setMessage("There's no data with current parameters");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

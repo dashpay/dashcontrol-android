@@ -4,8 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DashAndroid.iml" filepath="$PROJECT_DIR$/DashAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dash-control-android.iml" filepath="$PROJECT_DIR$/dash-control-android.iml" />
+      <module fileurl="file://D:\Dash project\DashAndroid\dash-control-android.iml" filepath="D:\Dash project\DashAndroid\dash-control-android.iml" />
     </modules>
   </component>
 </project>
