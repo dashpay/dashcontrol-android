@@ -1,5 +1,7 @@
 package com.dash.dashapp.utils;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.net.URL;
  */
 
 public class HttpUtil {
+
+    private static final String TAG = HttpUtil.class.getSimpleName();
 
     public static InputStream httpRequest(String urlString) throws IOException {
 
@@ -35,6 +39,8 @@ public class HttpUtil {
         HttpURLConnection connection = null;
         try {
             //Create connection
+
+            Log.d(TAG, "executePost: "+ targetURL);
             url = new URL(targetURL);
             connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("POST");

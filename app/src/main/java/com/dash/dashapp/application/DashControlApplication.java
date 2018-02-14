@@ -1,6 +1,7 @@
 package com.dash.dashapp.application;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class DashControlApplication extends Application {
 
     private int i;
     private long currentDate;
+    private static Context mContext;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -65,6 +67,8 @@ public class DashControlApplication extends Application {
         Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate*1000));
 
         importChartData(startDate, endDate);
+
+        mContext = getApplicationContext();
 
     }
 
@@ -199,6 +203,10 @@ public class DashControlApplication extends Application {
         Configuration configuration = resources.getConfiguration();
         //configuration.setLocale(locale);
         getApplicationContext().createConfigurationContext(configuration);
+    }
+
+    public static Context getAppContext(){
+        return  mContext;
     }
 
 }

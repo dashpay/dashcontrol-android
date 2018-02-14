@@ -135,7 +135,6 @@ public class PriceFragment extends BaseFragment {
                 // If the radiobutton that has changed in check state is now checked...
                 if (isChecked) {
                     // Changes the textview's text to "Checked: example radiobutton text"
-
                     Log.d(TAG, checkedRadioButton.getText() + "");
 
                     String selectedtimeFrame = checkedRadioButton.getText() + "";

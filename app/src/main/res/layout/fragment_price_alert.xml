@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/price_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Price"
+        android:textColor="@android:color/tertiary_text_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/price_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:text="10000"
+        android:gravity="right"
+        android:textColor="@android:color/secondary_text_light"
+        app:layout_constraintBaseline_toBaselineOf="@id/price_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/price_textview"
+        app:layout_constraintTop_toTopOf="parent"
+        android:inputType="numberDecimal"
+        />
+
+
+    <RadioGroup
+        android:id="@+id/trigger_type_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:checkedButton="@id/trigger_type_over_radiobutton"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@id/price_edittext">
+
+        <TextView
+            android:id="@+id/trigger_type_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:textColor="@android:color/tertiary_text_light"
+            android:text="Alert when" />
+
+        <RadioButton
+            android:id="@+id/trigger_type_over_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Over" />
+
+        <RadioButton
+            android:id="@+id/trigger_type_under_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Under" />
+    </RadioGroup>
+
+    <CheckedTextView
+        android:id="@+id/trigger_consume_checkedtextview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="true"
+        android:text="Trigger alert once"
+        android:textColor="@android:color/tertiary_text_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trigger_type_radiogroup" />
+
+    <CheckedTextView
+        android:id="@+id/trigger_standardize_tether_checkedtextview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="false"
+        android:text="Standardize tether"
+        android:textColor="@android:color/tertiary_text_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trigger_consume_checkedtextview" />
+
+    <TextView
+        android:id="@+id/ignore_for_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Ignore for (in seconds)"
+        android:textColor="@android:color/tertiary_text_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/trigger_standardize_tether_checkedtextview" />
+
+    <EditText
+        android:id="@+id/ignore_for_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:text="10000"
+        android:gravity="right"
+        android:textColor="@android:color/secondary_text_light"
+        app:layout_constraintBaseline_toBaselineOf="@id/ignore_for_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ignore_for_textview"
+        app:layout_constraintTop_toBottomOf="@id/trigger_standardize_tether_checkedtextview"
+        android:inputType="number"
+        />
+
+</android.support.constraint.ConstraintLayout>

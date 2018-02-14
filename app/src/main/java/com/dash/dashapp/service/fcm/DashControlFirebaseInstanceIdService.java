@@ -1,8 +1,10 @@
 package com.dash.dashapp.service.fcm;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.dash.dashapp.helpers.ApiHelper;
+import com.dash.dashapp.helpers.AuthSharedPreferenceHelper;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -26,7 +28,7 @@ public class DashControlFirebaseInstanceIdService extends FirebaseInstanceIdServ
 
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-
+        AuthSharedPreferenceHelper.getAuthSharedPreferenceHelper().setFcmToken(refreshedToken);
         sendRegistrationToServer(refreshedToken);
     }
 
@@ -36,7 +38,7 @@ public class DashControlFirebaseInstanceIdService extends FirebaseInstanceIdServ
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        ApiHelper.createOrUpdateDevice(this,token);
+        ApiHelper.updateFcmToken(AuthSharedPreferenceHelper.getAuthSharedPreferenceHelper().getDeviceId(),token);
     }
 
 }

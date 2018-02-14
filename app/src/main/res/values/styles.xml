@@ -47,4 +47,11 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
+    <style name="SplashStyle" parent="Dash_theme">
+        <item name="android:windowBackground">@drawable/splash_bg</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>
