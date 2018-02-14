@@ -114,8 +114,11 @@ public class PriceFragment extends BaseFragment {
 
         ButterKnife.bind(this, view);
 
-        timeFrame = DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+        timeFrameRadioGroup.check(R.id.radio6h);
+        gapRadioGroup.check(R.id.radio5m);
 
+        timeFrame = DateUtil.SIX_HOURS_INTERVAL;
+        gap = DateUtil.FIVE_MINUTES_GAP;
         drawChart(timeFrame, gap);
 
         setRadioGroupListeners();
@@ -188,22 +191,22 @@ public class PriceFragment extends BaseFragment {
 
                     switch (selectedtimeFrame) {
                         case DateUtil.FIVE_MINUTES_GAP_STRING:
-                            timeFrame = DateUtil.FIVE_MINUTES_GAP;
+                            gap = DateUtil.FIVE_MINUTES_GAP;
                             break;
                         case DateUtil.FIFTEEN_MINUTES_GAP_STRING:
-                            timeFrame = DateUtil.FIFTEEN_MINUTES_GAP;
+                            gap = DateUtil.FIFTEEN_MINUTES_GAP;
                             break;
                         case DateUtil.THIRTY_MINUTES_GAP_STRING:
-                            timeFrame = DateUtil.THIRTY_MINUTES_GAP;
+                            gap = DateUtil.THIRTY_MINUTES_GAP;
                             break;
                         case DateUtil.TWO_HOURS_GAP_STRING:
-                            timeFrame = DateUtil.TWO_HOURS_GAP;
+                            gap = DateUtil.TWO_HOURS_GAP;
                             break;
                         case DateUtil.FOUR_HOURS_GAP_STRING:
-                            timeFrame = DateUtil.FOUR_HOURS_GAP;
+                            gap = DateUtil.FOUR_HOURS_GAP;
                             break;
                         case DateUtil.TWENTY_FOUR_HOURS_GAP_STRING:
-                            timeFrame = DateUtil.TWENTY_FOUR_HOURS_GAP;
+                            gap = DateUtil.TWENTY_FOUR_HOURS_GAP;
                             break;
                         default:
                             break;
@@ -249,7 +252,7 @@ public class PriceFragment extends BaseFragment {
 
         List<CandleEntry> yVals1 = new ArrayList<>();
 
-        long currentDate = DateUtil.timestampMilliToSec();
+        long currentDate = System.currentTimeMillis();
 
         long startDate = currentDate - timeframe;
         long endDate = currentDate;
@@ -258,8 +261,8 @@ public class PriceFragment extends BaseFragment {
         MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
         List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap);
 
-        Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate * 1000));
-        Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate * 1000));
+        Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate));
+        Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate));
 
         for (int i = 0; i < priceChartDataList.size(); i++) {
 
@@ -272,8 +275,6 @@ public class PriceFragment extends BaseFragment {
 
             float open = (float) pcd.getOpen();
             float close = (float) pcd.getClose();
-
-            boolean even = i % 2 == 0;
 
             yVals1.add(new CandleEntry(
                     i,
