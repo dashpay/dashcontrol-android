@@ -73,6 +73,10 @@ public class PriceFragment extends BaseFragment {
     RadioGroup gapRadioGroup;
     @BindView(R.id.radio1d)
     RadioButton oneDayRadioButton;
+    @BindView(R.id.radio24h)
+    RadioButton twentyFourHoursRadioButton;
+    @BindView(R.id.radio6h)
+    RadioButton sixHoursRadioButton;
 
 
     private OnFragmentInteractionListener mListener;
@@ -219,21 +223,43 @@ public class PriceFragment extends BaseFragment {
                     switch (selectedtimeFrame) {
                         case DateUtil.FIVE_MINUTES_GAP_STRING:
                             gap = DateUtil.FIVE_MINUTES_GAP;
+                            if (!twentyFourHoursRadioButton.isEnabled())
+                                twentyFourHoursRadioButton.setEnabled(true);
+                            if (!sixHoursRadioButton.isEnabled())
+                                sixHoursRadioButton.setEnabled(true);
                             break;
                         case DateUtil.FIFTEEN_MINUTES_GAP_STRING:
                             gap = DateUtil.FIFTEEN_MINUTES_GAP;
+                            if (!twentyFourHoursRadioButton.isEnabled())
+                                twentyFourHoursRadioButton.setEnabled(true);
+                            if (!sixHoursRadioButton.isEnabled())
+                                sixHoursRadioButton.setEnabled(true);
                             break;
                         case DateUtil.THIRTY_MINUTES_GAP_STRING:
                             gap = DateUtil.THIRTY_MINUTES_GAP;
+                            if (!twentyFourHoursRadioButton.isEnabled())
+                                twentyFourHoursRadioButton.setEnabled(true);
+                            if (!sixHoursRadioButton.isEnabled())
+                                sixHoursRadioButton.setEnabled(true);
                             break;
                         case DateUtil.TWO_HOURS_GAP_STRING:
                             gap = DateUtil.TWO_HOURS_GAP;
+                            if (!twentyFourHoursRadioButton.isEnabled())
+                                twentyFourHoursRadioButton.setEnabled(true);
+                            if (!sixHoursRadioButton.isEnabled())
+                                sixHoursRadioButton.setEnabled(true);
                             break;
                         case DateUtil.FOUR_HOURS_GAP_STRING:
                             gap = DateUtil.FOUR_HOURS_GAP;
+                            if (!twentyFourHoursRadioButton.isEnabled())
+                                twentyFourHoursRadioButton.setEnabled(true);
+                            if (!sixHoursRadioButton.isEnabled())
+                                sixHoursRadioButton.setEnabled(true);
                             break;
                         case DateUtil.TWENTY_FOUR_HOURS_GAP_STRING:
                             gap = DateUtil.TWENTY_FOUR_HOURS_GAP;
+                            twentyFourHoursRadioButton.setEnabled(false);
+                            sixHoursRadioButton.setEnabled(false);
                             break;
                         default:
                             break;
