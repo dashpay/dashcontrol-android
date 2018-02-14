@@ -1,7 +1,6 @@
 package com.dash.dashapp.fragments;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -25,7 +24,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.MainActivity;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PriceChartData;
@@ -73,6 +71,8 @@ public class PriceFragment extends BaseFragment {
     RadioGroup timeFrameRadioGroup;
     @BindView(R.id.radioGroup_gap)
     RadioGroup gapRadioGroup;
+    @BindView(R.id.radio1d)
+    RadioButton oneDayRadioButton;
 
 
     private OnFragmentInteractionListener mListener;
@@ -121,7 +121,10 @@ public class PriceFragment extends BaseFragment {
         gapRadioGroup.check(R.id.radio5m);
 
         timeFrame = DateUtil.SIX_HOURS_INTERVAL;
+        oneDayRadioButton.setEnabled(false);
+
         gap = DateUtil.FIVE_MINUTES_GAP;
+
         drawChart(timeFrame, gap);
 
         setRadioGroupListeners();
@@ -148,27 +151,48 @@ public class PriceFragment extends BaseFragment {
                     switch (selectedtimeFrame) {
                         case DateUtil.SIX_HOURS_INTERVAL_STRING:
                             timeFrame = DateUtil.SIX_HOURS_INTERVAL;
+                            oneDayRadioButton.setEnabled(false);
                             break;
+
                         case DateUtil.TWENTY_FOUR_HOURS_INTERVAL_STRING:
                             timeFrame = DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
+                            oneDayRadioButton.setEnabled(false);
                             break;
+
                         case DateUtil.TWO_DAYS_INTERVAL_STRING:
                             timeFrame = DateUtil.TWO_DAYS_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
+
                         case DateUtil.FOUR_DAYS_INTERVAL_STRING:
                             timeFrame = DateUtil.FOUR_DAYS_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
+
                         case DateUtil.ONE_WEEK_INTERVAL_STRING:
                             timeFrame = DateUtil.ONE_WEEK_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
+
                         case DateUtil.TWO_WEEKS_INTERVAL_STRING:
                             timeFrame = DateUtil.TWO_WEEKS_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
+
                         case DateUtil.ONE_MONTH_INTERVAL_STRING:
                             timeFrame = DateUtil.ONE_MONTH_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
+
                         case DateUtil.THREE_MONTHS_INTERVAL_STRING:
                             timeFrame = DateUtil.THREE_MONTHS_INTERVAL;
+                            if (!oneDayRadioButton.isEnabled())
+                                oneDayRadioButton.setEnabled(true);
                             break;
                         default:
                             break;
@@ -309,7 +333,7 @@ public class PriceFragment extends BaseFragment {
             mChart.setData(data);
             mChart.invalidate();
 
-        }else{
+        } else {
             AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
             alertDialog.setTitle("Error");
             alertDialog.setMessage("There's no data with current parameters");
@@ -319,7 +343,8 @@ public class PriceFragment extends BaseFragment {
                             dialog.dismiss();
                         }
                     });
-            alertDialog.show();        }
+            alertDialog.show();
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
