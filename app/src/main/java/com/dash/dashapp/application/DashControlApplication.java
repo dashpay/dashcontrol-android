@@ -17,7 +17,7 @@ import com.dash.dashapp.utils.MyDBHandler;
 import com.dash.dashapp.utils.MySingleton;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 import com.dash.dashapp.utils.URLs;
-//import com.facebook.stetho.Stetho;
+import com.facebook.stetho.Stetho;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,7 +57,7 @@ public class DashControlApplication extends Application {
 
         //pickDefaultLanguage();
 
-        //Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
 
         i = 0;
 
