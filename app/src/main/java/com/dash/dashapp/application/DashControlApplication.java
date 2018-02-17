@@ -90,6 +90,8 @@ public class DashControlApplication extends Application {
 
         mContext = getApplicationContext();
 
+        pickDefaultLanguage();
+
     }
 
     private void importChartData(long startDate, long endDate) {
