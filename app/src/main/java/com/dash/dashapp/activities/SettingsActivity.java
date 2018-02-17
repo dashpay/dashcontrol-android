@@ -2,17 +2,17 @@ package com.dash.dashapp.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.utils.MyDBHandler;
-import com.dash.dashapp.utils.SharedPreferencesManager;
+import com.dash.dashapp.adapters.SettingsAdapter;
+import com.dash.dashapp.models.SettingsModel;
 import com.dash.dashapp.utils.URLs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -30,7 +30,9 @@ public class SettingsActivity extends BaseActivity {
         put("kr", URLs.RSS_LINK_KR);
     }};
     @BindView(R.id.list_languages)
-    ListView listLanguages;
+    RecyclerView listLanguages;
+    private SettingsAdapter mSettingsAdapter;
+
 
     @Override
     protected int getLayoutResourceId() {
@@ -51,7 +53,7 @@ public class SettingsActivity extends BaseActivity {
 
 
         // Get ListView object from xml
-        listLanguages = (ListView) findViewById(R.id.list_languages);
+        listLanguages = (RecyclerView) findViewById(R.id.list_languages);
 
         // Defined Array values to show in ListView
         String[] languages = new String[]{
@@ -82,28 +84,19 @@ public class SettingsActivity extends BaseActivity {
         // Third parameter - ID of the TextView to which the data is written
         // Forth - the Array of data
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, languages);
 
+        List settingsModel = new ArrayList();
+
+        for(int i = 0; i<languages.length; i++ ){
+            settingsModel.add(new SettingsModel(languages[i],values[i]));
+        }
+
+        mSettingsAdapter = new SettingsAdapter(settingsModel,this);
 
         // Assign adapter to ListView
-        listLanguages.setAdapter(adapter);
-
-        // ListView Item Click Listener
-        listLanguages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                if (!SharedPreferencesManager.getLanguageRSS(getApplicationContext()).equals(values[position])) {
-                    SharedPreferencesManager.setLanguageRSS(getApplicationContext(), values[position]);
-
-                    MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
-                    dbHandler.deleteAllNews();
-                }
-            }
-
-        });
+        listLanguages.setAdapter(mSettingsAdapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        listLanguages.setLayoutManager(linearLayoutManager);
     }
+
 }

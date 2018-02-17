@@ -23,12 +23,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.dash.dashapp.R;
 import com.dash.dashapp.activities.MainActivity;
 import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.NewsView;
 import com.dash.dashapp.interfaces.RSSUpdateListener;
 import com.dash.dashapp.models.News;
-import com.dash.dashapp.R;
 import com.dash.dashapp.utils.LoadMoreNews;
 import com.dash.dashapp.utils.MyDBHandler;
 import com.dash.dashapp.utils.XmlUtil;
@@ -46,6 +46,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     private RSSUpdateListener dbListener;
     private List<News> newsList;
     private boolean updatePerforming = false;
+    private static boolean isFirstLoad = true;
 
 
     /**
@@ -92,6 +93,19 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+        if (isFirstLoad) {
+            Log.i(TAG, "onResume: "+false);
+            handleRSS();
+            isFirstLoad = false;
+        }
+        else{
+            loadRSS();
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -101,12 +115,22 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
 
             @Override
             public void onRefresh() {
-                if (!updatePerforming){
-                    updateRSS();
+                if (!updatePerforming) {
+                    handleRSS();
+                } else {
+                    turnWheelOff();
                 }
             }
         });
 
+
+    }
+
+
+    public void handleRSS() {
+
+        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
+        newsList = dbHandler.findAllNews(null);
 
         if (!isNetworkAvailable()) {
 
@@ -119,43 +143,43 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
-                                    //getActivity().finish();
+                                    Log.i(TAG, "onClick: " + newsList.size());
+                                    if (newsList.size() > 0) {
+                                        if (mInfinitePlaceHolderView.getVisibility() != View.VISIBLE)
+                                            mInfinitePlaceHolderView.setVisibility(View.VISIBLE);
+                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
+                                        mSwipeRefreshLayout.setBackgroundResource(0);
+                                        loadRSS();
+                                    } else {
+                                        if (mInfinitePlaceHolderView.getVisibility() != View.GONE)
+                                            mInfinitePlaceHolderView.setVisibility(View.GONE);
+                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
+                                    }
                                 }
                             });
 
             AlertDialog alert = builder.create();
             alert.show();
 
-        } else if (isNetworkAvailable()) {
-            handleRSS();
-        }
-    }
-
-
-    public void handleRSS() {
-
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        newsList = dbHandler.findAllNews(null);
-
-        if (newsList.size() == 0) {
-            updateRSS();
         } else {
+            updateRSS();
             loadRSS();
         }
+
     }
 
     public void loadRSS() {
         turnWheelOn();
         for (int i = 0; i < LoadMoreNews.LOAD_VIEW_SET_COUNT; i++) {
-            try{
+            try {
                 mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
                 Log.d(TAG, "Add view index + " + i);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.getMessage();
             }
         }
 
-        if (newsList.size() > NUMBER_FIRST_BATCH){
+        if (newsList.size() > NUMBER_FIRST_BATCH) {
             mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreNews(mInfinitePlaceHolderView, newsList));
         }
         turnWheelOff();
@@ -269,7 +293,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         newsList = dbHandler.findAllNews(null);
 
-        if (mInfinitePlaceHolderView.getChildCount() == 0){
+        if (mInfinitePlaceHolderView.getChildCount() == 0) {
             loadRSS();
             turnWheelOff();
         }
@@ -292,7 +316,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     @Override
     public void onStop() {
         turnWheelOff();
-        if (mSwipeRefreshLayout!=null) {
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(false);
             mSwipeRefreshLayout.destroyDrawingCache();
             mSwipeRefreshLayout.clearAnimation();

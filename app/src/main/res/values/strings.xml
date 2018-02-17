@@ -8,7 +8,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="alert_message">Network is not available</string>
+    <string name="alert_message">Network is not available. Loading Offline Data.</string>
     <string name="alert_title">Error</string>
     <string name="alert_positive">Ok</string>
     <string name="title_activity_settings">Settings</string>

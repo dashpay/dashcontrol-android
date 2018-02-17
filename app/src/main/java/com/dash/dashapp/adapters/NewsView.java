@@ -2,11 +2,18 @@ package com.dash.dashapp.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.dash.dashapp.R;
 import com.dash.dashapp.activities.ContentRSSActivity;
 import com.dash.dashapp.models.News;
-import com.dash.dashapp.R;
 import com.mindorks.placeholderview.annotations.Click;
 import com.mindorks.placeholderview.annotations.Layout;
 import com.mindorks.placeholderview.annotations.Resolve;
@@ -55,13 +62,22 @@ public class NewsView {
         String dateSQL = sqlFormat.format(dateRSS);
 
         dateTxt.setText(dateSQL);
-        //Glide.with(mContext).load(mInfo.getImageUrl()).into(imageView);
+
+        if (mNews.getThumbnail() != null) {
+            Glide.with(mContext).asBitmap()
+                    .load(mNews.getThumbnail())
+                    .into(new SimpleTarget<Bitmap>(100, 100) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            titleTxt.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(titleTxt.getResources(), resource), null, null, null);
+                        }
+                    });
+        }
     }
 
 
-
     @Click(R.id.news_row)
-    private void onClick(){
+    private void onClick() {
         Intent intent = new Intent(mContext, ContentRSSActivity.class);
         intent.putExtra(TITLE_NEWS, mNews.getTitle());
         intent.putExtra(CONTENT_NEWS, mNews.getContent());
