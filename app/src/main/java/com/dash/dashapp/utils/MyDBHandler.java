@@ -192,7 +192,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_TRADES, priceChartData.getTrades());
         values.put(COLUMN_VOLUME, priceChartData.getVolume());
 
-        /*Log.d(TAG, "Current priceChartData : " +
+        Log.d(TAG, "Current priceChartData : " +
                 " Time : " + priceChartData.getTime() + " " +
                 " Start gap : " + priceChartData.getStartGap() + " " +
                 " End gap : " + priceChartData.getEndGap() + " " +
@@ -203,7 +203,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 " Low : " + priceChartData.getLow() + " " +
                 " High : " + priceChartData.getHigh() + " " +
                 " Pair volume : " + priceChartData.getPairVolume() + " " +
-                " Trades : " + priceChartData.getTrades());*/
+                " Trades : " + priceChartData.getTrades());
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_PRICE_CHART, null, values);
@@ -222,37 +222,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         String query = "SELECT *" +
                 " FROM " + TABLE_PRICE_CHART +
-                " WHERE " + COLUMN_TIME + " > " + dateStart +
-                " AND " + COLUMN_TIME + " < " + dateEnd +
-                " AND " + COLUMN_GAP + " = " + gap +
-                " ORDER BY " + COLUMN_END_GAP + " DESC;";
-
-
-        /*String query = "SELECT " +
-                "gap," +
-                "MAX(" + COLUMN_CLOSE + ")," +
-                "MAX(" + COLUMN_HIGH + ")," +
-                "MIN(" + COLUMN_LOW + ")," +
-                "MAX(" + COLUMN_OPEN + ")," +
-                "SUM(" + COLUMN_PAIR_VOLUME + ")," +
-                "SUM(" + COLUMN_TRADES + ")," +
-                "SUM(" + COLUMN_VOLUME + ") " +
-                "FROM " +
-                "(" +
-                "SELECT CASE WHEN (ROW_NUMBER () OVER (PARTITION BY(" + COLUMN_TIME + " - (" + COLUMN_TIME + "%" + gap + ")) ORDER BY time DESC)) = 1 THEN " + COLUMN_CLOSE + " ELSE 0 END AS " + COLUMN_CLOSE + "," +
-                COLUMN_HIGH + "," +
-                COLUMN_LOW + "," +
-                "CASE WHEN (ROW_NUMBER () OVER (PARTITION BY(" + COLUMN_TIME + " - (" + COLUMN_TIME + "%" + gap + ")) ORDER BY time ASC)) = 1 THEN " + COLUMN_OPEN + " ELSE 0 END AS " + COLUMN_OPEN + "," +
-                COLUMN_PAIR_VOLUME + "," +
-                COLUMN_TRADES + "," +
-                COLUMN_VOLUME + "," +
-                COLUMN_TIME + " - (" + COLUMN_TIME + "%" + gap + ") AS gap," +
-                COLUMN_TIME +
-                " FROM " + TABLE_PRICE_CHART +
-                " WHERE " + COLUMN_TIME + " > " + dateStart +
-                " AND " + COLUMN_TIME + " <= " + dateEnd + " ORDER BY " + COLUMN_TIME + " DESC) t" +
-                " GROUP BY t.gap";*/
-
+                " WHERE " + COLUMN_TIME + " >= " + dateStart +
+                " AND " + COLUMN_TIME + " <= " + dateEnd +
+                " AND " + COLUMN_GAP + " = " + gap;
 
         Log.d(TAG, "Query : " + query);
 
@@ -260,30 +232,17 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
             PriceChartData priceChartData = new PriceChartData();
-            priceChartData.setTime(cursor.getLong(0));
-            priceChartData.setStartGap(cursor.getLong(1));
-            priceChartData.setEndGap(cursor.getLong(2));
-            priceChartData.setGap(cursor.getLong(3));
-            priceChartData.setClose(cursor.getLong(4));
-            priceChartData.setHigh(cursor.getLong(5));
-            priceChartData.setLow(cursor.getLong(6));
-            priceChartData.setOpen(cursor.getLong(7));
-            priceChartData.setPairVolume(cursor.getLong(8));
-            priceChartData.setTrades(cursor.getLong(9));
-            priceChartData.setVolume(cursor.getLong(10));
-
-            /*Log.d(TAG, "Current priceChartData : " +
-                    " Time : " + priceChartData.getTime() + " " +
-                    " Start gap : " + priceChartData.getStartGap() + " " +
-                    " End gap : " + priceChartData.getEndGap() + " " +
-                    " Gap : " + priceChartData.getGap() + " " +
-                    " Volume : " + priceChartData.getVolume() + " " +
-                    " Close : " + priceChartData.getClose() + " " +
-                    " Open : " + priceChartData.getOpen() + " " +
-                    " Low : " + priceChartData.getLow() + " " +
-                    " High : " + priceChartData.getHigh() + " " +
-                    " Pair volume : " + priceChartData.getPairVolume() + " " +
-                    " Trades : " + priceChartData.getTrades());*/
+            priceChartData.setTime(cursor.getLong(cursor.getColumnIndex(COLUMN_TIME)));
+            priceChartData.setStartGap(cursor.getLong(cursor.getColumnIndex(COLUMN_START_GAP)));
+            priceChartData.setEndGap(cursor.getLong(cursor.getColumnIndex(COLUMN_END_GAP)));
+            priceChartData.setGap(cursor.getLong(cursor.getColumnIndex(COLUMN_GAP)));
+            priceChartData.setClose(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE)));
+            priceChartData.setHigh(cursor.getLong(cursor.getColumnIndex(COLUMN_HIGH)));
+            priceChartData.setLow(cursor.getLong(cursor.getColumnIndex(COLUMN_LOW)));
+            priceChartData.setOpen(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN)));
+            priceChartData.setPairVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_PAIR_VOLUME)));
+            priceChartData.setTrades(cursor.getLong(cursor.getColumnIndex(COLUMN_TRADES)));
+            priceChartData.setVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_VOLUME)));
 
             priceChartList.add(priceChartData);
         }
@@ -293,13 +252,37 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return priceChartList;
     }
 
-    public void deleteAllPriceChart(long dateStart, long dateEnd) {
+    /**
+     * Getting the latest record for graph and give it's date
+     */
+    public long getLatestRecordedDateInGraph() {
+
+        long latestDate = 0;
+
+        String query = "SELECT MAX(" + COLUMN_TIME + ")" +
+                " FROM " + TABLE_PRICE_CHART;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            latestDate = cursor.getLong(0);
+        }
+
+        return latestDate;
+
+    }
+
+    public void deletePriceChart(long dateStart, long dateEnd) {
 
         Log.d(TAG, "Delete all price chart");
 
         SQLiteDatabase db = this.getWritableDatabase();
         if (dateStart == 0 && dateEnd == 0) {
-            db.execSQL("delete from " + TABLE_PRICE_CHART);
+            db.execSQL("DELETE FROM " + TABLE_PRICE_CHART);
+        }else{
+            db.execSQL("DELETE FROM " + TABLE_PRICE_CHART +
+                    " WHERE " + COLUMN_TIME + " > " + dateStart +
+                    " AND " + COLUMN_TIME + " < " + dateEnd );
         }
         db.close();
     }
@@ -513,8 +496,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL("delete from " + TABLE_PROPOSALS);
         db.close();
     }
-
-
 }
 
 

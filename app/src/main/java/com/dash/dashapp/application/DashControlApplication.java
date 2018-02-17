@@ -40,15 +40,16 @@ public class DashControlApplication extends Application {
     private int i;
     private long currentDate;
     private static Context mContext;
+    private boolean isDatabaseEmpty = true;
 
-    @Override
+    /*@Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (locale != null) {
             newConfig.setLocale(locale);
             getApplicationContext().createConfigurationContext(newConfig);
         }
-    }
+    }*/
 
     @Override
     public void onCreate() {
@@ -61,15 +62,29 @@ public class DashControlApplication extends Application {
         i = 0;
 
         MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
-        dbHandler.deleteAllPriceChart(0, 0);
+
+
+        // TODO only download new data
+        //Getting latest database data
+        long latestDate = dbHandler.getLatestRecordedDateInGraph();
 
         currentDate = System.currentTimeMillis();
+
+        // Deleting data older than 3 months
+        dbHandler.deletePriceChart(0, currentDate - DateUtil.THREE_MONTHS_INTERVAL);
 
         long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
         long endDate = currentDate;
 
-        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate * 1000));
-        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate * 1000));
+        if (latestDate != 0) {
+            startDate = latestDate;
+            isDatabaseEmpty = false;
+        } else {
+            isDatabaseEmpty = true;
+        }
+
+        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate));
+        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate));
 
         importChartData(startDate, endDate);
 
@@ -94,7 +109,6 @@ public class DashControlApplication extends Application {
         String noLimit = "&noLimit";
 
         String URLGraph = URLs.URL_GRAPH + startDateString + endDateString + marketString + exchangeString + noLimit;
-
 
         Log.d(TAG, "URLGraph : " + URLGraph);
 
@@ -138,7 +152,7 @@ public class DashControlApplication extends Application {
 
                                         priceChartData.setTime(timestampMilli);
                                         priceChartData.setStartGap(timestampMilli);
-                                        priceChartData.setEndGap(timestampMilli + DateUtil.FIVE_MINUTES_GAP );
+                                        priceChartData.setEndGap(timestampMilli + DateUtil.FIVE_MINUTES_GAP);
                                         priceChartData.setGap(DateUtil.FIVE_MINUTES_GAP);
                                         priceChartData.setClose(close);
                                         priceChartData.setHigh(high);
@@ -185,14 +199,14 @@ public class DashControlApplication extends Application {
                                             double sumVolume = 0;
                                             double minimumLow = firstObject.getLow();
                                             double maximumHigh = firstObject.getHigh();
-                                            for(PriceChartData currentPriceChart : listPriceChartDataFifteenMinutes){
+                                            for (PriceChartData currentPriceChart : listPriceChartDataFifteenMinutes) {
                                                 sumPairVolume += currentPriceChart.getPairVolume();
                                                 sumTrades += currentPriceChart.getTrades();
                                                 sumVolume += currentPriceChart.getVolume();
-                                                if (currentPriceChart.getLow() < minimumLow ){
+                                                if (currentPriceChart.getLow() < minimumLow) {
                                                     minimumLow = currentPriceChart.getLow();
                                                 }
-                                                if (currentPriceChart.getHigh() > maximumHigh ){
+                                                if (currentPriceChart.getHigh() > maximumHigh) {
                                                     maximumHigh = currentPriceChart.getHigh();
                                                 }
                                             }
@@ -234,14 +248,14 @@ public class DashControlApplication extends Application {
                                             double sumVolume = 0;
                                             double minimumLow = firstObject.getLow();
                                             double maximumHigh = firstObject.getHigh();
-                                            for(PriceChartData currentPriceChart : listPriceChartDataThirtyMinutes){
+                                            for (PriceChartData currentPriceChart : listPriceChartDataThirtyMinutes) {
                                                 sumPairVolume += currentPriceChart.getPairVolume();
                                                 sumTrades += currentPriceChart.getTrades();
                                                 sumVolume += currentPriceChart.getVolume();
-                                                if (currentPriceChart.getLow() < minimumLow ){
+                                                if (currentPriceChart.getLow() < minimumLow) {
                                                     minimumLow = currentPriceChart.getLow();
                                                 }
-                                                if (currentPriceChart.getHigh() > maximumHigh ){
+                                                if (currentPriceChart.getHigh() > maximumHigh) {
                                                     maximumHigh = currentPriceChart.getHigh();
                                                 }
                                             }
@@ -284,14 +298,14 @@ public class DashControlApplication extends Application {
                                             double sumVolume = 0;
                                             double minimumLow = firstObject.getLow();
                                             double maximumHigh = firstObject.getHigh();
-                                            for(PriceChartData currentPriceChart : listPriceChartDataTwoHours){
+                                            for (PriceChartData currentPriceChart : listPriceChartDataTwoHours) {
                                                 sumPairVolume += currentPriceChart.getPairVolume();
                                                 sumTrades += currentPriceChart.getTrades();
                                                 sumVolume += currentPriceChart.getVolume();
-                                                if (currentPriceChart.getLow() < minimumLow ){
+                                                if (currentPriceChart.getLow() < minimumLow) {
                                                     minimumLow = currentPriceChart.getLow();
                                                 }
-                                                if (currentPriceChart.getHigh() > maximumHigh ){
+                                                if (currentPriceChart.getHigh() > maximumHigh) {
                                                     maximumHigh = currentPriceChart.getHigh();
                                                 }
                                             }
@@ -333,14 +347,14 @@ public class DashControlApplication extends Application {
                                             double sumVolume = 0;
                                             double minimumLow = firstObject.getLow();
                                             double maximumHigh = firstObject.getHigh();
-                                            for(PriceChartData currentPriceChart : listPriceChartDataFourHours){
+                                            for (PriceChartData currentPriceChart : listPriceChartDataFourHours) {
                                                 sumPairVolume += currentPriceChart.getPairVolume();
                                                 sumTrades += currentPriceChart.getTrades();
                                                 sumVolume += currentPriceChart.getVolume();
-                                                if (currentPriceChart.getLow() < minimumLow ){
+                                                if (currentPriceChart.getLow() < minimumLow) {
                                                     minimumLow = currentPriceChart.getLow();
                                                 }
-                                                if (currentPriceChart.getHigh() > maximumHigh ){
+                                                if (currentPriceChart.getHigh() > maximumHigh) {
                                                     maximumHigh = currentPriceChart.getHigh();
                                                 }
                                             }
@@ -383,14 +397,14 @@ public class DashControlApplication extends Application {
                                             double sumVolume = 0;
                                             double minimumLow = firstObject.getLow();
                                             double maximumHigh = firstObject.getHigh();
-                                            for(PriceChartData currentPriceChart : listPriceChartDataTwentyFourHours){
+                                            for (PriceChartData currentPriceChart : listPriceChartDataTwentyFourHours) {
                                                 sumPairVolume += currentPriceChart.getPairVolume();
                                                 sumTrades += currentPriceChart.getTrades();
                                                 sumVolume += currentPriceChart.getVolume();
-                                                if (currentPriceChart.getLow() < minimumLow ){
+                                                if (currentPriceChart.getLow() < minimumLow) {
                                                     minimumLow = currentPriceChart.getLow();
                                                 }
-                                                if (currentPriceChart.getHigh() > maximumHigh ){
+                                                if (currentPriceChart.getHigh() > maximumHigh) {
                                                     maximumHigh = currentPriceChart.getHigh();
                                                 }
                                             }
@@ -420,19 +434,22 @@ public class DashControlApplication extends Application {
                                     }
 
 
-                                    //This part downloads the next interval (we first download the firsts 6 hours, then fill to the first 24h, etc ...
-                                    i++;
+                                    if (isDatabaseEmpty) {
 
-                                    Log.e(TAG, "i  : " + i);
+                                        //This part downloads the next interval (we first download the firsts 6 hours, then fill to the first 24h, etc ...
+                                        i++;
 
-                                    if (i < DateUtil.intervalArray.length) {
+                                        Log.e(TAG, "i  : " + i);
 
-                                        long startDate = currentDate - DateUtil.intervalArray[i];
-                                        long endDate = currentDate - DateUtil.intervalArray[i - 1] - 1; // -1 is to avoid getting the start value from the previous query
+                                        if (i < DateUtil.intervalArray.length) {
 
-                                        importChartData(startDate, endDate);
-                                    } else {
-                                        i = 0;
+                                            long startDate = currentDate - DateUtil.intervalArray[i];
+                                            long endDate = currentDate - DateUtil.intervalArray[i - 1] - 1; // -1 is to avoid getting the start value from the previous query
+
+                                            importChartData(startDate, endDate);
+                                        } else {
+                                            i = 0;
+                                        }
                                     }
 
                                 } catch (JSONException e) {
@@ -501,8 +518,8 @@ public class DashControlApplication extends Application {
         getApplicationContext().createConfigurationContext(configuration);
     }
 
-    public static Context getAppContext(){
-        return  mContext;
+    public static Context getAppContext() {
+        return mContext;
     }
 
 }

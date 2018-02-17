@@ -318,6 +318,8 @@ public class PriceFragment extends BaseFragment {
 
             List<CandleEntry> yVals1 = new ArrayList<>();
 
+            long xAxisValue = 0;
+
             for (int i = 0; i < priceChartDataList.size(); i++) {
 
                 PriceChartData pcd = priceChartDataList.get(i);
@@ -330,6 +332,8 @@ public class PriceFragment extends BaseFragment {
                 float open = (float) pcd.getOpen();
                 float close = (float) pcd.getClose();
 
+                xAxisValue += (gap / 1000 / 60);
+
                 yVals1.add(new CandleEntry(
                         i,
                         high,
@@ -338,6 +342,8 @@ public class PriceFragment extends BaseFragment {
                         close,
                         getResources().getDrawable(R.drawable.star)
                 ));
+
+                Log.d(TAG, " open : " + open + " / close : " + close);
             }
 
             CandleDataSet set1 = new CandleDataSet(yVals1, "Data Set");
@@ -350,7 +356,7 @@ public class PriceFragment extends BaseFragment {
             set1.setDecreasingColor(Color.RED);
             set1.setDecreasingPaintStyle(Paint.Style.FILL);
             set1.setIncreasingColor(Color.rgb(122, 242, 84));
-            set1.setIncreasingPaintStyle(Paint.Style.STROKE);
+            set1.setIncreasingPaintStyle(Paint.Style.FILL);
             set1.setNeutralColor(Color.BLUE);
             //set1.setHighlightLineWidth(1f);
 
