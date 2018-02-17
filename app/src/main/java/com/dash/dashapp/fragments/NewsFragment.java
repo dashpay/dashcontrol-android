@@ -97,13 +97,11 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     public void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
-        if (isFirstLoad) {
-            Log.i(TAG, "onResume: "+false);
-            handleRSS();
-            isFirstLoad = false;
+        if(newsList!=null && newsList.size()>0){
+            loadRSS();
         }
         else{
-            loadRSS();
+            handleRSS();
         }
     }
 
