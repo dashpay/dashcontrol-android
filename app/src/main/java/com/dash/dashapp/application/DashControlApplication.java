@@ -96,8 +96,10 @@ public class DashControlApplication extends Application {
 
     private void importChartData(long startDate, long endDate) {
 
-        Log.d(TAG, "Intervale : " + DateUtil.intervalArray[i]);
+        startDate = DateUtil.convertToUTC(startDate);
+        endDate = DateUtil.convertToUTC(endDate);
 
+        Log.d(TAG, "Intervale : " + DateUtil.intervalArray[i]);
 
         Log.d("DateDebug", "Postman test startDate : " + startDate
                 + " endDate : " + endDate);
@@ -143,7 +145,7 @@ public class DashControlApplication extends Application {
 
                                         PriceChartData priceChartData = new PriceChartData();
 
-                                        long timestampMilli = DateUtil.dateStringToMilliseconds(jsonobj.getString("time"));
+                                        long timestampMilli = DateUtil.UTCToLocale(DateUtil.dateStringToMilliseconds(jsonobj.getString("time")));
                                         double close = (jsonobj.getDouble("close"));
                                         double high = (jsonobj.getInt("high"));
                                         double low = (jsonobj.getInt("low"));
