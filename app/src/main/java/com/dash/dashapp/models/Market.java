@@ -7,6 +7,7 @@ package com.dash.dashapp.models;
 public class Market {
     private String name;
     private double price;
+    private int isDefault;
 
     public Market(String name, double price) {
         this.name = name;
@@ -31,5 +32,13 @@ public class Market {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public int getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(int isDefault) {
+        this.isDefault = isDefault;
     }
 }

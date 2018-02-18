@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 25;
+    public static final int DATABASE_VERSION = 27;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
 
@@ -83,7 +83,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     //public static final String COLUMN_EXCHANGE = "exchange";
     //public static final String COLUMN_MARKET = "market";
     public static final String COLUMN_PRICE = "price";
-    public static final String COLUMN_DEFAULT = "default";
+    public static final String COLUMN_DEFAULT = "default_market";
 
 
     public MyDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {
@@ -144,7 +144,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 "CREATE TABLE " + TABLE_MARKET_PRICE + "(" +
                         COLUMN_EXCHANGE + " TEXT," +
                         COLUMN_MARKET + " TEXT," +
-                        COLUMN_PRICE + " REAL" +
+                        COLUMN_PRICE + " REAL," +
                         COLUMN_DEFAULT + " INTEGER" +
                         ")";
         db.execSQL(CREATE_MARKET_PRICE);
@@ -164,8 +164,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         COLUMN_OPEN + " REAL," +
                         COLUMN_PAIR_VOLUME + " REAL," +
                         COLUMN_TRADES + " REAL," +
-                        COLUMN_VOLUME + " REAL," +
-                        " PRIMARY KEY (" + COLUMN_EXCHANGE + ", " + COLUMN_MARKET + ", " + COLUMN_TIME + ")" +
+                        COLUMN_VOLUME + " REAL" +
                         ")";
         db.execSQL(CREATE_PRICE_CHART_TABLE);
 
@@ -370,6 +369,45 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public List<Exchange> findExchanges() {
+
+        List<Exchange> exchangeList = new ArrayList<>();
+        Exchange exchange = new Exchange();
+        exchange.setListMarket(new ArrayList<Market>());
+
+        String query = "SELECT *" +
+                " FROM " + TABLE_MARKET_PRICE +
+                " ORDER BY " + COLUMN_EXCHANGE + " ASC";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            if (exchange.getName() != null){
+                if (!exchange.getName().equals(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)))){
+                    exchangeList.add(exchange);
+                    exchange = new Exchange();
+                    exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+                    exchange.setListMarket(new ArrayList<Market>());
+                }
+            }else{
+                exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+            }
+
+            Market market = new Market();
+            market.setName(cursor.getString(cursor.getColumnIndex(COLUMN_MARKET)));
+            market.setPrice(cursor.getDouble(cursor.getColumnIndex(COLUMN_PRICE)));
+            market.setIsDefault(cursor.getInt(cursor.getColumnIndex(COLUMN_DEFAULT)));
+
+            exchange.getListMarket().add(market);
+        }
+
+        exchangeList.add(exchange);
+
+        cursor.close();
+        db.close();
+        return exchangeList;
+    }
+
 
     public void updateDefault(Exchange exchange, Market market) {
 
@@ -378,6 +416,14 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 " SET " + COLUMN_DEFAULT + " = 1" +
                 " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
                 " AND " + COLUMN_MARKET + " = '" + market.getName() + "'");
+        db.close();
+    }
+
+
+
+    public void deleteAllMarket() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_MARKET_PRICE);
         db.close();
     }
 
@@ -430,9 +476,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         String query = "SELECT *" +
                 " FROM " + TABLE_PRICE_CHART +
-                " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
-                " AND " + COLUMN_MARKET + " = '" + market.getName() + "'" +
-                " AND " + COLUMN_TIME + " >= " + dateStart +
+                //" WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
+                //" AND " + COLUMN_MARKET + " = '" + market.getName() + "'" +
+                " WHERE " + COLUMN_TIME + " >= " + dateStart +
                 " AND " + COLUMN_TIME + " <= " + dateEnd +
                 " AND " + COLUMN_GAP + " = " + gap;
 
@@ -448,13 +494,13 @@ public class MyDBHandler extends SQLiteOpenHelper {
             priceChartData.setStartGap(cursor.getLong(cursor.getColumnIndex(COLUMN_START_GAP)));
             priceChartData.setEndGap(cursor.getLong(cursor.getColumnIndex(COLUMN_END_GAP)));
             priceChartData.setGap(cursor.getLong(cursor.getColumnIndex(COLUMN_GAP)));
-            priceChartData.setClose(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE)));
-            priceChartData.setHigh(cursor.getLong(cursor.getColumnIndex(COLUMN_HIGH)));
-            priceChartData.setLow(cursor.getLong(cursor.getColumnIndex(COLUMN_LOW)));
-            priceChartData.setOpen(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN)));
-            priceChartData.setPairVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_PAIR_VOLUME)));
-            priceChartData.setTrades(cursor.getLong(cursor.getColumnIndex(COLUMN_TRADES)));
-            priceChartData.setVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_VOLUME)));
+            priceChartData.setClose(cursor.getDouble(cursor.getColumnIndex(COLUMN_CLOSE)));
+            priceChartData.setHigh(cursor.getDouble(cursor.getColumnIndex(COLUMN_HIGH)));
+            priceChartData.setLow(cursor.getDouble(cursor.getColumnIndex(COLUMN_LOW)));
+            priceChartData.setOpen(cursor.getDouble(cursor.getColumnIndex(COLUMN_OPEN)));
+            priceChartData.setPairVolume(cursor.getDouble(cursor.getColumnIndex(COLUMN_PAIR_VOLUME)));
+            priceChartData.setTrades(cursor.getDouble(cursor.getColumnIndex(COLUMN_TRADES)));
+            priceChartData.setVolume(cursor.getDouble(cursor.getColumnIndex(COLUMN_VOLUME)));
 
             priceChartList.add(priceChartData);
         }
@@ -486,7 +532,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         long latestDate = 0;
 
-        String query = "SELECT MAX(" + COLUMN_TIME + ")" +
+        String query = "SELECT MAX(" + COLUMN_TIME + ") as " + COLUMN_TIME +
                 " FROM " + TABLE_PRICE_CHART +
                 " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
                 " AND " + COLUMN_MARKET + " = '" + market.getName() + "'";
@@ -502,8 +548,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return latestDate;
 
     }
-
-
 }
 
 

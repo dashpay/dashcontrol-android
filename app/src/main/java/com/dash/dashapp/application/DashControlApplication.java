@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -47,7 +44,7 @@ public class DashControlApplication extends Application {
     private int indexIntervals;
     private long currentDate;
     private static Context mContext;
-    private boolean isDatabaseEmpty = true;
+    private boolean downloadStepByStep = true;
 
     private Exchange currentExchange = new Exchange();
     private Market currentMarket = new Market();
@@ -74,14 +71,16 @@ public class DashControlApplication extends Application {
 
         Stetho.initializeWithDefaults(this);
 
-        setSpinnerAndPrices();
+        setMarketAndExchanges();
 
     }
 
 
-    private void setSpinnerAndPrices() {
+    private void setMarketAndExchanges() {
 
         dbHandler = new MyDBHandler(getApplicationContext(), null);
+
+        dbHandler.deleteAllMarket();
 
         // Getting prices
         JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
@@ -89,6 +88,9 @@ public class DashControlApplication extends Application {
 
                     @Override
                     public void onResponse(JSONObject response) {
+
+                        Log.d(TAG, "Loading Exchanges");
+
                         listExchanges = new ArrayList<>();
 
                         try {
@@ -132,8 +134,8 @@ public class DashControlApplication extends Application {
                                     e.getMessage();
                                 }
                                 try {
-                                    double dash_usd = exchangeJson.getDouble("DASH_USDT");
-                                    Market market = new Market("DASH_USDT", dash_usd);
+                                    double dash_usdt = exchangeJson.getDouble("DASH_USDT");
+                                    Market market = new Market("DASH_USDT", dash_usdt);
                                     listMarket.add(market);
 
                                     dbHandler.addMarket(exchange, market, 0);
@@ -173,7 +175,8 @@ public class DashControlApplication extends Application {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            List<String> listMarketString = new ArrayList<>();
+
+                            Log.d(TAG, "Loading Default values");
 
                             JSONObject price = response.getJSONObject("default");
                             currentExchange.setName(price.getString("exchange"));
@@ -181,7 +184,7 @@ public class DashControlApplication extends Application {
 
                             dbHandler.updateDefault(currentExchange, currentMarket);
 
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.getMessage();
                         }
 
@@ -192,33 +195,23 @@ public class DashControlApplication extends Application {
                         dbHandler.deletePriceChart(0, currentDate - DateUtil.THREE_MONTHS_INTERVAL);
 
                         // Importing graph prices based on available Exchanges and market
-
                         currentDate = System.currentTimeMillis();
-
-                        for (Exchange exchange : listExchanges){
-                            for (Market market : exchange.getListMarket()){
-                                indexIntervals = 0;
-
-                            }
-                        }
+                        indexIntervals = 0;
 
                         //Getting latest database data
-                        long latestDate = dbHandler.getLatestRecordedDateInGraph();
+                        long latestDate = dbHandler.getLatestRecordedDateInGraph(currentExchange, currentMarket);
 
-                        long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
+                        long startDate = currentDate - DateUtil.intervalArray[indexIntervals];
                         long endDate = currentDate;
 
                         if (latestDate != 0) {
                             startDate = latestDate;
-                            isDatabaseEmpty = false;
+                            downloadStepByStep = false;
                         } else {
-                            isDatabaseEmpty = true;
+                            downloadStepByStep = true;
                         }
 
-                        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate));
-                        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate));
-
-                        importChartData(startDate, endDate);
+                        importChartData(startDate, endDate, currentExchange, currentMarket);
                     }
                 }, new Response.ErrorListener() {
 
@@ -235,7 +228,7 @@ public class DashControlApplication extends Application {
         MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestExchanges);
     }
 
-    private void importChartData(long startDate, long endDate) {
+    private void importChartData(long startDate, long endDate, final Exchange exchange, final Market market) {
 
         startDate = DateUtil.convertToUTC(startDate);
         endDate = DateUtil.convertToUTC(endDate);
@@ -247,6 +240,8 @@ public class DashControlApplication extends Application {
 
         String startDateString = "start=" + startDate;
         String endDateString = "&end=" + endDate;
+        //String marketString = "&market=" + market.getName();
+        //String exchangeString = "&exchange=" + exchange.getName();
         String marketString = "&market=DASH_USDT";
         String exchangeString = "&exchange=poloniex";
 
@@ -295,6 +290,8 @@ public class DashControlApplication extends Application {
                                         double trades = (jsonobj.getInt("trades"));
                                         double volume = (jsonobj.getInt("volume"));
 
+                                        priceChartData.setExchange(exchange.getName());
+                                        priceChartData.setMarket(market.getName());
                                         priceChartData.setTime(timestampMilli);
                                         priceChartData.setStartGap(timestampMilli);
                                         priceChartData.setEndGap(timestampMilli + DateUtil.FIVE_MINUTES_GAP);
@@ -326,6 +323,9 @@ public class DashControlApplication extends Application {
                                             PriceChartData priceChartDataFifteenMinutes = new PriceChartData();
 
                                             priceChartDataFifteenMinutes.setGap(DateUtil.FIFTEEN_MINUTES_GAP);
+
+                                            priceChartDataFifteenMinutes.setExchange(exchange.getName());
+                                            priceChartDataFifteenMinutes.setMarket(market.getName());
 
                                             PriceChartData firstObject = listPriceChartDataFifteenMinutes.get(0);
                                             PriceChartData lastObject = listPriceChartDataFifteenMinutes.get(listPriceChartDataFifteenMinutes.size() - 1);
@@ -375,6 +375,9 @@ public class DashControlApplication extends Application {
                                             PriceChartData priceChartDataThirtyMinutes = new PriceChartData();
 
                                             priceChartDataThirtyMinutes.setGap(DateUtil.THIRTY_MINUTES_GAP);
+
+                                            priceChartDataThirtyMinutes.setExchange(exchange.getName());
+                                            priceChartDataThirtyMinutes.setMarket(market.getName());
 
                                             PriceChartData firstObject = listPriceChartDataThirtyMinutes.get(0);
                                             PriceChartData lastObject = listPriceChartDataThirtyMinutes.get(listPriceChartDataThirtyMinutes.size() - 1);
@@ -426,6 +429,9 @@ public class DashControlApplication extends Application {
 
                                             priceChartDataTwoHours.setGap(DateUtil.TWO_HOURS_GAP);
 
+                                            priceChartDataTwoHours.setExchange(exchange.getName());
+                                            priceChartDataTwoHours.setMarket(market.getName());
+
                                             PriceChartData firstObject = listPriceChartDataTwoHours.get(0);
                                             PriceChartData lastObject = listPriceChartDataTwoHours.get(listPriceChartDataTwoHours.size() - 1);
 
@@ -474,6 +480,9 @@ public class DashControlApplication extends Application {
                                             PriceChartData priceChartDataFourHours = new PriceChartData();
 
                                             priceChartDataFourHours.setGap(DateUtil.FOUR_HOURS_GAP);
+
+                                            priceChartDataFourHours.setExchange(exchange.getName());
+                                            priceChartDataFourHours.setMarket(market.getName());
 
                                             PriceChartData firstObject = listPriceChartDataFourHours.get(0);
                                             PriceChartData lastObject = listPriceChartDataFourHours.get(listPriceChartDataFourHours.size() - 1);
@@ -524,6 +533,9 @@ public class DashControlApplication extends Application {
                                             PriceChartData priceChartDataTwentyFourHours = new PriceChartData();
 
                                             priceChartDataTwentyFourHours.setGap(DateUtil.TWENTY_FOUR_HOURS_GAP);
+
+                                            priceChartDataTwentyFourHours.setExchange(exchange.getName());
+                                            priceChartDataTwentyFourHours.setMarket(market.getName());
 
                                             PriceChartData firstObject = listPriceChartDataTwentyFourHours.get(0);
                                             PriceChartData lastObject = listPriceChartDataTwentyFourHours.get(listPriceChartDataTwentyFourHours.size() - 1);
@@ -579,7 +591,7 @@ public class DashControlApplication extends Application {
                                     }
 
 
-                                    if (isDatabaseEmpty) {
+                                    if (downloadStepByStep) {
 
                                         //This part downloads the next interval (we first download the firsts 6 hours, then fill to the first 24h, etc ...
                                         indexIntervals++;
@@ -589,11 +601,14 @@ public class DashControlApplication extends Application {
                                         if (indexIntervals < DateUtil.intervalArray.length) {
 
                                             long startDate = currentDate - DateUtil.intervalArray[indexIntervals];
-                                            long endDate = currentDate - DateUtil.intervalArray[indexIntervals - 1] - 1; // -1 is to avoid getting the start value from the previous query
+                                            long endDate = currentDate - DateUtil.intervalArray[indexIntervals - 1]; // - 1; // -1 is to avoid getting the start value from the previous query
 
-                                            importChartData(startDate, endDate);
+                                            importChartData(startDate, endDate, exchange, market);
                                         } else {
+                                            // We continue downloading with another exchange/market
                                             indexIntervals = 0;
+
+                                            //downloadOtherExchangeMarket();
                                         }
                                     }
 
@@ -635,6 +650,40 @@ public class DashControlApplication extends Application {
 
         // Access the RequestQueue through your singleton class.
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsObjRequestExchanges);
+    }
+
+    /**
+     * Perform the download of the non default market and exchange prices in bulk
+     */
+    private void downloadOtherExchangeMarket() {
+        for (Exchange exchange : listExchanges) {
+            for (Market market : exchange.getListMarket()) {
+
+                if (!exchange.getName().equals(currentExchange.getName()) || !market.getName().equals(currentMarket.getName())) {
+
+
+                    // Importing graph prices based on available Exchanges and market
+                    currentDate = System.currentTimeMillis();
+                    indexIntervals = 0;
+
+                    //Getting latest database data
+                    long latestDate = dbHandler.getLatestRecordedDateInGraph(exchange, market);
+
+                    long startDate = currentDate - DateUtil.THREE_MONTHS_INTERVAL;
+                    long endDate = currentDate;
+
+                    if (latestDate != 0) {
+                        startDate = latestDate;
+                    }
+                    downloadStepByStep = false;
+
+                    Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate));
+                    Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate));
+
+                    importChartData(startDate, endDate, exchange, market);
+                }
+            }
+        }
     }
 
     private void pickDefaultLanguage() {

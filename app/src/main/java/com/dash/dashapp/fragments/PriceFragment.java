@@ -84,10 +84,12 @@ public class PriceFragment extends BaseFragment {
     private Exchange currentExchange = new Exchange();
     private Market currentMarket = new Market();
 
-    private List<Exchange> listExchanges;
-
     private long timeFrame = 0;
     private long gap = 0;
+
+    private MyDBHandler dbHandler;
+
+    private List<Exchange> listExchange;
 
 
     public PriceFragment() {
@@ -129,9 +131,11 @@ public class PriceFragment extends BaseFragment {
 
         gap = DateUtil.FIVE_MINUTES_GAP;
 
-        drawChart(timeFrame, gap);
+        dbHandler = new MyDBHandler(getContext(), null);
 
         setRadioGroupListeners();
+
+        setSpinnerAndPrices();
 
         return view;
     }
@@ -201,7 +205,7 @@ public class PriceFragment extends BaseFragment {
                         default:
                             break;
                     }
-                    drawChart(timeFrame, gap);
+                    drawChart(timeFrame, gap, currentExchange, currentMarket);
                 }
             }
         });
@@ -210,7 +214,7 @@ public class PriceFragment extends BaseFragment {
         gapRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                RadioButton checkedRadioButton = group.findViewById(checkedId);
                 // This puts the value (true/false) into the variable
                 boolean isChecked = checkedRadioButton.isChecked();
                 // If the radiobutton that has changed in check state is now checked...
@@ -264,21 +268,20 @@ public class PriceFragment extends BaseFragment {
                         default:
                             break;
                     }
-                    drawChart(timeFrame, gap);
+                    drawChart(timeFrame, gap, currentExchange, currentMarket);
                 }
             }
         });
     }
 
-    private void drawChart(long timeframe, long gap) {
+    private void drawChart(long timeframe, long gap, Exchange exchange, Market market) {
 
         long currentDate = System.currentTimeMillis();
 
         long startDate = currentDate - timeframe;
         long endDate = currentDate;
 
-        MyDBHandler dbHandler = new MyDBHandler(getContext(), null);
-        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap);
+        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap, exchange, market);
 
         Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate));
         Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate));
@@ -403,182 +406,87 @@ public class PriceFragment extends BaseFragment {
         mListener = null;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        try {
-            setSpinnerAndPrices();
-        } catch (Exception e) {
-            e.getMessage();
-        }
-
-
-    }
-
     private void setSpinnerAndPrices() {
 
-        // Getting prices
-        JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
-                (Request.Method.GET, URLs.URL_PRICE, null, new Response.Listener<JSONObject>() {
+        listExchange = dbHandler.findExchanges();
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        listExchanges = new ArrayList<>();
-                        List<String> listExchangesString = new ArrayList<>();
+        List<String> listExchangesString = new ArrayList<>();
+        List<String> listMarketString = new ArrayList<>();
 
-                        try {
+        for (Exchange exchange : listExchange){
+            listExchangesString.add(exchange.getName());
+            for (Market market : exchange.getListMarket()){
+                listMarketString.add(market.getName());
+                if (market.getIsDefault() == 1){
+                    currentExchange = exchange;
+                    currentMarket = market;
+                    priceTextview.setText(market.getPrice() + "");
+                }
+            }
+        }
 
-                            Iterator<String> listExchangesKeys = response.keys();
+        ArrayAdapter<String> adapterExchanges = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listExchangesString);
+        spinnerExchanges.setAdapter(adapterExchanges);
 
-                            // Getting exchanges
-                            while (listExchangesKeys.hasNext()) {
+        ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
+        spinnerMarket.setAdapter(adapterMarket);
 
-                                //Foreach exchange getting the market
-                                List<Market> listMarket = new ArrayList<>();
+        int defaultExchangePosition = adapterExchanges.getPosition(currentExchange.getName());
+        spinnerExchanges.setSelection(defaultExchangePosition);
 
+        int defaultMarketPosition = adapterExchanges.getPosition(currentMarket.getName());
+        spinnerMarket.setSelection(defaultMarketPosition);
 
-                                String exchangeName = listExchangesKeys.next();
-                                // get the value i care about
-                                JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
+        drawChart(timeFrame, gap, currentExchange, currentMarket);
 
-                                try {
-                                    double dash_btc = exchangeJson.getDouble("DASH_BTC");
-                                    Market market = new Market("DASH_BTC", dash_btc);
-                                    listMarket.add(market);
-                                } catch (Exception e) {
-                                    e.getMessage();
-                                }
-                                try {
-                                    double dash_usd = exchangeJson.getDouble("DASH_USD");
-                                    Market market = new Market("DASH_USD", dash_usd);
-                                    listMarket.add(market);
-                                } catch (Exception e) {
-                                    e.getMessage();
-                                }
+        spinnerExchanges.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // your code here
+                currentExchange = listExchange.get(position);
 
-                                Exchange exchange = new Exchange(exchangeName, listMarket);
-                                listExchanges.add(exchange);
-                                listExchangesString.add(exchange.getName());
+                List<String> listMarketString = new ArrayList<>();
 
-                            }
+                for (int j = 0; j < currentExchange.getListMarket().size(); j++) {
+                    listMarketString.add(currentExchange.getListMarket().get(j).getName());
+                }
 
-                            ArrayAdapter<String> adapterExchanges = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listExchangesString);
-                            spinnerExchanges.setAdapter(adapterExchanges);
+                ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
 
-                            setDefaultExchanges();
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-                        error.getMessage();
-                    }
-                });
-        // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestPrice);
-    }
-
-    private void setDefaultExchanges() {
-
-        // Getting exchanges (default exchange to display)
-        JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
-                (Request.Method.GET, URLs.URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            List<String> listMarketString = new ArrayList<>();
-
-                            JSONObject price = response.getJSONObject("default");
-                            currentExchange.setName(price.getString("exchange"));
-                            currentMarket.setName(price.getString("market"));
-                            int indexDefaultMarket = 0;
-
-                            for (int i = 0; i < listExchanges.size(); i++) {
-                                if (listExchanges.get(i).getName().equals(currentExchange.getName())) {
-                                    spinnerExchanges.setSelection(i);
-                                    currentExchange = listExchanges.get(i);
-                                    for (int j = 0; j < listExchanges.get(i).getListMarket().size(); j++) {
-                                        listMarketString.add(listExchanges.get(i).getListMarket().get(j).getName());
-                                        if (listExchanges.get(i).getListMarket().get(j).getName().equals(currentMarket.getName())) {
-                                            indexDefaultMarket = j;
-                                        }
-                                    }
-
-                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
-                                    spinnerMarket.setAdapter(adapterMarket);
-                                    spinnerMarket.setSelection(indexDefaultMarket);
-                                    priceTextview.setText(currentExchange.getListMarket().get(indexDefaultMarket).getPrice() + "");
-
-                                }
-                            }
-
-                            spinnerExchanges.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                                    // your code here
-                                    currentExchange = listExchanges.get(position);
-
-                                    List<String> listMarketString = new ArrayList<>();
-
-                                    for (int j = 0; j < currentExchange.getListMarket().size(); j++) {
-                                        listMarketString.add(currentExchange.getListMarket().get(j).getName());
-                                    }
-
-                                    ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
-
-                                    spinnerMarket.setAdapter(adapterMarket);
-                                    spinnerMarket.setSelection(0);
-                                    currentMarket = currentExchange.getListMarket().get(0);
-                                    priceTextview.setText(currentMarket.getPrice() + "");
-
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> parentView) {
-                                    // your code here
-                                }
-
-                            });
+                spinnerMarket.setAdapter(adapterMarket);
+                spinnerMarket.setSelection(0);
+                currentMarket = currentExchange.getListMarket().get(0);
+                priceTextview.setText(currentMarket.getPrice() + "");
 
 
-                            spinnerMarket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                                    currentMarket = currentExchange.getListMarket().get(position);
-                                    priceTextview.setText(currentMarket.getPrice() + "");
-                                }
+                //drawChart(timeFrame, gap, currentExchange, currentMarket);
 
-                                @Override
-                                public void onNothingSelected(AdapterView<?> parentView) {
-                                    // your code here
-                                }
+            }
 
-                            });
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        });
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-                        error.getMessage();
-                        Log.d(TAG, "Error : " + error.getMessage());
 
-                    }
-                });
+        spinnerMarket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                currentMarket = currentExchange.getListMarket().get(position);
+                priceTextview.setText(currentMarket.getPrice() + "");
 
-        // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestExchanges);
+                //drawChart(timeFrame, gap, currentExchange, currentMarket);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
     }
 
     /**
