@@ -6,6 +6,8 @@ package com.dash.dashapp.models;
 
 public class PriceChartData {
 
+    private String exchange;
+    private String market;
     private long time;
     private long startGap;
     private long endGap;
@@ -104,5 +106,21 @@ public class PriceChartData {
 
     public void setGap(long gap) {
         this.gap = gap;
+    }
+
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
+    }
+
+    public String getMarket() {
+        return market;
+    }
+
+    public void setMarket(String market) {
+        this.market = market;
     }
 }

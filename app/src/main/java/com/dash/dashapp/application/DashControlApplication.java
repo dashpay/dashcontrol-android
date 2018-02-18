@@ -5,12 +5,18 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.activities.SettingsActivity;
+import com.dash.dashapp.models.Exchange;
+import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PriceChartData;
 import com.dash.dashapp.utils.DateUtil;
 import com.dash.dashapp.utils.MyDBHandler;
@@ -26,6 +32,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,61 +44,195 @@ public class DashControlApplication extends Application {
     private static final String TAG = "DashControlApplication";
     private Locale locale = null;
 
-    private int i;
+    private int indexIntervals;
     private long currentDate;
     private static Context mContext;
     private boolean isDatabaseEmpty = true;
 
-    /*@Override
+    private Exchange currentExchange = new Exchange();
+    private Market currentMarket = new Market();
+
+    private List<Exchange> listExchanges;
+    private MyDBHandler dbHandler;
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (locale != null) {
             newConfig.setLocale(locale);
             getApplicationContext().createConfigurationContext(newConfig);
         }
-    }*/
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        //pickDefaultLanguage();
-
-        Stetho.initializeWithDefaults(this);
-
-        i = 0;
-
-        MyDBHandler dbHandler = new MyDBHandler(getApplicationContext(), null);
-
-
-        // TODO only download new data
-        //Getting latest database data
-        long latestDate = dbHandler.getLatestRecordedDateInGraph();
-
-        currentDate = System.currentTimeMillis();
-
-        // Deleting data older than 3 months
-        dbHandler.deletePriceChart(0, currentDate - DateUtil.THREE_MONTHS_INTERVAL);
-
-        long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
-        long endDate = currentDate;
-
-        if (latestDate != 0) {
-            startDate = latestDate;
-            isDatabaseEmpty = false;
-        } else {
-            isDatabaseEmpty = true;
-        }
-
-        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate));
-        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate));
-
-        importChartData(startDate, endDate);
-
         mContext = getApplicationContext();
 
         pickDefaultLanguage();
 
+        Stetho.initializeWithDefaults(this);
+
+        setSpinnerAndPrices();
+
+    }
+
+
+    private void setSpinnerAndPrices() {
+
+        dbHandler = new MyDBHandler(getApplicationContext(), null);
+
+        // Getting prices
+        JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
+                (Request.Method.GET, URLs.URL_PRICE, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        listExchanges = new ArrayList<>();
+
+                        try {
+
+                            Iterator<String> listExchangesKeys = response.keys();
+
+
+                            // Getting exchanges
+                            while (listExchangesKeys.hasNext()) {
+
+                                //Foreach exchange getting the market
+                                List<Market> listMarket = new ArrayList<>();
+
+
+                                String exchangeName = listExchangesKeys.next();
+
+                                Exchange exchange = new Exchange();
+                                exchange.setName(exchangeName);
+
+                                // get the value i care about
+                                JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
+
+                                try {
+                                    double dash_btc = exchangeJson.getDouble("DASH_BTC");
+                                    Market market = new Market("DASH_BTC", dash_btc);
+                                    listMarket.add(market);
+
+                                    dbHandler.addMarket(exchange, market, 0);
+
+                                } catch (Exception e) {
+                                    e.getMessage();
+                                }
+                                try {
+                                    double dash_usd = exchangeJson.getDouble("DASH_USD");
+                                    Market market = new Market("DASH_USD", dash_usd);
+                                    listMarket.add(market);
+
+                                    dbHandler.addMarket(exchange, market, 0);
+
+                                } catch (Exception e) {
+                                    e.getMessage();
+                                }
+                                try {
+                                    double dash_usd = exchangeJson.getDouble("DASH_USDT");
+                                    Market market = new Market("DASH_USDT", dash_usd);
+                                    listMarket.add(market);
+
+                                    dbHandler.addMarket(exchange, market, 0);
+
+                                } catch (Exception e) {
+                                    e.getMessage();
+                                }
+
+                                exchange.setListMarket(listMarket);
+                                listExchanges.add(exchange);
+                            }
+
+                            setDefaultExchanges();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        error.getMessage();
+                    }
+                });
+        // Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestPrice);
+    }
+
+    private void setDefaultExchanges() {
+
+        // Getting exchanges (default exchange to display)
+        JsonObjectRequest jsObjRequestExchanges = new JsonObjectRequest
+                (Request.Method.GET, URLs.URL_EXCHANGES, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            List<String> listMarketString = new ArrayList<>();
+
+                            JSONObject price = response.getJSONObject("default");
+                            currentExchange.setName(price.getString("exchange"));
+                            currentMarket.setName(price.getString("market"));
+
+                            dbHandler.updateDefault(currentExchange, currentMarket);
+
+                        }catch (Exception e){
+                            e.getMessage();
+                        }
+
+
+                        //////////////// IMPORTING GRAPH PRICES /////////////////
+
+                        // Deleting data older than 3 months
+                        dbHandler.deletePriceChart(0, currentDate - DateUtil.THREE_MONTHS_INTERVAL);
+
+                        // Importing graph prices based on available Exchanges and market
+
+                        currentDate = System.currentTimeMillis();
+
+                        for (Exchange exchange : listExchanges){
+                            for (Market market : exchange.getListMarket()){
+                                indexIntervals = 0;
+
+                            }
+                        }
+
+                        //Getting latest database data
+                        long latestDate = dbHandler.getLatestRecordedDateInGraph();
+
+                        long startDate = currentDate - DateUtil.SIX_HOURS_INTERVAL;
+                        long endDate = currentDate;
+
+                        if (latestDate != 0) {
+                            startDate = latestDate;
+                            isDatabaseEmpty = false;
+                        } else {
+                            isDatabaseEmpty = true;
+                        }
+
+                        Log.d("DateDebug", "Querying server with start date : " + DateUtil.getDate(startDate));
+                        Log.d("DateDebug", "Querying server with end date : " + DateUtil.getDate(endDate));
+
+                        importChartData(startDate, endDate);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        error.getMessage();
+                        Log.d(TAG, "Error : " + error.getMessage());
+
+                    }
+                });
+
+        // Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestExchanges);
     }
 
     private void importChartData(long startDate, long endDate) {
@@ -99,7 +240,7 @@ public class DashControlApplication extends Application {
         startDate = DateUtil.convertToUTC(startDate);
         endDate = DateUtil.convertToUTC(endDate);
 
-        Log.d(TAG, "Intervale : " + DateUtil.intervalArray[i]);
+        Log.d(TAG, "Intervale : " + DateUtil.intervalArray[indexIntervals]);
 
         Log.d("DateDebug", "Postman test startDate : " + startDate
                 + " endDate : " + endDate);
@@ -441,18 +582,18 @@ public class DashControlApplication extends Application {
                                     if (isDatabaseEmpty) {
 
                                         //This part downloads the next interval (we first download the firsts 6 hours, then fill to the first 24h, etc ...
-                                        i++;
+                                        indexIntervals++;
 
-                                        Log.e(TAG, "i  : " + i);
+                                        Log.e(TAG, "i  : " + indexIntervals);
 
-                                        if (i < DateUtil.intervalArray.length) {
+                                        if (indexIntervals < DateUtil.intervalArray.length) {
 
-                                            long startDate = currentDate - DateUtil.intervalArray[i];
-                                            long endDate = currentDate - DateUtil.intervalArray[i - 1] - 1; // -1 is to avoid getting the start value from the previous query
+                                            long startDate = currentDate - DateUtil.intervalArray[indexIntervals];
+                                            long endDate = currentDate - DateUtil.intervalArray[indexIntervals - 1] - 1; // -1 is to avoid getting the start value from the previous query
 
                                             importChartData(startDate, endDate);
                                         } else {
-                                            i = 0;
+                                            indexIntervals = 0;
                                         }
                                     }
 
