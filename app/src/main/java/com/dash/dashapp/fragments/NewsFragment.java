@@ -114,6 +114,7 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
             @Override
             public void onRefresh() {
                 if (!updatePerforming) {
+                    mInfinitePlaceHolderView.removeAllViews();
                     handleRSS();
                 } else {
                     turnWheelOff();

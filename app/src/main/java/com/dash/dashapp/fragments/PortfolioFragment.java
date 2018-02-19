@@ -14,20 +14,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
+import com.dash.dashapp.R;
 import com.dash.dashapp.activities.AddMasternodeActivity;
 import com.dash.dashapp.activities.AddWalletActivity;
-import com.dash.dashapp.adapters.HeadingView;
 import com.dash.dashapp.adapters.MasternodeView;
 import com.dash.dashapp.adapters.WalletView;
+import com.dash.dashapp.helpers.ApiHelper;
+import com.dash.dashapp.helpers.WalletSharedPreferenceHelper;
 import com.dash.dashapp.models.Masternode;
 import com.dash.dashapp.models.Wallet;
-import com.dash.dashapp.R;
+import com.dash.dashapp.models.WalletBalance;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +46,8 @@ public class PortfolioFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ExpandablePlaceHolderView mExpandableView;
+    private static HashMap<String, Double> wallet_map;
+
 
     public PortfolioFragment() {
         // Required empty public constructor
@@ -63,6 +70,7 @@ public class PortfolioFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        wallet_map = new HashMap<>();
     }
 
     @Override
@@ -71,6 +79,7 @@ public class PortfolioFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
 
+        mExpandableView = (ExpandablePlaceHolderView) view.findViewById(R.id.masternodeWalletExpandableView);
 
         // creating floating button menu
         final FloatingActionMenu fam = (FloatingActionMenu) view.findViewById(R.id.menu_masternode_wallet);
@@ -103,17 +112,14 @@ public class PortfolioFragment extends Fragment {
         fam.setIconToggleAnimatorSet(set);
 
 
-
         final FloatingActionButton addMasternode = (FloatingActionButton) view.findViewById(R.id.button_add_masternode);
         addMasternode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AddMasternodeActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,100);
             }
         });
-
-
 
 
         final FloatingActionButton addWallet = (FloatingActionButton) view.findViewById(R.id.button_add_wallet);
@@ -121,41 +127,22 @@ public class PortfolioFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AddWalletActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,200);
             }
         });
-
-
-
-        List<Masternode> listMasternode = new ArrayList<>();
-        Masternode m1 = new Masternode("Masternode 1");
-        Masternode m2 = new Masternode("Masternode 2");
-        listMasternode.add(m1);
-        listMasternode.add(m2);
-
-        List<Wallet> listWallet = new ArrayList<>();
-        Wallet w1 = new Wallet("Wallet 1");
-        Wallet w2 = new Wallet("Wallet 2");
-        listWallet.add(w1);
-        listWallet.add(w2);
-
-        mExpandableView = (ExpandablePlaceHolderView) view.findViewById(R.id.masternodeWalletExpandableView);
-
-        mExpandableView.addView(new HeadingView(getContext(), "MY MASTERNODES"));
-        for (Masternode masternode : listMasternode) {
-            mExpandableView.addView(new MasternodeView(getContext(), masternode));
-        }
-
-        mExpandableView.addView(new HeadingView(getContext(), "MY WALLETS"));
-        for (Wallet wallet : listWallet) {
-            mExpandableView.addView(new WalletView(getContext(), wallet));
-        }
 
 
         // Inflate the layout for this fragment
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (wallet_map == null) wallet_map = new HashMap<>();
+        reload_wallets();
+        refreshViews();
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -194,5 +181,51 @@ public class PortfolioFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 100 || requestCode == 200) {
+        if(resultCode == getActivity().RESULT_OK){
+            reload_wallets();
+            if(mExpandableView!=null) mExpandableView.removeAllViews();
+            refreshViews();
+        }
+        }
+    }
+
+    private void reload_wallets() {
+        Set<String> address_book = WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().getWallet_address_book();
+        if (address_book != null) {
+            try {
+                List<WalletBalance> walletBalanceList = ApiHelper.getPriceForWalletOrMasterNode(address_book.toArray(new String[address_book.size()]));
+                if (walletBalanceList != null && !walletBalanceList.isEmpty()) {
+                    if (wallet_map == null) wallet_map = new HashMap<>();
+                    wallet_map.clear();
+                    for (WalletBalance walletBalance : walletBalanceList) {
+                        wallet_map.put(walletBalance.getAddress(), walletBalance.getAmount());
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void refreshViews(){
+        for (Map.Entry<String, Double> wallet : wallet_map.entrySet()) {
+            String key = wallet.getKey();
+            Double value = wallet.getValue();
+            if (value != null) {
+                if (value > 1000) {
+                    mExpandableView.addView(new MasternodeView(getContext(), new Masternode(key + " : " + value + " DASH")));
+                } else {
+                    mExpandableView.addView(new WalletView(getContext(), new Wallet(key + " : " + value + " DASH")));
+                }
+            }
+        }
+
     }
 }

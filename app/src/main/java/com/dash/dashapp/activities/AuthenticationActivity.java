@@ -35,6 +35,8 @@ import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+
 public class AuthenticationActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -120,8 +122,12 @@ public class AuthenticationActivity extends AppCompatActivity {
                     Log.d(TAG, "Credential Save: OK");
                     sharedPreferenceHelper.setDeviceId(mCurrentCredential.getId());
                     sharedPreferenceHelper.setPassword(mCurrentCredential.getPassword());
-                    ApiHelper.createOrUpdateDevice(this, mCurrentCredential.getId(),
-                            mCurrentCredential.getPassword(), sharedPreferenceHelper.getFcmToken());
+                    try {
+                        ApiHelper.createOrUpdateDevice(mCurrentCredential.getId(),null,
+                                mCurrentCredential.getPassword(), sharedPreferenceHelper.getFcmToken());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     openMainScreen();
                 } else {
                     Log.e(TAG, "Credential Save: NOT OK");

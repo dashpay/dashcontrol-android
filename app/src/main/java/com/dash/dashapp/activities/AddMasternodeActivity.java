@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dash.dashapp.R;
+import com.dash.dashapp.helpers.WalletSharedPreferenceHelper;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -20,15 +22,15 @@ public class AddMasternodeActivity extends BaseActivity {
 
 
     @BindView(R.id.adressEditText)
-    EditText adressEditText;
-    @BindView(R.id.votingKeyEditText)
-    TextView votingKeyEditText;
+    EditText addressEditText;
     @BindView(R.id.includeMasterNodeToggle)
     ToggleButton includeMasterNodeToggle;
     @BindView(R.id.paymentNotifToggle)
     ToggleButton paymentNotifToggle;
     @BindView(R.id.qrCodeImport)
     TextView qrCodeImport;
+    @BindView(R.id.btn_AddMasterNode)
+    Button addMasterNode;
 
     private String scanContent, scanFormat;
 
@@ -50,6 +52,22 @@ public class AddMasternodeActivity extends BaseActivity {
 
         ab.setTitle("Add Masternode");
 
+        addMasterNode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String address = addressEditText.getText().toString().trim();
+                if(address!=null && !address.isEmpty()){
+                    WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().addWalletToAddressBook(address);
+                    Intent data = new Intent();
+                    setResult(RESULT_OK,data);
+                    finish();
+                }
+                else{
+                    addressEditText.setError("Address cannot be empty!");
+                }
+            }
+        });
+
     }
 
     @Override
@@ -60,15 +78,21 @@ public class AddMasternodeActivity extends BaseActivity {
             if (scanningResult.getContents() != null) {
                 scanContent = scanningResult.getContents().toString();
                 scanFormat = scanningResult.getFormatName().toString();
+                if (scanFormat.equals("QR_CODE")) addressEditText.setText(scanContent);
             }
-
-            Toast.makeText(this, scanContent + "   type:" + scanFormat, Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(this, "Nothing scanned", Toast.LENGTH_SHORT).show();
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent data = new Intent();
+        setResult(RESULT_CANCELED,data);
+        finish();
+    }
 
     @OnClick({
             R.id.qrCodeImport

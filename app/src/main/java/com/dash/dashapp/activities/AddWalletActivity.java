@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dash.dashapp.R;
+import com.dash.dashapp.helpers.WalletSharedPreferenceHelper;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -18,12 +20,14 @@ import butterknife.OnClick;
 
 public class AddWalletActivity extends BaseActivity {
 
-    @BindView(R.id.adressWalletEditText)
-    EditText adressWalletEditText;
+    @BindView(R.id.addressWalletEditText)
+    EditText addressWalletEditText;
     @BindView(R.id.paymentNotificationToggle)
     ToggleButton paymentNotificationToggle;
     @BindView(R.id.qrCodeImport)
     TextView qrCodeImport;
+    @BindView(R.id.btn_AddWallet)
+    Button addWallet;
 
     private String scanContent, scanFormat;
 
@@ -44,6 +48,21 @@ public class AddWalletActivity extends BaseActivity {
 
         ab.setTitle("Add Wallet");
 
+        addWallet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String address = addressWalletEditText.getText().toString().trim();
+                if(address!=null && !address.isEmpty()){
+                    WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().addWalletToAddressBook(address);
+                    Intent data = new Intent();
+                    setResult(RESULT_OK,data);
+                    finish();
+                }
+                else{
+                    addressWalletEditText.setError("Address cannot be empty!");
+                }
+            }
+        });
     }
 
 
@@ -56,14 +75,22 @@ public class AddWalletActivity extends BaseActivity {
                 scanContent = scanningResult.getContents().toString();
                 scanFormat = scanningResult.getFormatName().toString();
             }
+            if (scanFormat.equals("QR_CODE")) addressWalletEditText.setText(scanContent);
+        } else
 
-            Toast.makeText(this, scanContent + "   type:" + scanFormat, Toast.LENGTH_SHORT).show();
-
-        } else {
+        {
             Toast.makeText(this, "Nothing scanned", Toast.LENGTH_SHORT).show();
         }
+
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent data = new Intent();
+        setResult(RESULT_CANCELED,data);
+        finish();
+    }
 
     @OnClick({
             R.id.qrCodeImport
