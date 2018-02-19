@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.dash.dashapp.models.Exchange;
+import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.News;
 import com.dash.dashapp.models.PriceChartData;
 import com.dash.dashapp.models.Proposal;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 23;
+    public static final int DATABASE_VERSION = 27;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
 
@@ -61,6 +63,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
 
     public static final String TABLE_PRICE_CHART = "price_chart";
+    public static final String COLUMN_EXCHANGE = "exchange";
+    public static final String COLUMN_MARKET = "market";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_START_GAP = "start_gap";
     public static final String COLUMN_END_GAP = "end_gap";
@@ -75,6 +79,13 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_VOLUME = "volume";
 
 
+    public static final String TABLE_MARKET_PRICE = "market_price";
+    //public static final String COLUMN_EXCHANGE = "exchange";
+    //public static final String COLUMN_MARKET = "market";
+    public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_DEFAULT = "default_market";
+
+
     public MyDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
     }
@@ -84,6 +95,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROPOSALS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MARKET_PRICE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRICE_CHART);
         onCreate(db);
     }
@@ -127,8 +139,21 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         ")";
         db.execSQL(CREATE_PROPOSAL_TABLE);
 
+
+        String CREATE_MARKET_PRICE =
+                "CREATE TABLE " + TABLE_MARKET_PRICE + "(" +
+                        COLUMN_EXCHANGE + " TEXT," +
+                        COLUMN_MARKET + " TEXT," +
+                        COLUMN_PRICE + " REAL," +
+                        COLUMN_DEFAULT + " INTEGER" +
+                        ")";
+        db.execSQL(CREATE_MARKET_PRICE);
+
+
         String CREATE_PRICE_CHART_TABLE =
                 "CREATE TABLE " + TABLE_PRICE_CHART + "(" +
+                        COLUMN_EXCHANGE + " TEXT," +
+                        COLUMN_MARKET + " TEXT," +
                         COLUMN_TIME + " REAL," +
                         COLUMN_START_GAP + " REAL," +
                         COLUMN_END_GAP + " REAL," +
@@ -146,6 +171,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         String CREATE_INDEX_END_GAP =
                 "CREATE INDEX " + COLUMN_END_GAP_INDEX + " ON " + TABLE_PRICE_CHART + "(" + COLUMN_END_GAP + " )";
         db.execSQL(CREATE_INDEX_END_GAP);
+
     }
 
 
@@ -174,12 +200,240 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    // NEWS
+
+    public News findNews(String newsId) {
+        String query = "SELECT *" +
+                " FROM " + TABLE_NEWS +
+                " WHERE " + COLUMN_RSS_GUID + "='" + newsId + "';";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        News news = new News();
+        if (cursor.moveToFirst()) {
+            news.setGuid(cursor.getString(cursor.getColumnIndex(COLUMN_RSS_GUID)));
+            news.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
+            news.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
+            news.setPubDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE)));
+            news.setContent(cursor.getString(cursor.getColumnIndex(COLUMN_CONTENT)));
+            cursor.close();
+        } else {
+            news = null;
+        }
+        db.close();
+        return news;
+    }
+
+    public List<News> findAllNews(String filter) {
+        Log.d(TAG, "Find list news");
+
+        List<News> newsList = new ArrayList<>();
+
+        String query = "SELECT *" +
+                " FROM " + TABLE_NEWS;
+        if (filter != null) {
+            query += " WHERE " + COLUMN_TITLE + " " +
+                    "LIKE '%" + filter + "%'";
+        }
+        query += " ORDER BY " + COLUMN_DATE + " DESC;";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            News news = new News();
+            news.setGuid(cursor.getString(cursor.getColumnIndex(COLUMN_RSS_GUID)));
+            news.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
+            news.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
+            news.setPubDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE)));
+            news.setContent(cursor.getString(cursor.getColumnIndex(COLUMN_CONTENT)));
+            newsList.add(news);
+        }
+        cursor.close();
+
+        db.close();
+        return newsList;
+    }
+
+    public void deleteAllNews() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_NEWS);
+        db.close();
+    }
+
+    // PROPOSALS
+    public void addProposal(Proposal proposal) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HASH, proposal.getHash());
+        values.put(COLUMN_NAME, proposal.getName());
+        values.put(COLUMN_URL, proposal.getUrl());
+        values.put(COLUMN_DW_URL, proposal.getDw_url());
+        values.put(COLUMN_DW_URL_COMMENTS, proposal.getDw_url_comments());
+        values.put(COLUMN_TITLE_PROP, proposal.getTitle());
+        values.put(COLUMN_DATE_ADDED, proposal.getDate_added());
+        values.put(COLUMN_DATE_ADDED_HUMAN, proposal.getDate_added_human());
+        values.put(COLUMN_DATE_END, proposal.getDate_end());
+        values.put(COLUMN_VOTING_DEADLINE_HUMAN, proposal.getVoting_deadline_human());
+        values.put(COLUMN_WILL_BE_FUNDED, proposal.isWill_be_funded());
+        values.put(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING, proposal.getRemaining_yes_votes_until_funding());
+        values.put(COLUMN_IN_NEXT_BUDGET, proposal.isIn_next_budget());
+        values.put(COLUMN_MONTHLY_AMOUNT, proposal.getMonthly_amount());
+        values.put(COLUMN_TOTAL_PAYMENT_COUNT, proposal.getTotal_payment_count());
+        values.put(COLUMN_REMAINING_PAYMENT_COUNT, proposal.getRemaining_payment_count());
+        values.put(COLUMN_YES, proposal.getYes());
+        values.put(COLUMN_NO, proposal.getNo());
+        values.put(COLUMN_ORDER, proposal.getOrder());
+        values.put(COLUMN_COMMENT_AMOUNT, proposal.getComment_amount());
+        values.put(COLUMN_OWNER_USERNAME, proposal.getOwner_username());
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_PROPOSALS, null, values);
+        db.close();
+    }
+
+    public List<Proposal> findAllProposals(String filter) {
+        Log.d(TAG, "Find list proposals");
+
+        List<Proposal> proposalsList = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_PROPOSALS;
+        if (filter != null) {
+            query += " WHERE " + COLUMN_TITLE_PROP + " LIKE '%" + filter + "%'";
+        }
+        query += " ORDER BY " + COLUMN_DATE_END + " ASC;";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            Proposal proposal = new Proposal();
+            proposal.setHash(cursor.getString(cursor.getColumnIndex(COLUMN_HASH)));
+            proposal.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
+            proposal.setUrl(cursor.getString(cursor.getColumnIndex(COLUMN_URL)));
+            proposal.setDw_url(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL)));
+            proposal.setDw_url_comments(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL_COMMENTS)));
+            proposal.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE_PROP)));
+            proposal.setDate_added(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED)));
+            proposal.setDate_added_human(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED_HUMAN)));
+            proposal.setDate_end(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_END)));
+            proposal.setVoting_deadline_human(cursor.getString(cursor.getColumnIndex(COLUMN_VOTING_DEADLINE_HUMAN)));
+            proposal.setWill_be_funded(cursor.getInt(cursor.getColumnIndex(COLUMN_WILL_BE_FUNDED)) != 0);
+            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING)));
+            proposal.setIn_next_budget(cursor.getInt(cursor.getColumnIndex(COLUMN_IN_NEXT_BUDGET)) != 0);
+            proposal.setMonthly_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_MONTHLY_AMOUNT)));
+            proposal.setTotal_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_TOTAL_PAYMENT_COUNT)));
+            proposal.setRemaining_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_PAYMENT_COUNT)));
+            proposal.setYes(cursor.getInt(cursor.getColumnIndex(COLUMN_YES)));
+            proposal.setNo(cursor.getInt(cursor.getColumnIndex(COLUMN_NO)));
+            proposal.setOrder(cursor.getInt(cursor.getColumnIndex(COLUMN_ORDER)));
+            proposal.setComment_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_COMMENT_AMOUNT)));
+            proposal.setOwner_username(cursor.getString(cursor.getColumnIndex(COLUMN_OWNER_USERNAME)));
+            proposalsList.add(proposal);
+        }
+        cursor.close();
+        db.close();
+        return proposalsList;
+    }
+
+
+    public boolean deleteProposal(String proposalHash) {
+        boolean result = false;
+        String query = "SELECT *" +
+                " FROM " + TABLE_PROPOSALS +
+                " WHERE " + COLUMN_HASH + " =  '" + proposalHash + "';";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        Proposal proposal = new Proposal();
+        if (cursor.moveToFirst()) {
+            proposal.setHash(cursor.getString(0));
+            db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
+                    new String[]{String.valueOf(proposal.getHash())});
+            cursor.close();
+            result = true;
+        }
+        db.close();
+        return result;
+    }
+
+    public void deleteAllProposals() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_PROPOSALS);
+        db.close();
+    }
+
+
+    ////////////////////////////////// EXCHANGE / MARKET ///////////////////////////////////
+    public void addMarket(Exchange exchange, Market market, int isDefault) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EXCHANGE, exchange.getName());
+        values.put(COLUMN_MARKET, market.getName());
+        values.put(COLUMN_PRICE, market.getPrice());
+        values.put(COLUMN_DEFAULT, isDefault);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_MARKET_PRICE, null, values);
+        db.close();
+    }
+
+    public List<Exchange> findExchanges() {
+
+        List<Exchange> exchangeList = new ArrayList<>();
+        Exchange exchange = new Exchange();
+        exchange.setListMarket(new ArrayList<Market>());
+
+        String query = "SELECT *" +
+                " FROM " + TABLE_MARKET_PRICE +
+                " ORDER BY " + COLUMN_EXCHANGE + " ASC";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            if (exchange.getName() != null){
+                if (!exchange.getName().equals(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)))){
+                    exchangeList.add(exchange);
+                    exchange = new Exchange();
+                    exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+                    exchange.setListMarket(new ArrayList<Market>());
+                }
+            }else{
+                exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+            }
+
+            Market market = new Market();
+            market.setName(cursor.getString(cursor.getColumnIndex(COLUMN_MARKET)));
+            market.setPrice(cursor.getDouble(cursor.getColumnIndex(COLUMN_PRICE)));
+            market.setIsDefault(cursor.getInt(cursor.getColumnIndex(COLUMN_DEFAULT)));
+
+            exchange.getListMarket().add(market);
+        }
+
+        exchangeList.add(exchange);
+
+        cursor.close();
+        db.close();
+        return exchangeList;
+    }
+
+
+    public void updateDefault(Exchange exchange, Market market) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_MARKET_PRICE +
+                " SET " + COLUMN_DEFAULT + " = 1" +
+                " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
+                " AND " + COLUMN_MARKET + " = '" + market.getName() + "'");
+        db.close();
+    }
+
+
+
+    public void deleteAllMarket() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_MARKET_PRICE);
+        db.close();
+    }
+
+    ///////////////////////////// PRICE CHART /////////////////////////////////////////
     public void addPriceChart(PriceChartData priceChartData) {
         //Log.d(TAG, "Add price chart");
 
         ContentValues values = new ContentValues();
-        Log.d("DateDebug", "Inserting in database : " + DateUtil.getDate(priceChartData.getTime()));
+        values.put(COLUMN_EXCHANGE, priceChartData.getExchange());
+        values.put(COLUMN_MARKET, priceChartData.getMarket());
         values.put(COLUMN_TIME, priceChartData.getTime());
         values.put(COLUMN_START_GAP, priceChartData.getStartGap());
         values.put(COLUMN_END_GAP, priceChartData.getEndGap());
@@ -211,7 +465,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
 
-    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd, long gap) {
+    public List<PriceChartData> findPriceChart(long dateStart, long dateEnd, long gap, Exchange exchange, Market market) {
 
         // TODO AGGREGATE GAP WITH SQL
         Log.d(TAG, "Find list Price chart");
@@ -222,6 +476,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         String query = "SELECT *" +
                 " FROM " + TABLE_PRICE_CHART +
+                //" WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
+                //" AND " + COLUMN_MARKET + " = '" + market.getName() + "'" +
                 " WHERE " + COLUMN_TIME + " >= " + dateStart +
                 " AND " + COLUMN_TIME + " <= " + dateEnd +
                 " AND " + COLUMN_GAP + " = " + gap;
@@ -232,17 +488,19 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
             PriceChartData priceChartData = new PriceChartData();
+            priceChartData.setExchange(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+            priceChartData.setMarket(cursor.getString(cursor.getColumnIndex(COLUMN_MARKET)));
             priceChartData.setTime(cursor.getLong(cursor.getColumnIndex(COLUMN_TIME)));
             priceChartData.setStartGap(cursor.getLong(cursor.getColumnIndex(COLUMN_START_GAP)));
             priceChartData.setEndGap(cursor.getLong(cursor.getColumnIndex(COLUMN_END_GAP)));
             priceChartData.setGap(cursor.getLong(cursor.getColumnIndex(COLUMN_GAP)));
-            priceChartData.setClose(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE)));
-            priceChartData.setHigh(cursor.getLong(cursor.getColumnIndex(COLUMN_HIGH)));
-            priceChartData.setLow(cursor.getLong(cursor.getColumnIndex(COLUMN_LOW)));
-            priceChartData.setOpen(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN)));
-            priceChartData.setPairVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_PAIR_VOLUME)));
-            priceChartData.setTrades(cursor.getLong(cursor.getColumnIndex(COLUMN_TRADES)));
-            priceChartData.setVolume(cursor.getLong(cursor.getColumnIndex(COLUMN_VOLUME)));
+            priceChartData.setClose(cursor.getDouble(cursor.getColumnIndex(COLUMN_CLOSE)));
+            priceChartData.setHigh(cursor.getDouble(cursor.getColumnIndex(COLUMN_HIGH)));
+            priceChartData.setLow(cursor.getDouble(cursor.getColumnIndex(COLUMN_LOW)));
+            priceChartData.setOpen(cursor.getDouble(cursor.getColumnIndex(COLUMN_OPEN)));
+            priceChartData.setPairVolume(cursor.getDouble(cursor.getColumnIndex(COLUMN_PAIR_VOLUME)));
+            priceChartData.setTrades(cursor.getDouble(cursor.getColumnIndex(COLUMN_TRADES)));
+            priceChartData.setVolume(cursor.getDouble(cursor.getColumnIndex(COLUMN_VOLUME)));
 
             priceChartList.add(priceChartData);
         }
@@ -252,26 +510,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return priceChartList;
     }
 
-    /**
-     * Getting the latest record for graph and give it's date
-     */
-    public long getLatestRecordedDateInGraph() {
-
-        long latestDate = 0;
-
-        String query = "SELECT MAX(" + COLUMN_TIME + ")" +
-                " FROM " + TABLE_PRICE_CHART;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            latestDate = cursor.getLong(0);
-        }
-
-        return latestDate;
-
-    }
-
     public void deletePriceChart(long dateStart, long dateEnd) {
 
         Log.d(TAG, "Delete all price chart");
@@ -279,222 +517,36 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         if (dateStart == 0 && dateEnd == 0) {
             db.execSQL("DELETE FROM " + TABLE_PRICE_CHART);
-        }else{
+        } else {
             db.execSQL("DELETE FROM " + TABLE_PRICE_CHART +
                     " WHERE " + COLUMN_TIME + " > " + dateStart +
-                    " AND " + COLUMN_TIME + " < " + dateEnd );
+                    " AND " + COLUMN_TIME + " < " + dateEnd);
         }
         db.close();
     }
 
-    public News findNews(String newsId) {
-        String query = "SELECT * FROM " + TABLE_NEWS + " WHERE " + COLUMN_RSS_GUID + "='" + newsId + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        News news = new News();
-        if (cursor.moveToFirst()) {
-            news.setGuid(cursor.getString(1));
-            news.setTitle(cursor.getString(2));
-            news.setThumbnail(cursor.getString(3));
-            news.setPubDate(cursor.getString(4));
-            news.setContent(cursor.getString(5));
-            cursor.close();
-        } else {
-            news = null;
-        }
-        db.close();
-        return news;
-    }
+    /**
+     * Getting the latest record for graph and give it's date
+     */
+    public long getLatestRecordedDateInGraph(Exchange exchange, Market market) {
 
-    public List<News> findAllNews(String filter) {
-        Log.d(TAG, "Find list news");
+        long latestDate = 0;
 
-        List<News> newsList = new ArrayList<>();
-
-        String query = "SELECT * FROM " + TABLE_NEWS;
-        if (filter != null) {
-            query += " WHERE " + COLUMN_TITLE + " LIKE '%" + filter + "%'";
-        }
-        query += " ORDER BY " + COLUMN_DATE + " DESC;";
+        String query = "SELECT MAX(" + COLUMN_TIME + ") as " + COLUMN_TIME +
+                " FROM " + TABLE_PRICE_CHART +
+                " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
+                " AND " + COLUMN_MARKET + " = '" + market.getName() + "'";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
-            News news = new News();
-            news.setGuid(cursor.getString(1));
-            news.setTitle(cursor.getString(2));
-            news.setThumbnail(cursor.getString(3));
-            news.setPubDate(cursor.getString(4));
-            news.setContent(cursor.getString(5));
-            newsList.add(news);
-        }
-        cursor.close();
-
-        db.close();
-        return newsList;
-    }
-
-
-    public boolean deleteNews(String newsId) {
-        boolean result = false;
-        String query = "SELECT * FROM " + TABLE_NEWS + " WHERE " + COLUMN_RSS_GUID + " =  '" + newsId + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        News news = new News();
-        if (cursor.moveToFirst()) {
-            news.setGuid(cursor.getString(1));
-            db.delete(TABLE_NEWS, COLUMN_RSS_GUID + " = ?",
-                    new String[]{String.valueOf(news.getGuid())});
-            cursor.close();
-            result = true;
-        }
-        db.close();
-        return result;
-    }
-
-    public void deleteAllNews() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_NEWS);
-        db.close();
-    }
-
-
-    public void deletePriceChart() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_NEWS);
-        db.close();
-    }
-
-
-    // PROPOSALS
-    public void addProposal(Proposal proposal) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_HASH, proposal.getHash());
-        values.put(COLUMN_NAME, proposal.getName());
-        values.put(COLUMN_URL, proposal.getUrl());
-        values.put(COLUMN_DW_URL, proposal.getDw_url());
-        values.put(COLUMN_DW_URL_COMMENTS, proposal.getDw_url_comments());
-        values.put(COLUMN_TITLE_PROP, proposal.getTitle());
-        values.put(COLUMN_DATE_ADDED, proposal.getDate_added());
-        values.put(COLUMN_DATE_ADDED_HUMAN, proposal.getDate_added_human());
-        values.put(COLUMN_DATE_END, proposal.getDate_end());
-        values.put(COLUMN_VOTING_DEADLINE_HUMAN, proposal.getVoting_deadline_human());
-        values.put(COLUMN_WILL_BE_FUNDED, proposal.isWill_be_funded());
-        values.put(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING, proposal.getRemaining_yes_votes_until_funding());
-        values.put(COLUMN_IN_NEXT_BUDGET, proposal.isIn_next_budget());
-        values.put(COLUMN_MONTHLY_AMOUNT, proposal.getMonthly_amount());
-        values.put(COLUMN_TOTAL_PAYMENT_COUNT, proposal.getTotal_payment_count());
-        values.put(COLUMN_REMAINING_PAYMENT_COUNT, proposal.getRemaining_payment_count());
-        values.put(COLUMN_YES, proposal.getYes());
-        values.put(COLUMN_NO, proposal.getNo());
-        values.put(COLUMN_ORDER, proposal.getOrder());
-        values.put(COLUMN_COMMENT_AMOUNT, proposal.getComment_amount());
-        values.put(COLUMN_OWNER_USERNAME, proposal.getOwner_username());
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(TABLE_PROPOSALS, null, values);
-        db.close();
-    }
-
-    public Proposal findProposal(String proposalHash) {
-        String query = "SELECT * FROM " + TABLE_PROPOSALS + " WHERE " + COLUMN_HASH + "='" + proposalHash + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        Proposal proposal = new Proposal();
-        if (cursor.moveToFirst()) {
-            proposal.setHash(cursor.getString(0));
-            proposal.setName(cursor.getString(1));
-            proposal.setUrl(cursor.getString(2));
-            proposal.setDw_url(cursor.getString(3));
-            proposal.setDw_url_comments(cursor.getString(4));
-            proposal.setTitle(cursor.getString(5));
-            proposal.setDate_added(cursor.getString(6));
-            proposal.setDate_added_human(cursor.getString(7));
-            proposal.setDate_end(cursor.getString(8));
-            proposal.setVoting_deadline_human(cursor.getString(9));
-            proposal.setWill_be_funded(cursor.getInt(10) != 0);
-            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
-            proposal.setIn_next_budget(cursor.getInt(12) != 0);
-            proposal.setMonthly_amount(cursor.getInt(13));
-            proposal.setTotal_payment_count(cursor.getInt(14));
-            proposal.setRemaining_payment_count(cursor.getInt(15));
-            proposal.setYes(cursor.getInt(16));
-            proposal.setNo(cursor.getInt(17));
-            proposal.setOrder(cursor.getInt(18));
-            proposal.setComment_amount(cursor.getInt(19));
-            proposal.setOwner_username(cursor.getString(20));
-            cursor.close();
-        } else {
-            proposal = null;
-        }
-        db.close();
-        return proposal;
-    }
-
-    public List<Proposal> findAllProposals(String filter) {
-        Log.d(TAG, "Find list proposals");
-
-        List<Proposal> proposalsList = new ArrayList<>();
-
-        String query = "SELECT * FROM " + TABLE_PROPOSALS;
-        if (filter != null) {
-            query += " WHERE " + COLUMN_TITLE_PROP + " LIKE '%" + filter + "%'";
-        }
-        query += " ORDER BY " + COLUMN_DATE_END + " ASC;";
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            Proposal proposal = new Proposal();
-            proposal.setHash(cursor.getString(0));
-            proposal.setName(cursor.getString(1));
-            proposal.setUrl(cursor.getString(2));
-            proposal.setDw_url(cursor.getString(3));
-            proposal.setDw_url_comments(cursor.getString(4));
-            proposal.setTitle(cursor.getString(5));
-            proposal.setDate_added(cursor.getString(6));
-            proposal.setDate_added_human(cursor.getString(7));
-            proposal.setDate_end(cursor.getString(8));
-            proposal.setVoting_deadline_human(cursor.getString(9));
-            proposal.setWill_be_funded(cursor.getInt(10) != 0);
-            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(11));
-            proposal.setIn_next_budget(cursor.getInt(12) != 0);
-            proposal.setMonthly_amount(cursor.getInt(13));
-            proposal.setTotal_payment_count(cursor.getInt(14));
-            proposal.setRemaining_payment_count(cursor.getInt(15));
-            proposal.setYes(cursor.getInt(16));
-            proposal.setNo(cursor.getInt(17));
-            proposal.setOrder(cursor.getInt(18));
-            proposal.setComment_amount(cursor.getInt(19));
-            proposal.setOwner_username(cursor.getString(20));
-            proposalsList.add(proposal);
+            latestDate = cursor.getLong(cursor.getColumnIndex(COLUMN_TIME));
         }
         cursor.close();
         db.close();
-        return proposalsList;
-    }
 
+        return latestDate;
 
-    public boolean deleteProposal(String proposalHash) {
-        boolean result = false;
-        String query = "SELECT * FROM " + TABLE_PROPOSALS + " WHERE " + COLUMN_HASH + " =  '" + proposalHash + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        Proposal proposal = new Proposal();
-        if (cursor.moveToFirst()) {
-            proposal.setHash(cursor.getString(0));
-            db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
-                    new String[]{String.valueOf(proposal.getHash())});
-            cursor.close();
-            result = true;
-        }
-        db.close();
-        return result;
-    }
-
-    public void deleteAllProposals() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_PROPOSALS);
-        db.close();
     }
 }
 

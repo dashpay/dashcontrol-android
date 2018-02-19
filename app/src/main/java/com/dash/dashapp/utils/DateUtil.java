@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Created by sebas on 9/18/2017.
@@ -92,10 +93,11 @@ public class DateUtil {
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date parsedDate = dateFormat.parse(dateAndTime);
             timestamp = new java.sql.Timestamp(parsedDate.getTime());
         } catch(Exception e) { //this generic but you can control another types of exception
-            // look the origin of excption
+            // look the origin of exception
             e.getMessage();
         }
 
@@ -114,7 +116,19 @@ public class DateUtil {
         }
     }
 
-    public static long timestampMilliToSec(){
-        return System.currentTimeMillis()/1000;
+    public static long convertToUTC(long date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        calendar.setTimeInMillis(date);
+        return calendar.getTimeInMillis();
     }
+
+
+    public static long UTCToLocale(long date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getDefault());
+        calendar.setTimeInMillis(date);
+        return calendar.getTimeInMillis();
+    }
+
 }
