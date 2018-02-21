@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.dash.dashapp.interfaces.ProposalUpdateListener;
+import com.dash.dashapp.models.Comment;
 import com.dash.dashapp.models.Proposal;
 
 import org.json.JSONArray;
@@ -112,8 +113,82 @@ public class JsonUtil {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+
             dbProposalListener.onDatabaseUpdateCompleted();
+
+            // Getting the comments for each proposal
+            MyDBHandler dbHandler = new MyDBHandler(context, null);
+            List<Proposal> proposalList = dbHandler.findAllProposals(null);
+
+            for (Proposal proposal : proposalList ){
+                new UpdateCommentDB().execute(proposal.getHash());
+            }
+
             super.onPostExecute(aVoid);
+        }
+    }
+
+
+
+    public class UpdateCommentDB extends AsyncTask<String, Void, Void> {
+
+        public UpdateCommentDB() {
+        }
+
+        // required methods
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+                String hashProposal = params[0];
+                String URL_COMMENT_LIST = "https://www.dashcentral.org/api/v1/proposal?hash=" + hashProposal; //change Object to required type
+
+                MyDBHandler dbHandler = new MyDBHandler(context, null);
+
+                InputStream jsonContent = HttpUtil.httpRequest(URL_COMMENT_LIST);
+
+                BufferedReader streamReader = new BufferedReader(new InputStreamReader(jsonContent, "UTF-8"));
+
+                StringBuilder responseStrBuilder = new StringBuilder();
+
+                String inputStr;
+                while ((inputStr = streamReader.readLine()) != null)
+                    responseStrBuilder.append(inputStr);
+                JSONObject proposalJson = new JSONObject(responseStrBuilder.toString());
+
+                JSONObject proposalObject = proposalJson.getJSONObject("proposal");
+
+                JSONArray array = proposalJson.getJSONArray("comments");
+                for(int i = 0 ; i < array.length() ; i++){
+                    Comment comment = new Comment();
+                    comment.setHashProposal(proposalObject.getString("hash"));
+                    comment.setId(array.getJSONObject(i).getString("id"));
+                    comment.setUsername(array.getJSONObject(i).getString("username"));
+                    comment.setDate(array.getJSONObject(i).getString("date"));
+                    comment.setDate_human(array.getJSONObject(i).getString("date_human"));
+                    comment.setOrder(array.getJSONObject(i).getInt("order"));
+                    comment.setLevel(array.getJSONObject(i).getInt("level"));
+                    comment.setRecently_posted(array.getJSONObject(i).getBoolean("recently_posted"));
+                    comment.setPosted_by_owner(array.getJSONObject(i).getBoolean("posted_by_owner"));
+                    comment.setReply_url(array.getJSONObject(i).getString("reply_url"));
+                    comment.setContent(array.getJSONObject(i).getString("content"));
+                    dbHandler.addComments(comment);
+                }
+                jsonContent.close();
+
+            } catch (Exception e) {
+                e.getMessage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
         }
     }
 }

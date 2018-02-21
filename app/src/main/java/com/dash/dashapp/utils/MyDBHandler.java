@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.dash.dashapp.models.Comment;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.News;
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 27;
+    public static final int DATABASE_VERSION = 29;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
 
@@ -62,6 +63,20 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_OWNER_USERNAME = "owner_username"; //username of the proposal owner on DashCentral [string]
 
 
+    public static final String TABLE_COMMENTS = "comments"; // Comment table
+    public static final String COLUMN_HASH_PROPOSAL = "hash_proposal"; // Foreign key dash
+    public static final String COLUMN_ID_COMMENTS = "id";  // unique comment identifier [string]
+    public static final String COLUMN_USERNAME = "username"; // DashCentral username of the comment poster [string]
+    public static final String COLUMN_DATE_COMMENTS = "date"; // comment date [datetime, UTC]
+    public static final String COLUMN_DATE_HUMAN = "date_human"; // time since comment has been posted in words e.g. "3 days ago" [string]
+    public static final String COLUMN_ORDER_COMMENTS = "order_comments"; // sort comments using this order value [integer]
+    public static final String COLUMN_LEVEL = "level"; // use the level value to add a css padding (e.g. $level*13px) to the comments in order to create the impression of a tree [integer]
+    public static final String COLUMN_RECENTLY_POSTED = "recently_posted"; // use this value to highlight comments that have been posted recently [boolean]
+    public static final String COLUMN_POSTED_BY_OWNER = "posted_by_owner"; // highlight comments posted by the owner of the proposal [boolean]
+    public static final String COLUMN_REPLY_URL = "reply_url"; // add a reply link to each comment and use this URL [string]
+    public static final String COLUMN_CONTENT_COMMENTS = "content"; //  comment content [string]
+
+
     public static final String TABLE_PRICE_CHART = "price_chart";
     public static final String COLUMN_EXCHANGE = "exchange";
     public static final String COLUMN_MARKET = "market";
@@ -80,8 +95,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
 
     public static final String TABLE_MARKET_PRICE = "market_price";
-    //public static final String COLUMN_EXCHANGE = "exchange";
-    //public static final String COLUMN_MARKET = "market";
+    public static final String COLUMN_EXCHANGE_PRICE = "exchange";
+    public static final String COLUMN_MARKET_PRICE = "market";
     public static final String COLUMN_PRICE = "price";
     public static final String COLUMN_DEFAULT = "default_market";
 
@@ -95,6 +110,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROPOSALS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MARKET_PRICE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRICE_CHART);
         onCreate(db);
@@ -140,10 +156,27 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_PROPOSAL_TABLE);
 
 
+        String CREATE_COMMENTS =
+                "CREATE TABLE " + TABLE_COMMENTS + "(" +
+                        COLUMN_HASH_PROPOSAL + " TEXT," +
+                        COLUMN_ID_COMMENTS + " TEXT," +
+                        COLUMN_USERNAME + " TEXT," +
+                        COLUMN_DATE_COMMENTS + " TEXT," +
+                        COLUMN_DATE_HUMAN + " TEXT," +
+                        COLUMN_ORDER_COMMENTS + " INTEGER," +
+                        COLUMN_LEVEL + " INTEGER," +
+                        COLUMN_RECENTLY_POSTED + " INTEGER," +
+                        COLUMN_POSTED_BY_OWNER + " INTEGER," +
+                        COLUMN_REPLY_URL + " TEXT," +
+                        COLUMN_CONTENT_COMMENTS + " TEXT" +
+                        ")";
+        db.execSQL(CREATE_COMMENTS);
+
+
         String CREATE_MARKET_PRICE =
                 "CREATE TABLE " + TABLE_MARKET_PRICE + "(" +
-                        COLUMN_EXCHANGE + " TEXT," +
-                        COLUMN_MARKET + " TEXT," +
+                        COLUMN_EXCHANGE_PRICE + " TEXT," +
+                        COLUMN_MARKET_PRICE + " TEXT," +
                         COLUMN_PRICE + " REAL," +
                         COLUMN_DEFAULT + " INTEGER" +
                         ")";
@@ -357,11 +390,70 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
 
+    // PROPOSALS
+    public void addComments(Comment comment) {
+        ContentValues values = new ContentValues();
+
+        Log.d(TAG, "Adding comment : " + comment.getContent());
+        values.put(COLUMN_HASH_PROPOSAL, comment.getHashProposal());
+        values.put(COLUMN_ID_COMMENTS, comment.getId());
+        values.put(COLUMN_USERNAME, comment.getUsername());
+        values.put(COLUMN_DATE_COMMENTS, comment.getDate());
+        values.put(COLUMN_DATE_HUMAN, comment.getDate_human());
+        values.put(COLUMN_ORDER_COMMENTS, comment.getOrder());
+        values.put(COLUMN_LEVEL, comment.getLevel());
+        values.put(COLUMN_RECENTLY_POSTED, comment.getRecently_posted() ? 1 : 0);
+        values.put(COLUMN_POSTED_BY_OWNER, comment.getPosted_by_owner() ? 1 : 0);
+        values.put(COLUMN_REPLY_URL, comment.getReply_url());
+        values.put(COLUMN_CONTENT_COMMENTS, comment.getContent());
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_COMMENTS, null, values);
+        db.close();
+    }
+
+
+    public List<Comment> findAllProposalComments(String hashProposal) {
+        Log.d(TAG, "Find list proposals");
+
+        List<Comment> commentsList = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_COMMENTS + " WHERE " + COLUMN_HASH_PROPOSAL + " = '" + hashProposal + "';";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            Comment comment = new Comment();
+            comment.setHashProposal(cursor.getString(cursor.getColumnIndex(COLUMN_HASH_PROPOSAL)));
+            comment.setId(cursor.getString(cursor.getColumnIndex(COLUMN_ID_COMMENTS)));
+            comment.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)));
+            comment.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_COMMENTS)));
+            comment.setDate_human(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_HUMAN)));
+            comment.setOrder(cursor.getInt(cursor.getColumnIndex(COLUMN_ORDER_COMMENTS)));
+            comment.setLevel(cursor.getInt(cursor.getColumnIndex(COLUMN_LEVEL)));
+            comment.setRecently_posted(cursor.getInt(cursor.getColumnIndex(COLUMN_RECENTLY_POSTED)) != 0);
+            comment.setPosted_by_owner(cursor.getInt(cursor.getColumnIndex(COLUMN_POSTED_BY_OWNER)) != 0);
+            comment.setReply_url(cursor.getString(cursor.getColumnIndex(COLUMN_REPLY_URL)));
+            comment.setContent(cursor.getString(cursor.getColumnIndex(COLUMN_CONTENT_COMMENTS)));
+            commentsList.add(comment);
+        }
+        cursor.close();
+        db.close();
+        return commentsList;
+    }
+
+
+    public void deleteAllComments() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from " + TABLE_PROPOSALS);
+        db.close();
+    }
+
+
     ////////////////////////////////// EXCHANGE / MARKET ///////////////////////////////////
     public void addMarket(Exchange exchange, Market market, int isDefault) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_EXCHANGE, exchange.getName());
-        values.put(COLUMN_MARKET, market.getName());
+        values.put(COLUMN_EXCHANGE_PRICE, exchange.getName());
+        values.put(COLUMN_MARKET_PRICE, market.getName());
         values.put(COLUMN_PRICE, market.getPrice());
         values.put(COLUMN_DEFAULT, isDefault);
         SQLiteDatabase db = this.getWritableDatabase();
@@ -377,24 +469,24 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         String query = "SELECT *" +
                 " FROM " + TABLE_MARKET_PRICE +
-                " ORDER BY " + COLUMN_EXCHANGE + " ASC";
+                " ORDER BY " + COLUMN_EXCHANGE_PRICE + " ASC";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
-            if (exchange.getName() != null){
-                if (!exchange.getName().equals(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)))){
+            if (exchange.getName() != null) {
+                if (!exchange.getName().equals(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE_PRICE)))) {
                     exchangeList.add(exchange);
                     exchange = new Exchange();
-                    exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
+                    exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE_PRICE)));
                     exchange.setListMarket(new ArrayList<Market>());
                 }
-            }else{
+            } else {
                 exchange.setName(cursor.getString(cursor.getColumnIndex(COLUMN_EXCHANGE)));
             }
 
             Market market = new Market();
-            market.setName(cursor.getString(cursor.getColumnIndex(COLUMN_MARKET)));
+            market.setName(cursor.getString(cursor.getColumnIndex(COLUMN_MARKET_PRICE)));
             market.setPrice(cursor.getDouble(cursor.getColumnIndex(COLUMN_PRICE)));
             market.setIsDefault(cursor.getInt(cursor.getColumnIndex(COLUMN_DEFAULT)));
 
@@ -414,11 +506,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE " + TABLE_MARKET_PRICE +
                 " SET " + COLUMN_DEFAULT + " = 1" +
-                " WHERE " + COLUMN_EXCHANGE + " = '" + exchange.getName() + "'" +
-                " AND " + COLUMN_MARKET + " = '" + market.getName() + "'");
+                " WHERE " + COLUMN_EXCHANGE_PRICE + " = '" + exchange.getName() + "'" +
+                " AND " + COLUMN_MARKET_PRICE + " = '" + market.getName() + "'");
         db.close();
     }
-
 
 
     public void deleteAllMarket() {
@@ -446,7 +537,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_TRADES, priceChartData.getTrades());
         values.put(COLUMN_VOLUME, priceChartData.getVolume());
 
-        Log.d(TAG, "Current priceChartData : " +
+        /*Log.d(TAG, "Current priceChartData : " +
                 " Time : " + priceChartData.getTime() + " " +
                 " Start gap : " + priceChartData.getStartGap() + " " +
                 " End gap : " + priceChartData.getEndGap() + " " +
@@ -457,7 +548,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 " Low : " + priceChartData.getLow() + " " +
                 " High : " + priceChartData.getHigh() + " " +
                 " Pair volume : " + priceChartData.getPairVolume() + " " +
-                " Trades : " + priceChartData.getTrades());
+                " Trades : " + priceChartData.getTrades());*/
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_PRICE_CHART, null, values);
@@ -468,9 +559,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public List<PriceChartData> findPriceChart(long dateStart, long dateEnd, long gap, Exchange exchange, Market market) {
 
         // TODO AGGREGATE GAP WITH SQL
-        Log.d(TAG, "Find list Price chart");
-        Log.d(TAG, "Start date : " + dateStart);
-        Log.d(TAG, "End date : " + dateEnd);
+        //Log.d(TAG, "Find list Price chart");
+        //Log.d(TAG, "Start date : " + dateStart);
+        //Log.d(TAG, "End date : " + dateEnd);
 
         List<PriceChartData> priceChartList = new ArrayList<>();
 
@@ -482,7 +573,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 " AND " + COLUMN_TIME + " <= " + dateEnd +
                 " AND " + COLUMN_GAP + " = " + gap;
 
-        Log.d(TAG, "Query : " + query);
+        //Log.d(TAG, "Query : " + query);
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);

@@ -171,6 +171,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
     public void updateProposals() {
         MyDBHandler dbHandler = new MyDBHandler(mContext, null);
         dbHandler.deleteAllProposals();
+        dbHandler.deleteAllComments();
         obj = new JsonUtil(getContext());
         obj.fetchProposalJson(dbListener);
     }
