@@ -19,13 +19,13 @@ import com.mindorks.placeholderview.annotations.expand.ParentPosition;
 public class WalletView {
 
     @ParentPosition
-    private int mParentPosition;
+    public int mParentPosition;
 
     @ChildPosition
-    private int mChildPosition;
+    public int mChildPosition;
 
     @View(R.id.wallet_textview)
-    private TextView titleTxt;
+    public TextView titleTxt;
 
     private Wallet mWallet;
     private Context mContext;
@@ -36,7 +36,7 @@ public class WalletView {
     }
 
     @Resolve
-    private void onResolved() {
+    public void onResolved() {
         titleTxt.setText(mWallet.getName());
     }
 }

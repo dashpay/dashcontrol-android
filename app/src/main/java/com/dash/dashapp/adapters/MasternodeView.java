@@ -19,13 +19,13 @@ import com.mindorks.placeholderview.annotations.expand.ParentPosition;
 public class MasternodeView {
 
     @ParentPosition
-    private int mParentPosition;
+    public int mParentPosition;
 
     @ChildPosition
-    private int mChildPosition;
+    public int mChildPosition;
 
     @View(R.id.masternode_textview)
-    private TextView titleTxt;
+    public TextView titleTxt;
 
     private Masternode mMasternode;
     private Context mContext;
@@ -36,7 +36,7 @@ public class MasternodeView {
     }
 
     @Resolve
-    private void onResolved() {
+    public void onResolved() {
         titleTxt.setText(mMasternode.getName());
     }
 }

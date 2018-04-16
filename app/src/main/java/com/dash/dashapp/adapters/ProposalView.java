@@ -30,28 +30,28 @@ public class ProposalView {
     private static final String CONTENT_PROPOSAL = "proposal";
 
     @View(R.id.approval_progress_bar)
-    private ProgressBar approvalRatePie;
+    public ProgressBar approvalRatePie;
 
     @View(R.id.approval_rate_textview)
-    private TextView approvalRateTextView;
+    public TextView approvalRateTextView;
 
     @View(R.id.title_textView)
-    private TextView titleTxt;
+    public TextView titleTxt;
 
     @View(R.id.title_owner_textview)
-    private TextView titleOwnerTextView;
+    public TextView titleOwnerTextView;
 
     @View(R.id.textView_month_remaining)
-    private TextView monthRemainingTextView;
+    public TextView monthRemainingTextView;
 
     @View(R.id.textView_comments_number)
-    private TextView commentsNumberTextView;
+    public TextView commentsNumberTextView;
 
     @View(R.id.textview_dash_amount)
-    private TextView dashAmountTextView;
+    public TextView dashAmountTextView;
 
     @View(R.id.textView_by_owner)
-    private TextView byOwnerTextView;
+    public TextView byOwnerTextView;
 
     private Proposal mProposal;
     private Context mContext;
@@ -62,7 +62,7 @@ public class ProposalView {
     }
 
     @Resolve
-    private void onResolved() {
+    public void onResolved() {
         titleTxt.setText(mProposal.getTitle());
 
         double ratioYes = ((double) mProposal.getYes() / (mProposal.getYes() + mProposal.getNo())) * 100;
@@ -102,7 +102,7 @@ public class ProposalView {
 
 
     @Click(R.id.proposal_row)
-    private void onClick() {
+    public void onClick() {
         Intent intent = new Intent(mContext, ProposalDetailActivity.class);
         intent.putExtra(CONTENT_PROPOSAL, mProposal);
         mContext.startActivity(intent);

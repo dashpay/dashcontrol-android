@@ -32,7 +32,7 @@ public class LoadMoreProposals {
     }
 
     @LoadMore
-    private void onLoadMore() {
+    public void onLoadMore() {
         Log.d("DEBUG", "onLoadMore");
         new ForcedWaitedLoading();
     }

@@ -33,10 +33,10 @@ public class NewsView {
     private static final String TITLE_NEWS = "title_rss";
     private static final String CONTENT_NEWS = "content_rss";
     @View(R.id.title)
-    private TextView titleTxt;
+    public TextView titleTxt;
 
     @View(R.id.date)
-    private TextView dateTxt;
+    public TextView dateTxt;
 
     private News mNews;
     private Context mContext;
@@ -47,7 +47,7 @@ public class NewsView {
     }
 
     @Resolve
-    private void onResolved() {
+    public void onResolved() {
         titleTxt.setText(mNews.getTitle());
 
         SimpleDateFormat rssFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -77,7 +77,7 @@ public class NewsView {
 
 
     @Click(R.id.news_row)
-    private void onClick() {
+    public void onClick() {
         Intent intent = new Intent(mContext, ContentRSSActivity.class);
         intent.putExtra(TITLE_NEWS, mNews.getTitle());
         intent.putExtra(CONTENT_NEWS, mNews.getContent());
