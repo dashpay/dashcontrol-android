@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,15 +29,22 @@ import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.BlogNewsView;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.models.BlogNews;
+import com.dash.dashapp.realm.DashBlogNewsRealm;
 import com.dash.dashapp.utils.LoadMoreView;
 import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.realm.Case;
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -114,18 +122,9 @@ public class NewsFragment extends Fragment {
         @Override
         public void onResponse(@NonNull Call<List<DashBlogNews>> call, @NonNull Response<List<DashBlogNews>> response) {
             if (response.isSuccessful()) {
-                if (currentPage == 1) {
-                    infinitePlaceHolderView.removeAllViews();
-                }
                 List<DashBlogNews> blogNewsList = Objects.requireNonNull(response.body());
-                for (DashBlogNews item : blogNewsList) {
-                    BlogNewsView blogNewsView = new BlogNewsView(getContext(), item);
-                    infinitePlaceHolderView.addView(blogNewsView);
-                }
-                infinitePlaceHolderView.loadingDone();
-                if (blogNewsList.size() < BLOG_NEWS_PAGE_SIZE) {
-                    infinitePlaceHolderView.noMoreToLoad();
-                }
+                display(new ArrayList<BlogNews.Convertible>(blogNewsList));
+                persist(blogNewsList);
             }
             swipeRefreshLayout.setRefreshing(false);
         }
@@ -133,9 +132,52 @@ public class NewsFragment extends Fragment {
         @Override
         public void onFailure(@NonNull Call<List<DashBlogNews>> call, @NonNull Throwable t) {
             Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            displayFromCache();
             swipeRefreshLayout.setRefreshing(false);
         }
     };
+
+    private void displayFromCache() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmQuery<DashBlogNewsRealm> whereQuery = realm.where(DashBlogNewsRealm.class);
+            RealmResults<DashBlogNewsRealm> queryResult = whereQuery.findAll();
+            List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
+            display(blogNewsList);
+        }
+    }
+
+    private void display(List<BlogNews.Convertible> blogNewsList) {
+        if (currentPage == 1) {
+            infinitePlaceHolderView.removeAllViews();
+        }
+        for (BlogNews.Convertible item : blogNewsList) {
+            BlogNewsView blogNewsView = new BlogNewsView(getContext(), item.convert());
+            infinitePlaceHolderView.addView(blogNewsView);
+        }
+        infinitePlaceHolderView.loadingDone();
+        if (blogNewsList.size() < BLOG_NEWS_PAGE_SIZE) {
+            infinitePlaceHolderView.noMoreToLoad();
+        }
+    }
+
+    private void persist(final List<DashBlogNews> blogNewsList) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    if (currentPage == 1) {
+                        realm.delete(DashBlogNewsRealm.class);
+                    }
+                    List<DashBlogNewsRealm> list = new ArrayList<>();
+                    for (DashBlogNews blogNews : blogNewsList) {
+                        DashBlogNewsRealm blogNewsRealm = DashBlogNewsRealm.convert(blogNews);
+                        list.add(blogNewsRealm);
+                    }
+                    realm.insert(list);
+                }
+            });
+        }
+    }
 
     LoadMoreView.Callback loadMoreCallback = new LoadMoreView.Callback() {
         @Override
@@ -150,45 +192,6 @@ public class NewsFragment extends Fragment {
             loadFirstPage();
         }
     };
-
-
-    public void handleRSS() {
-/*
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        mNewsList = dbHandler.findAllNews(null);
-
-        if (!isNetworkAvailable()) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage(R.string.alert_message)
-                    .setTitle(R.string.alert_title)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.alert_positive,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int id) {
-                                    Log.i(TAG, "onClick: " + mNewsList.size());
-                                    if (mNewsList.size() > 0) {
-                                        if (mInfinitePlaceHolderView.getVisibility() != View.VISIBLE)
-                                            mInfinitePlaceHolderView.setVisibility(View.VISIBLE);
-                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
-                                        mSwipeRefreshLayout.setBackgroundResource(0);
-                                        loadRSS();
-                                    } else {
-                                        if (mInfinitePlaceHolderView.getVisibility() != View.GONE)
-                                            mInfinitePlaceHolderView.setVisibility(View.GONE);
-                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
-                                    }
-                                }
-                            });
-
-            AlertDialog alert = builder.create();
-            alert.show();
-
-        }
-*/
-    }
 
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -214,21 +217,30 @@ public class NewsFragment extends Fragment {
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "Text submit");
-                infinitePlaceHolderView.removeAllViews();
-
-//                MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-//                mNewsList = dbHandler.findAllNews(query);
-//                loadRSS();
+                if (!TextUtils.isEmpty(query)) {
+                    infinitePlaceHolderView.removeAllViews();
+                    displayFromCache(query);
+                } else {
+                    loadFirstPage();
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "Text change");
-                return false;
+                return true;
             }
         });
+    }
+
+    private void displayFromCache(String searchQuery) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmQuery<DashBlogNewsRealm> whereQuery = realm.where(DashBlogNewsRealm.class)
+                    .like("title", "*" + searchQuery + "*", Case.INSENSITIVE);
+            RealmResults<DashBlogNewsRealm> queryResult = whereQuery.findAll();
+            List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
+            display(blogNewsList);
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

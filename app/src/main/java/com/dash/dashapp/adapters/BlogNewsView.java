@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.bumptech.glide.GenericTransitionOptions;
 import com.dash.dashapp.R;
 import com.dash.dashapp.activities.ContentRSSActivity;
-import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.models.BlogNews;
 import com.dash.dashapp.utils.GlideApp;
 import com.dash.dashapp.utils.URLs;
 import com.mindorks.placeholderview.annotations.Click;
@@ -35,35 +35,41 @@ public class BlogNewsView {
     @View(R.id.thumbnail)
     public ImageView thumbnailView;
 
-    private DashBlogNews blogNews;
+    @View(R.id.cached)
+    public ImageView cachedView;
+
+    private BlogNews blogNews;
     private Context context;
 
-    public BlogNewsView(Context context, DashBlogNews blogNews) {
+    public BlogNewsView(Context context, BlogNews blogNews) {
         this.context = context;
         this.blogNews = blogNews;
     }
 
     @Resolve
     public void onResolved() {
-        String titleHtml = blogNews.getTitle();
+        String titleHtml = blogNews.title;
         titleView.setText(Html.fromHtml(titleHtml));
 
         SimpleDateFormat newsDateFormat = new SimpleDateFormat("MMM dd, YYYY", Locale.US);
-        dateView.setText(newsDateFormat.format(blogNews.getDate()));
+        dateView.setText(newsDateFormat.format(blogNews.date));
 
-        if (blogNews.getImage() != null) {
-            String thumbnailUrl = (URLs.DASH_CONTROL_BASE_API + blogNews.getImage()).replace("//", "/");
+        if (blogNews.image != null) {
+            String thumbnailUrl = (URLs.DASH_CONTROL_BASE_API + blogNews.image).replace("//", "/");
             GlideApp.with(context)
                     .load(thumbnailUrl)
+                    .error(R.drawable.ic_broken_image_24dp)
                     .transition(GenericTransitionOptions.with(android.R.anim.fade_in))
                     .into(thumbnailView);
         }
+
+        cachedView.setVisibility(blogNews.cached ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
     @Click(R.id.news_row)
     public void onClick() {
         Intent intent = new Intent(context, ContentRSSActivity.class);
-        intent.putExtra(TITLE_NEWS, blogNews.getTitle());
+        intent.putExtra(TITLE_NEWS, blogNews.title);
 //        intent.putExtra(CONTENT_NEWS, mNews.getContent());
         context.startActivity(intent);
     }

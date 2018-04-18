@@ -1,40 +1,38 @@
 package com.dash.dashapp.api.data;
 
+import com.dash.dashapp.models.BlogNews;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DashBlogNews {
+public class DashBlogNews implements BlogNews.Convertible {
 
-    private String title;
-    private String url;
-    private String image;
-    private String date;
-    private String shortDate;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public String getShortDate() {
-        return shortDate;
-    }
+    public String title;
+    public String url;
+    public String image;
+    public String date;
+    public String shortDate;
 
     public Date getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
         try {
-            return dateFormat.parse(date);
+            return DATE_FORMAT.parse(date);
         } catch (ParseException e) {
             return null;
         }
+    }
+
+    @Override
+    public BlogNews convert() {
+        BlogNews blogNews = new BlogNews();
+        blogNews.title = title;
+        blogNews.url = url;
+        blogNews.image = image;
+        blogNews.date = getDate();
+        blogNews.cached = false;
+        return blogNews;
     }
 }

@@ -21,6 +21,7 @@ import com.dash.dashapp.utils.MySingleton;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.Stetho;
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import io.realm.Realm;
 
 /**
  * Created by sebas on 9/18/2017.
@@ -69,10 +72,28 @@ public class DashControlApplication extends Application {
 
         pickDefaultLanguage();
 
-        Stetho.initializeWithDefaults(this);
-
         setMarketAndExchanges();
 
+        initRealm();
+    }
+
+    private void initRealm() {
+        Realm.init(this);
+//        Stetho.initializeWithDefaults(this);
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                .build()
+        );
+        /*
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this)
+                .name(Realm.DEFAULT_REALM_NAME)
+                .schemaVersion(0)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfiguration);
+        */
     }
 
 

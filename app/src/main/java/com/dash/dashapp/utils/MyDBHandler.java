@@ -10,14 +10,10 @@ import android.util.Log;
 import com.dash.dashapp.models.Comment;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
-import com.dash.dashapp.models.News;
 import com.dash.dashapp.models.PriceChartData;
 import com.dash.dashapp.models.Proposal;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,15 +24,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 29;
     private static final String DATABASE_NAME = "dashDB.db";
     private static final String TAG = "MyDBHandler";
-
-
-    public static final String TABLE_NEWS = "news";
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_RSS_GUID = "rss_id";
-    public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_THUMBNAIL = "image";
-    public static final String COLUMN_DATE = "date_pub";
-    public static final String COLUMN_CONTENT = "content";
 
 
     public static final String TABLE_PROPOSALS = "proposal";
@@ -108,7 +95,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROPOSALS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MARKET_PRICE);
@@ -118,16 +104,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_NEWS_TABLE =
-                "CREATE TABLE " + TABLE_NEWS + "(" +
-                        COLUMN_ID + " INTEGER PRIMARY KEY," +
-                        COLUMN_RSS_GUID + " TEXT," +
-                        COLUMN_TITLE + " TEXT," +
-                        COLUMN_THUMBNAIL + " TEXT," +
-                        COLUMN_DATE + " DATE," +
-                        COLUMN_CONTENT + " TEXT" +
-                        ")";
-        db.execSQL(CREATE_NEWS_TABLE);
 
         String CREATE_PROPOSAL_TABLE =
                 "CREATE TABLE " + TABLE_PROPOSALS + "(" +
@@ -205,90 +181,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 "CREATE INDEX " + COLUMN_END_GAP_INDEX + " ON " + TABLE_PRICE_CHART + "(" + COLUMN_END_GAP + " )";
         db.execSQL(CREATE_INDEX_END_GAP);
 
-    }
-
-
-    // NEWS
-    public void addNews(News news) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_RSS_GUID, news.getGuid());
-        values.put(COLUMN_TITLE, news.getTitle());
-        values.put(COLUMN_THUMBNAIL, news.getThumbnail());
-
-        SimpleDateFormat rssFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss");
-        Date dateRSS = new Date();
-        try {
-            dateRSS = rssFormat.parse(news.getPubDate());
-        } catch (ParseException ex) {
-            ex.getMessage();
-        }
-
-        SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        String dateSQL = sqlFormat.format(dateRSS);
-
-        values.put(COLUMN_DATE, dateSQL);
-        values.put(COLUMN_CONTENT, news.getContent());
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(TABLE_NEWS, null, values);
-        db.close();
-    }
-
-
-    public News findNews(String newsId) {
-        String query = "SELECT *" +
-                " FROM " + TABLE_NEWS +
-                " WHERE " + COLUMN_RSS_GUID + "='" + newsId + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        News news = new News();
-        if (cursor.moveToFirst()) {
-            news.setGuid(cursor.getString(cursor.getColumnIndex(COLUMN_RSS_GUID)));
-            news.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
-            news.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
-            news.setPubDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE)));
-            news.setContent(cursor.getString(cursor.getColumnIndex(COLUMN_CONTENT)));
-            cursor.close();
-        } else {
-            news = null;
-        }
-        db.close();
-        return news;
-    }
-
-    public List<News> findAllNews(String filter) {
-        Log.d(TAG, "Find list news");
-
-        List<News> newsList = new ArrayList<>();
-
-        String query = "SELECT *" +
-                " FROM " + TABLE_NEWS;
-        if (filter != null) {
-            query += " WHERE " + COLUMN_TITLE + " " +
-                    "LIKE '%" + filter + "%'";
-        }
-        query += " ORDER BY " + COLUMN_DATE + " DESC;";
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            News news = new News();
-            news.setGuid(cursor.getString(cursor.getColumnIndex(COLUMN_RSS_GUID)));
-            news.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
-            news.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
-            news.setPubDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE)));
-            news.setContent(cursor.getString(cursor.getColumnIndex(COLUMN_CONTENT)));
-            newsList.add(news);
-        }
-        cursor.close();
-
-        db.close();
-        return newsList;
-    }
-
-    public void deleteAllNews() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_NEWS);
-        db.close();
     }
 
     // PROPOSALS

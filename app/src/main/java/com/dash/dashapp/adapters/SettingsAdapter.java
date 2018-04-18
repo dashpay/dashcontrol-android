@@ -53,12 +53,12 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             checkedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!SharedPreferencesManager.getLanguageRSS(context).equals(url)) {
-                        SharedPreferencesManager.setLanguageRSS(context, url);
-                        MyDBHandler dbHandler = new MyDBHandler(context, null);
-                        dbHandler.deleteAllNews();
-                        context.startActivity(new Intent(context, MainActivity.class));
-                    }
+//                    if (!SharedPreferencesManager.getLanguageRSS(context).equals(url)) {
+//                        SharedPreferencesManager.setLanguageRSS(context, url);
+//                        MyDBHandler dbHandler = new MyDBHandler(context, null);
+//                        dbHandler.deleteAllNews();
+//                        context.startActivity(new Intent(context, MainActivity.class));
+//                    }
                 }
             });
 
