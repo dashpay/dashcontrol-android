@@ -25,7 +25,7 @@
             tools:listitem="@layout/proposal_view" />
 
         <ProgressBar
-            android:id="@+id/progress_wheel"
+            android:id="@+id/progress_circle"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="200dp"
             android:layout_height="200dp" />

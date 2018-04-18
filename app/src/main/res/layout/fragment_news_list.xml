@@ -14,14 +14,9 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:background="@color/dark_background"
+        android:scrollbars="horizontal"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/news_view" />
-
-    <ProgressBar
-        android:id="@+id/progress_wheel"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="200dp"
-        android:layout_height="200dp" />
-
 
 </android.support.v4.widget.SwipeRefreshLayout>

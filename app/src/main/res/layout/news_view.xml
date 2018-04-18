@@ -1,35 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="8dp"
-    android:layout_margin="8dp">
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/news_row"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/list_item_background"
+        android:foreground="@drawable/selectable_item_background_light"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:paddingEnd="10dp" />
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/dummy_image"
+            tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:drawableStart="@drawable/dummy_image"
-            android:padding="5dp"
-            android:textSize="18sp"
-            android:drawablePadding="6dp"
-            android:textStyle="bold" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/text_margin">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/title"
+                style="@style/text_list_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lorem_ipsum_long" />
+
+            <TextView
+                android:id="@+id/date"
+                style="@style/text_list_item_property"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/title"
+                android:layout_alignParentBottom="true"
+                android:text="@string/lorem_ipsum_shortest" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>

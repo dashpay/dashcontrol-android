@@ -79,5 +79,9 @@
     <string name="load_hint">Load\nHint</string>
     <string name="label_request_id_token">Request ID Token:</string>
 
+    <string name="lorem_ipsum_shortest">Lorem ipsum.</string>
+    <string name="lorem_ipsum_short">Lorem ipsum dolor sit amet.</string>
+    <string name="lorem_ipsum_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="lorem_ipsum_longest">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta imperdiet viverra. Duis rhoncus nunc auctor sem volutpat rutrum. Duis nec est placerat, vestibulum enim at, sollicitudin odio. Suspendisse ut nulla porttitor.</string>
 
 </resources>
