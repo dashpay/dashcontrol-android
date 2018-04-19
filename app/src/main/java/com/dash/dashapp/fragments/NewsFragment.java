@@ -2,8 +2,6 @@ package com.dash.dashapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,26 +11,24 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.activities.SettingsActivity;
-import com.dash.dashapp.adapters.BlogNewsView;
+import com.dash.dashapp.adapters.BlogNewsAdapter;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.DashBlogNews;
 import com.dash.dashapp.models.BlogNews;
 import com.dash.dashapp.realm.DashBlogNewsRealm;
-import com.dash.dashapp.utils.LoadMoreView;
-import com.mindorks.placeholderview.InfinitePlaceHolderView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +37,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -51,11 +46,8 @@ import retrofit2.Response;
 
 public class NewsFragment extends Fragment {
 
-    private static final String TAG = "NewsFragment";
-    private static final int BLOG_NEWS_PAGE_SIZE = 50;
-
     @BindView(R.id.news_list)
-    InfinitePlaceHolderView infinitePlaceHolderView;
+    RecyclerView infinitePlaceHolderView;
 
     @BindView(R.id.container)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -64,7 +56,12 @@ public class NewsFragment extends Fragment {
 
     private Call<List<DashBlogNews>> blogNewsCall;
 
+    private BlogNewsAdapter blogNewsAdapter;
+    private EndlessRecyclerViewScrollListener endlessScrollListener;
+
     private int currentPage = 0;
+
+    private boolean inSearchMode = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -87,10 +84,22 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        infinitePlaceHolderView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        infinitePlaceHolderView.setLayoutManager(layoutManager);
         infinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
         infinitePlaceHolderView.setHasFixedSize(true);
-        infinitePlaceHolderView.setLoadMoreResolver(new LoadMoreView(loadMoreCallback));
+        endlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                if (!inSearchMode) {
+                    loadNextPage();
+                }
+            }
+        };
+        infinitePlaceHolderView.addOnScrollListener(endlessScrollListener);
+
+        blogNewsAdapter = new BlogNewsAdapter();
+        infinitePlaceHolderView.setAdapter(blogNewsAdapter);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         swipeRefreshLayout.canChildScrollUp();
@@ -148,16 +157,14 @@ public class NewsFragment extends Fragment {
 
     private void display(List<BlogNews.Convertible> blogNewsList) {
         if (currentPage == 1) {
-            infinitePlaceHolderView.removeAllViews();
+            blogNewsAdapter.clear();
+            endlessScrollListener.resetState();
         }
+        List<BlogNews> list = new ArrayList<>();
         for (BlogNews.Convertible item : blogNewsList) {
-            BlogNewsView blogNewsView = new BlogNewsView(getContext(), item.convert());
-            infinitePlaceHolderView.addView(blogNewsView);
+            list.add(item.convert());
         }
-        infinitePlaceHolderView.loadingDone();
-        if (blogNewsList.size() < BLOG_NEWS_PAGE_SIZE) {
-            infinitePlaceHolderView.noMoreToLoad();
-        }
+        blogNewsAdapter.addAll(list);
     }
 
     private void persist(final List<DashBlogNews> blogNewsList) {
@@ -179,26 +186,12 @@ public class NewsFragment extends Fragment {
         }
     }
 
-    LoadMoreView.Callback loadMoreCallback = new LoadMoreView.Callback() {
-        @Override
-        public void onShowMore() {
-            loadNextPage();
-        }
-    };
-
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
             loadFirstPage();
         }
     };
-
-    public boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -217,45 +210,38 @@ public class NewsFragment extends Fragment {
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!TextUtils.isEmpty(query)) {
-                    infinitePlaceHolderView.removeAllViews();
-                    displayFromCache(query);
-                } else {
-                    loadFirstPage();
-                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return true;
+                ((Filterable) infinitePlaceHolderView.getAdapter()).getFilter().filter(newText);
+                return false;
+            }
+        });
+        sv.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewDetachedFromWindow(View arg0) {
+                inSearchMode = false;
+            }
+
+            @Override
+            public void onViewAttachedToWindow(View arg0) {
+                inSearchMode = true;
             }
         });
     }
 
-    private void displayFromCache(String searchQuery) {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            RealmQuery<DashBlogNewsRealm> whereQuery = realm.where(DashBlogNewsRealm.class)
-                    .like("title", "*" + searchQuery + "*", Case.INSENSITIVE);
-            RealmResults<DashBlogNewsRealm> queryResult = whereQuery.findAll();
-            List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
-            display(blogNewsList);
-        }
-    }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_settings: {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
                 return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
+            }
+            default: {
                 return super.onOptionsItemSelected(item);
-
+            }
         }
     }
 

@@ -1,53 +1,51 @@
 package com.dash.dashapp.adapters;
 
 import android.content.Context;
-import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.GenericTransitionOptions;
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.ContentRSSActivity;
+import com.dash.dashapp.interfaces.ItemClickListener;
 import com.dash.dashapp.models.BlogNews;
 import com.dash.dashapp.utils.GlideApp;
 import com.dash.dashapp.utils.URLs;
-import com.mindorks.placeholderview.annotations.Click;
-import com.mindorks.placeholderview.annotations.Layout;
-import com.mindorks.placeholderview.annotations.Resolve;
-import com.mindorks.placeholderview.annotations.View;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-@Layout(R.layout.news_view)
-public class BlogNewsView {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private static final String TITLE_NEWS = "title_rss";
-    private static final String CONTENT_NEWS = "content_rss";
+public class BlogNewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    @View(R.id.title)
+    @BindView(R.id.title)
     public TextView titleView;
 
-    @View(R.id.date)
+    @BindView(R.id.date)
     public TextView dateView;
 
-    @View(R.id.thumbnail)
+    @BindView(R.id.thumbnail)
     public ImageView thumbnailView;
 
-    @View(R.id.cached)
+    @BindView(R.id.cached)
     public ImageView cachedView;
 
-    private BlogNews blogNews;
     private Context context;
 
-    public BlogNewsView(Context context, BlogNews blogNews) {
-        this.context = context;
-        this.blogNews = blogNews;
+    private ItemClickListener itemClickListener;
+
+    public BlogNewsHolder(View itemView) {
+        super(itemView);
+        context = itemView.getContext();
+        ButterKnife.bind(this, itemView);
+        itemView.setOnClickListener(this);
     }
 
-    @Resolve
-    public void onResolved() {
+    public void bind(BlogNews blogNews) {
         String titleHtml = blogNews.title;
         titleView.setText(Html.fromHtml(titleHtml));
 
@@ -66,11 +64,16 @@ public class BlogNewsView {
         cachedView.setVisibility(blogNews.cached ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
-    @Click(R.id.news_row)
-    public void onClick() {
-        Intent intent = new Intent(context, ContentRSSActivity.class);
-        intent.putExtra(TITLE_NEWS, blogNews.title);
+    @Override
+    public void onClick(View v) {
+//        this.itemClickListener.onItemClick(v, getLayoutPosition());
+//        Intent intent = new Intent(context, ContentRSSActivity.class);
+//        intent.putExtra(TITLE_NEWS, blogNews.title);
 //        intent.putExtra(CONTENT_NEWS, mNews.getContent());
-        context.startActivity(intent);
+//        context.startActivity(intent);
+    }
+
+    public void setItemClickListener(ItemClickListener ic) {
+        this.itemClickListener = ic;
     }
 }
