@@ -13,11 +13,11 @@ public class BlogNews {
     public boolean cached;
 
     public String getImageUrl() {
-        return (URLs.DASH_CONTROL_BASE_API + image).replace("//", "/");
+        return (URLs.DASH_BLOG_API + image).replace("//", "/");
     }
 
     public String getBlogPostUrl() {
-        return (URLs.DASH_CONTROL_BASE_API + url).replace("//", "/");
+        return (URLs.DASH_BLOG_API + url).replace("//", "/");
     }
 
     public interface Convertible {

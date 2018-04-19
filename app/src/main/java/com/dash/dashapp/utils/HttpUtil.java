@@ -20,21 +20,6 @@ public class HttpUtil {
 
     private static final String TAG = HttpUtil.class.getSimpleName();
 
-    public static InputStream httpRequest(String urlString) throws IOException {
-
-        java.net.URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setReadTimeout(10000 /* milliseconds */);
-        conn.setConnectTimeout(15000 /* milliseconds */);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
-
-        // Starts the query
-        conn.connect();
-        return conn.getInputStream();
-    }
-
     public static Response executePost(String targetURL, String urlParameters) {
 
         OkHttpClient client = new OkHttpClient();

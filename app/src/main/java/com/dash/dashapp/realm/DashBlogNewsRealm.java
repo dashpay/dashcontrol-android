@@ -20,7 +20,7 @@ public class DashBlogNewsRealm extends RealmObject implements BlogNews.Convertib
         blogNews.title = src.getTitle();
         blogNews.url = src.url;
         blogNews.image = src.image;
-        blogNews.date = src.getDate();
+        blogNews.date = src.date;
         blogNews.shortDate = src.shortDate;
         return blogNews;
     }

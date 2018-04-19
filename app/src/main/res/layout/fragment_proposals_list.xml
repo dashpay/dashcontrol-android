@@ -15,13 +15,12 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context="com.dash.dashapp.fragments.ProposalsFragment">
 
-        <com.mindorks.placeholderview.InfinitePlaceHolderView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/proposals_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/proposal_view" />
 
         <ProgressBar
@@ -37,11 +36,11 @@
         android:id="@+id/button_add_proposal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="15dp"
-        app:backgroundTint="@color/colorPrimary"
         android:src="@drawable/ic_add_white_24px"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        app:backgroundTint="@color/colorPrimary" />
 
 </RelativeLayout>
