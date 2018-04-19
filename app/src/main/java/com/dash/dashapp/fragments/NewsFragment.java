@@ -52,6 +52,8 @@ public class NewsFragment extends Fragment {
     @BindView(R.id.container)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    private MenuItem searchMenuItem;
+
     private Unbinder unbinder;
 
     private Call<List<DashBlogNews>> blogNewsCall;
@@ -189,6 +191,9 @@ public class NewsFragment extends Fragment {
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
+            if (searchMenuItem != null) {
+                searchMenuItem.collapseActionView();
+            }
             loadFirstPage();
         }
     };
@@ -196,18 +201,18 @@ public class NewsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.top_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        setupSearchView(item);
+        searchMenuItem = menu.findItem(R.id.action_search);
+        setupSearchView();
     }
 
-    private void setupSearchView(MenuItem item) {
+    private void setupSearchView() {
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         ActionBar supportActionBar = Objects.requireNonNull(activity).getSupportActionBar();
         Context themedContext = Objects.requireNonNull(supportActionBar).getThemedContext();
-        SearchView sv = new SearchView(themedContext);
-        item.setShowAsAction(item.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | item.SHOW_AS_ACTION_IF_ROOM);
-        item.setActionView(sv);
-        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        SearchView searchView = new SearchView(themedContext);
+        searchMenuItem.setShowAsAction(searchMenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | searchMenuItem.SHOW_AS_ACTION_IF_ROOM);
+        searchMenuItem.setActionView(searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -219,7 +224,7 @@ public class NewsFragment extends Fragment {
                 return false;
             }
         });
-        sv.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewDetachedFromWindow(View arg0) {
                 inSearchMode = false;
