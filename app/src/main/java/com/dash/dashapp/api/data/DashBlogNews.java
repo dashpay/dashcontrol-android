@@ -6,7 +6,9 @@ import com.dash.dashapp.models.BlogNews;
 
 import java.util.Date;
 
-public class DashBlogNews implements BlogNews.Convertible {
+import io.realm.RealmObject;
+
+public class DashBlogNews extends RealmObject implements BlogNews.Convertible {
 
     public String title;
     public String url;
