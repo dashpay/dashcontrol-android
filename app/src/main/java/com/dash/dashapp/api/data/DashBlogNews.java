@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DashBlogNews implements BlogNews.Convertible {
+import io.realm.RealmObject;
+
+public class DashBlogNews extends RealmObject implements BlogNews.Convertible {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
 

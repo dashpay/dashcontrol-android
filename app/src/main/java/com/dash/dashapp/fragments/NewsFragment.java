@@ -28,7 +28,6 @@ import com.dash.dashapp.adapters.BlogNewsAdapter;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.DashBlogNews;
 import com.dash.dashapp.models.BlogNews;
-import com.dash.dashapp.realm.DashBlogNewsRealm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,8 +149,8 @@ public class NewsFragment extends Fragment {
 
     private void displayFromCache() {
         try (Realm realm = Realm.getDefaultInstance()) {
-            RealmQuery<DashBlogNewsRealm> whereQuery = realm.where(DashBlogNewsRealm.class);
-            RealmResults<DashBlogNewsRealm> queryResult = whereQuery.findAll();
+            RealmQuery<DashBlogNews> whereQuery = realm.where(DashBlogNews.class);
+            RealmResults<DashBlogNews> queryResult = whereQuery.findAll();
             List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
             display(blogNewsList);
         }
@@ -175,14 +174,9 @@ public class NewsFragment extends Fragment {
                 @Override
                 public void execute(@NonNull Realm realm) {
                     if (currentPage == 1) {
-                        realm.delete(DashBlogNewsRealm.class);
+                        realm.delete(DashBlogNews.class);
                     }
-                    List<DashBlogNewsRealm> list = new ArrayList<>();
-                    for (DashBlogNews blogNews : blogNewsList) {
-                        DashBlogNewsRealm blogNewsRealm = DashBlogNewsRealm.convert(blogNews);
-                        list.add(blogNewsRealm);
-                    }
-                    realm.insert(list);
+                    realm.insert(blogNewsList);
                 }
             });
         }
