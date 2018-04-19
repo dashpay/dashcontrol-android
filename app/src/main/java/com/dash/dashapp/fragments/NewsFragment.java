@@ -47,7 +47,7 @@ import retrofit2.Response;
 public class NewsFragment extends Fragment {
 
     @BindView(R.id.news_list)
-    RecyclerView infinitePlaceHolderView;
+    RecyclerView blogNewsRecyclerView;
 
     @BindView(R.id.container)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -87,9 +87,9 @@ public class NewsFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        infinitePlaceHolderView.setLayoutManager(layoutManager);
-        infinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
-        infinitePlaceHolderView.setHasFixedSize(true);
+        blogNewsRecyclerView.setLayoutManager(layoutManager);
+        blogNewsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        blogNewsRecyclerView.setHasFixedSize(true);
         endlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -98,10 +98,10 @@ public class NewsFragment extends Fragment {
                 }
             }
         };
-        infinitePlaceHolderView.addOnScrollListener(endlessScrollListener);
+        blogNewsRecyclerView.addOnScrollListener(endlessScrollListener);
 
         blogNewsAdapter = new BlogNewsAdapter();
-        infinitePlaceHolderView.setAdapter(blogNewsAdapter);
+        blogNewsRecyclerView.setAdapter(blogNewsAdapter);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         swipeRefreshLayout.canChildScrollUp();
@@ -126,10 +126,10 @@ public class NewsFragment extends Fragment {
 
     private void loadNextPage() {
         blogNewsCall = DashControlClient.getInstance().getBlogNews(++currentPage);
-        blogNewsCall.enqueue(callback);
+        blogNewsCall.enqueue(blogNewsCallCallback);
     }
 
-    Callback<List<DashBlogNews>> callback = new Callback<List<DashBlogNews>>() {
+    Callback<List<DashBlogNews>> blogNewsCallCallback = new Callback<List<DashBlogNews>>() {
         @Override
         public void onResponse(@NonNull Call<List<DashBlogNews>> call, @NonNull Response<List<DashBlogNews>> response) {
             if (response.isSuccessful()) {
@@ -220,7 +220,7 @@ public class NewsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                ((Filterable) infinitePlaceHolderView.getAdapter()).getFilter().filter(newText);
+                ((Filterable) blogNewsRecyclerView.getAdapter()).getFilter().filter(newText);
                 return false;
             }
         });
