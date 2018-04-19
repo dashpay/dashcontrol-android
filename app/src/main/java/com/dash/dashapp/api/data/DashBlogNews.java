@@ -1,5 +1,7 @@
 package com.dash.dashapp.api.data;
 
+import android.text.Html;
+
 import com.dash.dashapp.models.BlogNews;
 
 import java.text.ParseException;
@@ -25,10 +27,14 @@ public class DashBlogNews implements BlogNews.Convertible {
         }
     }
 
+    public String getTitle() {
+        return Html.fromHtml(title).toString();
+    }
+
     @Override
     public BlogNews convert() {
         BlogNews blogNews = new BlogNews();
-        blogNews.title = title;
+        blogNews.title = getTitle();
         blogNews.url = url;
         blogNews.image = image;
         blogNews.date = getDate();

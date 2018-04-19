@@ -1,26 +1,30 @@
 package com.dash.dashapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.GenericTransitionOptions;
 import com.dash.dashapp.R;
-import com.dash.dashapp.interfaces.ItemClickListener;
+import com.dash.dashapp.activities.SimpleWebViewActivity;
 import com.dash.dashapp.models.BlogNews;
 import com.dash.dashapp.utils.GlideApp;
-import com.dash.dashapp.utils.URLs;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
 
-public class BlogNewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class BlogNewsHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.title)
     public TextView titleView;
@@ -36,16 +40,17 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     private Context context;
 
-    private ItemClickListener itemClickListener;
+    private BlogNews blogNews;
 
-    public BlogNewsHolder(View itemView) {
+    BlogNewsHolder(View itemView) {
         super(itemView);
         context = itemView.getContext();
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(this);
     }
 
     public void bind(BlogNews blogNews) {
+        this.blogNews = blogNews;
+
         String titleHtml = blogNews.title;
         titleView.setText(Html.fromHtml(titleHtml));
 
@@ -53,9 +58,8 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder implements View.OnCl
         dateView.setText(newsDateFormat.format(blogNews.date));
 
         if (blogNews.image != null) {
-            String thumbnailUrl = (URLs.DASH_CONTROL_BASE_API + blogNews.image).replace("//", "/");
             GlideApp.with(context)
-                    .load(thumbnailUrl)
+                    .load(blogNews.getImageUrl())
                     .error(R.drawable.ic_broken_image_24dp)
                     .transition(GenericTransitionOptions.with(android.R.anim.fade_in))
                     .into(thumbnailView);
@@ -64,16 +68,21 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder implements View.OnCl
         cachedView.setVisibility(blogNews.cached ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
-    @Override
-    public void onClick(View v) {
-//        this.itemClickListener.onItemClick(v, getLayoutPosition());
-//        Intent intent = new Intent(context, ContentRSSActivity.class);
-//        intent.putExtra(TITLE_NEWS, blogNews.title);
-//        intent.putExtra(CONTENT_NEWS, mNews.getContent());
-//        context.startActivity(intent);
+    @OnClick
+    public void onClick() {
+        if (!TextUtils.isEmpty(blogNews.url)) {
+            Intent intent = SimpleWebViewActivity.createIntent(context, blogNews.title, blogNews.getBlogPostUrl());
+            context.startActivity(intent);
+        }
     }
 
-    public void setItemClickListener(ItemClickListener ic) {
-        this.itemClickListener = ic;
+    @OnLongClick
+    public boolean onLongClick() {
+        if (!TextUtils.isEmpty(blogNews.url)) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blogNews.getBlogPostUrl()));
+            context.startActivity(browserIntent);
+            return true;
+        }
+        return false;
     }
 }

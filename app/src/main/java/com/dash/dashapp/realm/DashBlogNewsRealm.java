@@ -17,7 +17,7 @@ public class DashBlogNewsRealm extends RealmObject implements BlogNews.Convertib
 
     public static DashBlogNewsRealm convert(DashBlogNews src) {
         DashBlogNewsRealm blogNews = new DashBlogNewsRealm();
-        blogNews.title = src.title;
+        blogNews.title = src.getTitle();
         blogNews.url = src.url;
         blogNews.image = src.image;
         blogNews.date = src.getDate();
