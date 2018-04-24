@@ -1,53 +1,68 @@
 package com.dash.dashapp.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.view.MenuItemCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.Filterable;
+import android.widget.Toast;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.MainActivity;
 import com.dash.dashapp.activities.SettingsActivity;
-import com.dash.dashapp.adapters.NewsView;
-import com.dash.dashapp.interfaces.RSSUpdateListener;
-import com.dash.dashapp.models.News;
-import com.dash.dashapp.utils.LoadMoreNews;
-import com.dash.dashapp.utils.MyDBHandler;
-import com.dash.dashapp.utils.XmlUtil;
-import com.mindorks.placeholderview.InfinitePlaceHolderView;
+import com.dash.dashapp.adapters.BlogNewsAdapter;
+import com.dash.dashapp.api.DashControlClient;
+import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.models.BlogNews;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class NewsFragment extends BaseFragment implements RSSUpdateListener {
-    private static final String TAG = "NewsFragment";
-    private static final int NUMBER_FIRST_BATCH = 10;
-    private InfinitePlaceHolderView mInfinitePlaceHolderView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar mProgressWheel;
-    private XmlUtil obj;
-    private RSSUpdateListener dbListener;
-    private List<News> newsList;
-    private boolean updatePerforming = false;
-    private static boolean isFirstLoad = true;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+public class NewsFragment extends Fragment {
+
+    @BindView(R.id.news_list)
+    RecyclerView blogNewsRecyclerView;
+
+    @BindView(R.id.container)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    private MenuItem searchMenuItem;
+
+    private Unbinder unbinder;
+
+    private Call<List<DashBlogNews>> blogNewsCall;
+
+    private BlogNewsAdapter blogNewsAdapter;
+    private EndlessRecyclerViewScrollListener endlessScrollListener;
+
+    private int currentPage = 0;
+
+    private boolean inSearchMode = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,8 +71,6 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     public NewsFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static NewsFragment newInstance() {
         NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
@@ -66,27 +79,32 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        dbListener = this;
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
-        mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.news_list);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        blogNewsRecyclerView.setLayoutManager(layoutManager);
+        blogNewsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        blogNewsRecyclerView.setHasFixedSize(true);
+        endlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                if (!inSearchMode) {
+                    loadNextPage();
+                }
+            }
+        };
+        blogNewsRecyclerView.addOnScrollListener(endlessScrollListener);
 
-        mInfinitePlaceHolderView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
-        mInfinitePlaceHolderView.setItemAnimator(new DefaultItemAnimator());
-        mInfinitePlaceHolderView.setHasFixedSize(true);
+        blogNewsAdapter = new BlogNewsAdapter();
+        blogNewsRecyclerView.setAdapter(blogNewsAdapter);
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.canChildScrollUp();
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
+        swipeRefreshLayout.canChildScrollUp();
+        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
 
         setHasOptionsMenu(true);
 
@@ -94,232 +112,160 @@ public class NewsFragment extends BaseFragment implements RSSUpdateListener {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.i(TAG, "onResume: ");
-        if(newsList!=null && newsList.size()>0){
-            loadRSS();
-        }
-        else{
-            handleRSS();
-        }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadFirstPage();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-
-            @Override
-            public void onRefresh() {
-                if (!updatePerforming) {
-                    mInfinitePlaceHolderView.removeAllViews();
-                    handleRSS();
-                } else {
-                    turnWheelOff();
-                }
-            }
-        });
-
-
+    private void loadFirstPage() {
+        currentPage = 0;
+        swipeRefreshLayout.setRefreshing(true);
+        loadNextPage();
     }
 
-
-    public void handleRSS() {
-
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        newsList = dbHandler.findAllNews(null);
-
-        if (!isNetworkAvailable()) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage(R.string.alert_message)
-                    .setTitle(R.string.alert_title)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.alert_positive,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int id) {
-                                    Log.i(TAG, "onClick: " + newsList.size());
-                                    if (newsList.size() > 0) {
-                                        if (mInfinitePlaceHolderView.getVisibility() != View.VISIBLE)
-                                            mInfinitePlaceHolderView.setVisibility(View.VISIBLE);
-                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
-                                        mSwipeRefreshLayout.setBackgroundResource(0);
-                                        loadRSS();
-                                    } else {
-                                        if (mInfinitePlaceHolderView.getVisibility() != View.GONE)
-                                            mInfinitePlaceHolderView.setVisibility(View.GONE);
-                                        mSwipeRefreshLayout.setBackground(getResources().getDrawable(R.drawable.splash_bg));
-                                    }
-                                }
-                            });
-
-            AlertDialog alert = builder.create();
-            alert.show();
-
-        } else {
-            updateRSS();
-            loadRSS();
-        }
-
+    private void loadNextPage() {
+        blogNewsCall = DashControlClient.getInstance().getBlogNews(++currentPage);
+        blogNewsCall.enqueue(blogNewsCallCallback);
     }
 
-    public void loadRSS() {
-        turnWheelOn();
-        for (int i = 0; i < LoadMoreNews.LOAD_VIEW_SET_COUNT; i++) {
-            try {
-                mInfinitePlaceHolderView.addView(new NewsView(getContext(), newsList.get(i)));
-                Log.d(TAG, "Add view index + " + i);
-            } catch (Exception e) {
-                e.getMessage();
-            }
-        }
-
-        if (newsList.size() > NUMBER_FIRST_BATCH) {
-            mInfinitePlaceHolderView.setLoadMoreResolver(new LoadMoreNews(mInfinitePlaceHolderView, newsList));
-        }
-        turnWheelOff();
-    }
-
-    public void updateRSS() {
-
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        dbHandler.deleteAllNews();
-        obj = new XmlUtil(getContext());
-        obj.fetchRSSXML(dbListener);
-    }
-
-    public boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-
-    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-        public WrapContentLinearLayoutManager(Context context) {
-            super(context);
-        }
-
-        //... constructor
+    Callback<List<DashBlogNews>> blogNewsCallCallback = new Callback<List<DashBlogNews>>() {
         @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            try {
-                super.onLayoutChildren(recycler, state);
-            } catch (IndexOutOfBoundsException e) {
-                Log.e("probe", "meet a IOOBE in RecyclerView");
-                e.getMessage();
+        public void onResponse(@NonNull Call<List<DashBlogNews>> call, @NonNull Response<List<DashBlogNews>> response) {
+            if (response.isSuccessful()) {
+                List<DashBlogNews> blogNewsList = Objects.requireNonNull(response.body());
+                display(new ArrayList<BlogNews.Convertible>(blogNewsList));
+                persist(blogNewsList);
             }
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        @Override
+        public void onFailure(@NonNull Call<List<DashBlogNews>> call, @NonNull Throwable t) {
+            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            displayFromCache();
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    };
+
+    private void displayFromCache() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmQuery<DashBlogNews> whereQuery = realm.where(DashBlogNews.class);
+            RealmResults<DashBlogNews> queryResult = whereQuery.findAll();
+            List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
+            display(blogNewsList);
         }
     }
+
+    private void display(List<BlogNews.Convertible> blogNewsList) {
+        if (currentPage == 1) {
+            blogNewsAdapter.clear();
+            endlessScrollListener.resetState();
+        }
+        List<BlogNews> list = new ArrayList<>();
+        for (BlogNews.Convertible item : blogNewsList) {
+            list.add(item.convert());
+        }
+        blogNewsAdapter.addAll(list);
+    }
+
+    private void persist(final List<DashBlogNews> blogNewsList) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    if (currentPage == 1) {
+                        realm.delete(DashBlogNews.class);
+                    }
+                    realm.insert(blogNewsList);
+                }
+            });
+        }
+    }
+
+    SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            if (searchMenuItem != null) {
+                searchMenuItem.collapseActionView();
+            }
+            loadFirstPage();
+        }
+    };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.top_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView sv = new SearchView(((MainActivity) getActivity()).getSupportActionBar().getThemedContext());
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setActionView(item, sv);
-        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchMenuItem = menu.findItem(R.id.action_search);
+        setupSearchView();
+    }
+
+    private void setupSearchView() {
+        AppCompatActivity activity = ((AppCompatActivity) getActivity());
+        ActionBar supportActionBar = Objects.requireNonNull(activity).getSupportActionBar();
+        Context themedContext = Objects.requireNonNull(supportActionBar).getThemedContext();
+        SearchView searchView = new SearchView(themedContext);
+        searchMenuItem.setShowAsAction(searchMenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | searchMenuItem.SHOW_AS_ACTION_IF_ROOM);
+        searchMenuItem.setActionView(searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "Text submit");
-                mInfinitePlaceHolderView.removeAllViews();
-
-                MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-                newsList = dbHandler.findAllNews(query);
-                loadRSS();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "Text change");
+                ((Filterable) blogNewsRecyclerView.getAdapter()).getFilter().filter(newText);
                 return false;
+            }
+        });
+        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewDetachedFromWindow(View arg0) {
+                inSearchMode = false;
+            }
+
+            @Override
+            public void onViewAttachedToWindow(View arg0) {
+                inSearchMode = true;
             }
         });
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_settings: {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
                 return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
-
-    @Override
-    public void onUpdateStarted() {
-        updatePerforming = true;
-        turnWheelOn();
-    }
-
-    @Override
-    public void onFirstBatchNewsCompleted(List<News> newsList) {
-        Log.d(TAG, "First batch completed");
-        this.newsList = newsList;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mInfinitePlaceHolderView.removeAllViews();
-                loadRSS();
-                turnWheelOff();
             }
-        });
-    }
-
-    @Override
-    public void onDatabaseUpdateCompleted() {
-        Log.d(TAG, "Database completed");
-        updatePerforming = false;
-        MyDBHandler dbHandler = new MyDBHandler(mContext, null);
-        newsList = dbHandler.findAllNews(null);
-
-        if (mInfinitePlaceHolderView.getChildCount() == 0) {
-            loadRSS();
-            turnWheelOff();
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
         }
-    }
-
-    private void turnWheelOn() {
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.VISIBLE);
-        }
-        mSwipeRefreshLayout.setRefreshing(true);
-    }
-
-    private void turnWheelOff() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mProgressWheel.setVisibility(View.GONE);
-        }
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onStop() {
-        turnWheelOff();
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setRefreshing(false);
-            mSwipeRefreshLayout.destroyDrawingCache();
-            mSwipeRefreshLayout.clearAnimation();
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.destroyDrawingCache();
+            swipeRefreshLayout.clearAnimation();
         }
         super.onStop();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (blogNewsCall != null) {
+            blogNewsCall.cancel();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        blogNewsCall = null;
+        unbinder.unbind();
     }
 }

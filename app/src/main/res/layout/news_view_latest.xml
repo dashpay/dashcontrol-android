@@ -11,46 +11,44 @@
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/list_item_background"
-        android:foreground="@drawable/selectable_item_background_light"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:layout_height="128dp">
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/dummy_image"
-            tools:ignore="ContentDescription" />
+            android:src="@drawable/dummy_image" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/text_margin">
+            android:layout_margin="8dp"
+            android:background="#cc1d71b8"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/title"
                 style="@style/text_list_item_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lorem_ipsum_long" />
+                android:layout_centerInParent="true"
+                android:text="@string/lorem_ipsum_long"
+                android:textColor="@color/text_light" />
 
             <TextView
                 android:id="@+id/date"
                 style="@style/text_list_item_property"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/title"
                 android:layout_alignParentBottom="true"
-                android:text="@string/lorem_ipsum_shortest" />
+                android:text="@string/lorem_ipsum_shortest"
+                android:textColor="@color/text_light" />
 
         </RelativeLayout>
-
-    </LinearLayout>
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/cached"

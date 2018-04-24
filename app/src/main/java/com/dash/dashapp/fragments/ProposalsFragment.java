@@ -80,7 +80,7 @@ public class ProposalsFragment extends BaseFragment implements ProposalUpdateLis
         View view = inflater.inflate(R.layout.fragment_proposals_list, container, false);
         Context context = view.getContext();
 
-        mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
+//        mProgressWheel = (ProgressBar) view.findViewById(R.id.progress_wheel);
         mInfinitePlaceHolderView = (InfinitePlaceHolderView) view.findViewById(R.id.proposals_list);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.container);
 

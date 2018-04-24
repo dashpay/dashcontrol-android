@@ -25,5 +25,5 @@ public class URLs {
     public final static String URL_PROPOSAL = BASE_URL_DASH_CONTROL + "budget";
     public static final String URL_GRAPH = BASE_URL_DASH_CONTROL + "chart_data?";
 
-
+    public static final String DASH_CONTROL_BASE_API = "https://www2.dash.org/";
 }

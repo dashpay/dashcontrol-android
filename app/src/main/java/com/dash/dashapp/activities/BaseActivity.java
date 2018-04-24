@@ -2,15 +2,17 @@ package com.dash.dashapp.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+
+import java.util.Objects;
 
 import butterknife.ButterKnife;
 
-/**
- * Created by sebas on 12/9/2017.
- */
-
 public abstract class BaseActivity extends AppCompatActivity {
+
+    private ActionBar actionBar;
 
     protected abstract int getLayoutResourceId();
 
@@ -20,5 +22,33 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         setContentView(getLayoutResourceId());
         ButterKnife.bind(this);
+
+        actionBar = Objects.requireNonNull(getSupportActionBar());
+    }
+
+    protected void showBackAction() {
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void setTitle(int titleId) {
+        actionBar.setTitle(titleId);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        actionBar.setTitle(title);
+    }
+
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
+        }
     }
 }
