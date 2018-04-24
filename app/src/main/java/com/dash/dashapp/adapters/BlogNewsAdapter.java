@@ -16,6 +16,9 @@ import java.util.List;
 
 public class BlogNewsAdapter extends RecyclerView.Adapter<BlogNewsHolder> implements Filterable {
 
+    private static final int VIEW_TYPE_LATEST = 0;
+    private static final int VIEW_TYPE_REGULAR = 1;
+
     private List<BlogNews> blogNewsList;
     private List<BlogNews> referenceBlogNewsList;
 
@@ -28,7 +31,18 @@ public class BlogNewsAdapter extends RecyclerView.Adapter<BlogNewsHolder> implem
     @Override
     public BlogNewsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.news_view, parent, false);
+        View view;
+        switch (viewType) {
+            case VIEW_TYPE_LATEST: {
+                view = inflater.inflate(R.layout.news_view_latest, parent, false);
+                break;
+            }
+            case VIEW_TYPE_REGULAR:
+            default: {
+                view = inflater.inflate(R.layout.news_view, parent, false);
+                break;
+            }
+        }
         return new BlogNewsHolder(view);
     }
 
@@ -47,6 +61,15 @@ public class BlogNewsAdapter extends RecyclerView.Adapter<BlogNewsHolder> implem
     @Override
     public int getItemCount() {
         return blogNewsList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return VIEW_TYPE_LATEST;
+        } else {
+            return VIEW_TYPE_REGULAR;
+        }
     }
 
     public void clear() {
