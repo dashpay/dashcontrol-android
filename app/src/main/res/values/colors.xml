@@ -6,10 +6,12 @@
     <color name="primary_dark_material_dark">#e3f2fd</color>
     <color name="accent_material_dark">#bbdefb</color>
     <color name="background_material_dark">#ffffff</color>
-    <color name="grey">#A0A0A0</color>
-    <color name="lighter_grey">#BEBEBE</color>
-    <color name="lightest_grey">#F0F0F0</color>
-    <color name="white">#FFFFFF</color>
+    <color name="grey">#a0a0a0</color>
+    <color name="lighter_grey">#bebebe</color>
+    <color name="lightest_grey">#f0f0f0</color>
+
+    <color name="white">#ffffff</color>
+    <color name="semi_white">#ccffffff</color>
 
     <color name="dash_blue">#1d71b8</color>
     <color name="theme_red">#ff2566</color>

@@ -28,6 +28,7 @@ import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.BudgetApiAnswer;
 import com.dash.dashapp.api.data.DashProposal;
 import com.dash.dashapp.models.BudgetProposal;
+import com.dash.dashapp.view.ExpandableFiltersView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,9 @@ public class ProposalsFragment extends BaseFragment {
     @BindView(R.id.container)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    @BindView(R.id.filters)
+    ExpandableFiltersView filtersView;
+
     private MenuItem searchMenuItem;
 
     private Unbinder unbinder;
@@ -58,6 +62,7 @@ public class ProposalsFragment extends BaseFragment {
     private Call<BudgetApiAnswer> budgetProposalsCall;
 
     private ProposalAdapter proposalAdapter;
+
     private EndlessRecyclerViewScrollListener endlessScrollListener;
 
     private int currentPage = 0;
@@ -86,6 +91,8 @@ public class ProposalsFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_proposals_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+        setHasOptionsMenu(true);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         proposalRecyclerView.setLayoutManager(layoutManager);
         proposalRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -107,9 +114,32 @@ public class ProposalsFragment extends BaseFragment {
         swipeRefreshLayout.canChildScrollUp();
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
 
-        setHasOptionsMenu(true);
+        filtersView.setOnFilterChangeListener(new ExpandableFiltersView.OnFilterChangeListener() {
+            @Override
+            public void onFilterChange(ExpandableFiltersView filtersView, ExpandableFiltersView.Filter filter) {
+                ProposalsFragment.this.onFilterChange(filter);
+            }
+        });
 
         return view;
+    }
+
+    private void onFilterChange(ExpandableFiltersView.Filter filter) {
+        ProposalAdapter proposalAdapter = (ProposalAdapter) proposalRecyclerView.getAdapter();
+        switch (filter) {
+            case CURRENT: {
+                proposalAdapter.setPropertyFilters(false, false);
+                break;
+            }
+            case ONGOING: {
+                proposalAdapter.setPropertyFilters(true, false);
+                break;
+            }
+            case PAST: {
+                proposalAdapter.setPropertyFilters(false, true);
+                break;
+            }
+        }
     }
 
     @Override

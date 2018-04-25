@@ -5,12 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.dash.dashapp.view.ExpandableFiltersView
+        android:id="@+id/filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/container"
         android:name="com.dash.dashapp.fragments.ProposalFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="507dp"
+        android:layout_below="@+id/filters"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:context="com.dash.dashapp.fragments.ProposalsFragment">
@@ -30,7 +35,6 @@
             android:layout_height="200dp" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/button_add_proposal"

@@ -32,4 +32,14 @@ public class BudgetProposal implements Serializable {
     public interface Convertible {
         BudgetProposal convert();
     }
+
+    public boolean isOngoing() {
+        Date today = new Date();
+        return dateEnd.after(today) && (remainingPaymentCount > 0) && willBeFunded && inNextBudget;
+    }
+
+    public boolean isPast() {
+        Date today = new Date();
+        return dateEnd.before(today);
+    }
 }

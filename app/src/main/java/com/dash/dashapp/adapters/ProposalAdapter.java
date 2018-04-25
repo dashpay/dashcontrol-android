@@ -19,6 +19,16 @@ public class ProposalAdapter extends RecyclerView.Adapter<ProposalHolder> implem
     private List<BudgetProposal> budgetProposalList;
     private List<BudgetProposal> referenceBudgetProposalList;
 
+    private boolean showOnlyOngoing = false;
+    private boolean showOnlyPast = false;
+    private CharSequence recentFilterConstraint;
+
+    public void setPropertyFilters(boolean showOnlyOngoing, boolean showOnlyPast) {
+        this.showOnlyOngoing = showOnlyOngoing;
+        this.showOnlyPast = showOnlyPast;
+        getFilter().filter(recentFilterConstraint);
+    }
+
     public ProposalAdapter() {
         this.budgetProposalList = new ArrayList<>();
         this.referenceBudgetProposalList = new ArrayList<>();
@@ -57,9 +67,10 @@ public class ProposalAdapter extends RecyclerView.Adapter<ProposalHolder> implem
 
     @Override
     public Filter getFilter() {
-        return new ProposalFilter(referenceBudgetProposalList) {
+        return new ProposalFilter(referenceBudgetProposalList, showOnlyOngoing, showOnlyPast) {
             @Override
-            protected void publishResults(List<BudgetProposal> budgetProposalFilteredList) {
+            protected void publishResults(CharSequence constraint, List<BudgetProposal> budgetProposalFilteredList) {
+                recentFilterConstraint = constraint;
                 budgetProposalList = budgetProposalFilteredList;
                 notifyDataSetChanged();
             }

@@ -6,33 +6,48 @@ import android.widget.Filter;
 import com.dash.dashapp.models.BudgetProposal;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class ProposalFilter extends Filter {
 
     private List<BudgetProposal> referenceBudgetProposalList;
 
-    ProposalFilter(List<BudgetProposal> referenceBudgetProposalList) {
+    private boolean showOnlyOngoing;
+    private boolean showOnlyPast;
+
+    ProposalFilter(List<BudgetProposal> referenceBudgetProposalList, boolean showOnlyOngoing, boolean showOnlyPast) {
         this.referenceBudgetProposalList = referenceBudgetProposalList;
+        this.showOnlyOngoing = showOnlyOngoing;
+        this.showOnlyPast = showOnlyPast;
     }
 
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
         FilterResults results = new FilterResults();
+        List<BudgetProposal> filteredBlogNews = new ArrayList<>();
         if (!TextUtils.isEmpty(constraint)) {
             constraint = constraint.toString().toUpperCase();
-            ArrayList<BudgetProposal> filteredBlogNews = new ArrayList<>();
             for (BudgetProposal item : referenceBudgetProposalList) {
                 if (item.title.toUpperCase().contains(constraint)) {
                     filteredBlogNews.add(item);
                 }
             }
-            results.count = filteredBlogNews.size();
-            results.values = filteredBlogNews;
         } else {
-            results.count = referenceBudgetProposalList.size();
-            results.values = referenceBudgetProposalList;
+            filteredBlogNews.addAll(referenceBudgetProposalList);
         }
+
+        for (Iterator<BudgetProposal> iterator = filteredBlogNews.iterator(); iterator.hasNext(); ) {
+            BudgetProposal proposal = iterator.next();
+            boolean toBeRemoved = (showOnlyOngoing && !proposal.isOngoing());
+            toBeRemoved |= (showOnlyPast && !proposal.isPast());
+            if (toBeRemoved) {
+                iterator.remove();
+            }
+        }
+
+        results.count = filteredBlogNews.size();
+        results.values = filteredBlogNews;
 
         return results;
     }
@@ -40,8 +55,8 @@ public abstract class ProposalFilter extends Filter {
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
         //noinspection unchecked
-        publishResults((List<BudgetProposal>) results.values);
+        publishResults(constraint, (List<BudgetProposal>) results.values);
     }
 
-    protected abstract void publishResults(List<BudgetProposal> blogNewsFilteredList);
+    protected abstract void publishResults(CharSequence constraint, List<BudgetProposal> blogNewsFilteredList);
 }
