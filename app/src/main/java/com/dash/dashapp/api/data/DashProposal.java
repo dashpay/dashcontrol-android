@@ -11,73 +11,73 @@ public class DashProposal extends RealmObject
         implements BudgetProposal.Convertible {
 
     @SerializedName("hash")
-    public String hash;
+    private String hash;
 
     @SerializedName("name")
-    public String name;
+    private String name;
 
     @SerializedName("url")
-    public String url;
+    private String url;
 
     @SerializedName("dw_url")
-    public String dwUrl;
+    private String dwUrl;
 
     @SerializedName("dw_url_comments")
-    public String dwUrlComments;
+    private String dwUrlComments;
 
     @SerializedName("title")
-    public String title;
+    private String title;
 
     @SerializedName("date_added")
-    public Date dateAdded;
+    private Date dateAdded;
 
     @SerializedName("date_added_human")
-    public String dateAddedHuman;
+    private String dateAddedHuman;
 
     @SerializedName("date_end")
-    public Date dateEnd;
+    private Date dateEnd;
 
     @SerializedName("voting_deadline")
-    public Date votingDeadline;
+    private Date votingDeadline;
 
     @SerializedName("voting_deadline_human")
-    public String votingDeadlineHuman;
+    private String votingDeadlineHuman;
 
     @SerializedName("will_be_funded")
-    public boolean willBeFunded;
+    private boolean willBeFunded;
 
     @SerializedName("remaining_yes_votes_until_funding")
-    public int remainingYesVotesUntilFunding;
+    private int remainingYesVotesUntilFunding;
 
     @SerializedName("in_next_budget")
-    public boolean inNextBudget;
+    private boolean inNextBudget;
 
     @SerializedName("monthly_amount")
-    public float monthlyAmount;
+    private float monthlyAmount;
 
     @SerializedName("total_payment_count")
-    public int totalPaymentCount;
+    private int totalPaymentCount;
 
     @SerializedName("remaining_payment_count")
-    public int remainingPaymentCount;
+    private int remainingPaymentCount;
 
     @SerializedName("yes")
-    public int yesVotes;
+    private int yesVotes;
 
     @SerializedName("no")
-    public int noVotes;
+    private int noVotes;
 
     @SerializedName("abstain")
-    public int abstainVotes;
+    private int abstainVotes;
 
     @SerializedName("order")
-    public int order;
+    private int order;
 
     @SerializedName("comment_amount")
-    public int commentAmount;
+    private int commentAmount;
 
     @SerializedName("owner_username")
-    public String owner;
+    private String owner;
 
     @Override
     public BudgetProposal convert() {
