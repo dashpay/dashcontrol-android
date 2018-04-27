@@ -41,11 +41,11 @@
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">No title entered by budgetProposal owner</string>
     <string name="textview_no_comments">No comments</string>
-    <string name="per_month">per month</string>
+    <string name="dash_per_month">Dash p/m</string>
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
-    <string name="dash" translatable="false">%1$f DASH</string>
+    <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
 
     <string name="radio_5m">5m</string>

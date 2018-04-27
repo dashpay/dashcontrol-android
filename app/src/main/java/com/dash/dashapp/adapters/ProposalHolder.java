@@ -3,6 +3,7 @@ package com.dash.dashapp.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.utils.DateUtil;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -23,31 +25,26 @@ import butterknife.OnClick;
 
 public class ProposalHolder extends RecyclerView.ViewHolder {
 
-    private static final String CONTENT_PROPOSAL = "budgetProposal";
+    @BindView(R.id.approval_progress)
+    ProgressBar approvalProgressView;
 
-    @BindView(R.id.approval_progress_bar)
-    public ProgressBar approvalRatePie;
+    @BindView(R.id.approval_progress_value)
+    TextView approvalProgressValueView;
 
-    @BindView(R.id.approval_rate_textview)
-    public TextView approvalRateTextView;
+    @BindView(R.id.title)
+    TextView titleView;
 
-    @BindView(R.id.title_textView)
-    public TextView titleTxt;
+    @BindView(R.id.month_remaining)
+    TextView monthRemainingView;
 
-    @BindView(R.id.title_owner_textview)
-    public TextView titleOwnerTextView;
+    @BindView(R.id.owner)
+    TextView ownerView;
 
-    @BindView(R.id.textView_month_remaining)
-    public TextView monthRemainingTextView;
+    @BindView(R.id.comments_number)
+    public TextView commentsNumberView;
 
-    @BindView(R.id.textView_comments_number)
-    public TextView commentsNumberTextView;
-
-    @BindView(R.id.textview_dash_amount)
-    public TextView dashAmountTextView;
-
-    @BindView(R.id.textView_by_owner)
-    public TextView byOwnerTextView;
+    @BindView(R.id.dash_amount)
+    public TextView dashAmountView;
 
     private Context context;
 
@@ -62,41 +59,37 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
     public void bind(BudgetProposal budgetProposal) {
         this.budgetProposal = budgetProposal;
 
-        titleTxt.setText(budgetProposal.title);
+        titleView.setText(budgetProposal.title);
 
-        double ratioYes = ((double) budgetProposal.yesVotes / (budgetProposal.yesVotes + budgetProposal.noVotes)) * 100;
-        int ratioYesInt = (int) ratioYes;
-        approvalRatePie.setProgress(ratioYesInt);
-        approvalRateTextView.setText(ratioYesInt + "%");
-
-        //TODO What's the owner title ?
-        if (!budgetProposal.title.equals("")) {
-            titleOwnerTextView.setText(budgetProposal.title);
-        }
+        int ratioYes = budgetProposal.getRatioYes();
+        approvalProgressView.setProgress(ratioYes);
+        approvalProgressValueView.setText(ratioYes + "%");
 
         //TODO calculate the month
         Date startDate = new Date();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         int monthRemaining = DateUtil.monthDifference(startDate, budgetProposal.dateEnd);
         if (monthRemaining == 1) {
-            monthRemainingTextView.setText(context.getString(R.string.month_remaining, monthRemaining));
+            monthRemainingView.setText(context.getString(R.string.month_remaining, monthRemaining));
         } else {
-            monthRemainingTextView.setText(context.getString(R.string.months_remaining, monthRemaining));
+            monthRemainingView.setText(context.getString(R.string.months_remaining, monthRemaining));
         }
 
-        commentsNumberTextView.setText(context.getString(R.string.comments, budgetProposal.commentAmount));
+        NumberFormat formatter = NumberFormat.getNumberInstance();
+//        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        dashAmountView.setText(formatter.format(budgetProposal.monthlyAmount));
 
-        dashAmountTextView.setText(context.getString(R.string.dash, budgetProposal.monthlyAmount));
-
-        if (!budgetProposal.owner.equals("")) {
-            byOwnerTextView.setText(context.getString(R.string.by, budgetProposal.owner));
+        if (!TextUtils.isEmpty(budgetProposal.owner)) {
+            ownerView.setText(context.getString(R.string.by, budgetProposal.owner));
         }
+
+        commentsNumberView.setText(String.valueOf(budgetProposal.commentAmount));
     }
 
     @OnClick
     public void onClick() {
-        Intent intent = new Intent(context, ProposalDetailActivity.class);
-        intent.putExtra(CONTENT_PROPOSAL, budgetProposal);
+        Intent intent = ProposalDetailActivity.createIntent(context, budgetProposal);
         context.startActivity(intent);
     }
 }

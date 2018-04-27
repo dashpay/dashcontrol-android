@@ -42,4 +42,9 @@ public class BudgetProposal implements Serializable {
         Date today = new Date();
         return dateEnd.before(today);
     }
+
+    public int getRatioYes() {
+        float ratioYes = ((float) yesVotes / (yesVotes + noVotes)) * 100;
+        return (int) ratioYes;
+    }
 }

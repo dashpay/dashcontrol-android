@@ -1,5 +1,6 @@
 package com.dash.dashapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -15,7 +16,8 @@ import butterknife.BindView;
 
 public class ProposalDetailActivity extends BaseActivity {
 
-    private static final String CONTENT_PROPOSAL = "proposal";
+    public static final String CONTENT_PROPOSAL = "proposal";
+
     @BindView(R.id.pie_yes_no)
     ProgressBar pieYesNo;
     @BindView(R.id.approval_rate_textview)
@@ -48,6 +50,12 @@ public class ProposalDetailActivity extends BaseActivity {
     Button buttonAbstain;
     @BindView(R.id.button_no)
     Button buttonNo;
+
+    public static Intent createIntent(Context context, BudgetProposal proposal) {
+        Intent intent = new Intent(context, ProposalDetailActivity.class);
+        intent.putExtra(CONTENT_PROPOSAL, proposal);
+        return intent;
+    }
 
     @Override
     protected int getLayoutResourceId() {
