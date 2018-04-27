@@ -7,8 +7,10 @@ import java.util.List;
  */
 
 public class Exchange {
+
     private String name;
     private List<Market> listMarket;
+
     public Exchange(String name, List<Market> listCurrencies) {
         this.name = name;
         this.listMarket = listCurrencies;

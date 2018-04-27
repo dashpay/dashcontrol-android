@@ -2,8 +2,10 @@ package com.dash.dashapp.api;
 
 import com.dash.dashapp.api.data.BudgetApiAnswer;
 import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.api.data.DashControlPricesAnswer;
 import com.dash.dashapp.api.service.DashBlogService;
 import com.dash.dashapp.api.service.DashCentralService;
+import com.dash.dashapp.api.service.DashControlService;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
@@ -23,6 +25,7 @@ public class DashControlClient {
 
     private final DashBlogService dashBlogService;
     private final DashCentralService dashCentralService;
+    private final DashControlService dashControlService;
 
     private static final DashControlClient INSTANCE = new DashControlClient();
 
@@ -57,6 +60,14 @@ public class DashControlClient {
                 .build();
 
         dashCentralService = retrofit.create(DashCentralService.class);
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.BASE_URL_DASH_CONTROL)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        dashControlService = retrofit.create(DashControlService.class);
     }
 
     public static DashControlClient getInstance() {
@@ -69,5 +80,9 @@ public class DashControlClient {
 
     public Call<BudgetApiAnswer> getDashProposals(int page) {
         return dashCentralService.proposals();
+    }
+
+    public Call<DashControlPricesAnswer> getExchanges() {
+        return dashControlService.prices();
     }
 }

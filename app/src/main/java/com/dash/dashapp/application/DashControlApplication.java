@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -12,6 +13,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.activities.SettingsActivity;
+import com.dash.dashapp.api.DashControlClient;
+import com.dash.dashapp.api.data.DashControlPricesAnswer;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PriceChartData;
@@ -30,12 +33,14 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import io.realm.Realm;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * Created by sebas on 9/18/2017.
@@ -82,9 +87,9 @@ public class DashControlApplication extends Application {
 //        Stetho.initializeWithDefaults(this);
         Stetho.initialize(
                 Stetho.newInitializerBuilder(this)
-                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                .build()
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                        .build()
         );
         /*
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this)
@@ -103,88 +108,52 @@ public class DashControlApplication extends Application {
 
         dbHandler.deleteAllMarket();
 
-        // Getting prices
-        JsonObjectRequest jsObjRequestPrice = new JsonObjectRequest
-                (Request.Method.GET, URLs.URL_PRICE, null, new Response.Listener<JSONObject>() {
+        Call<DashControlPricesAnswer> exchanges = DashControlClient.getInstance().getExchanges();
+        exchanges.enqueue(new Callback<DashControlPricesAnswer>() {
+            @Override
+            public void onResponse(@NonNull Call<DashControlPricesAnswer> call,
+                                   @NonNull retrofit2.Response<DashControlPricesAnswer> response) {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        Log.d(TAG, "Loading Exchanges");
-
-                        listExchanges = new ArrayList<>();
-
-                        try {
-
-                            Iterator<String> listExchangesKeys = response.keys();
-
-
-                            // Getting exchanges
-                            while (listExchangesKeys.hasNext()) {
-
-                                //Foreach exchange getting the market
-                                List<Market> listMarket = new ArrayList<>();
-
-
-                                String exchangeName = listExchangesKeys.next();
-
-                                Exchange exchange = new Exchange();
-                                exchange.setName(exchangeName);
-
-                                // get the value i care about
-                                JSONObject exchangeJson = (JSONObject) response.get(exchangeName);
-
-                                try {
-                                    double dash_btc = exchangeJson.getDouble("DASH_BTC");
-                                    Market market = new Market("DASH_BTC", dash_btc);
-                                    listMarket.add(market);
-
-                                    dbHandler.addMarket(exchange, market, 0);
-
-                                } catch (Exception e) {
-                                    e.getMessage();
-                                }
-                                try {
-                                    double dash_usd = exchangeJson.getDouble("DASH_USD");
-                                    Market market = new Market("DASH_USD", dash_usd);
-                                    listMarket.add(market);
-
-                                    dbHandler.addMarket(exchange, market, 0);
-
-                                } catch (Exception e) {
-                                    e.getMessage();
-                                }
-                                try {
-                                    double dash_usdt = exchangeJson.getDouble("DASH_USDT");
-                                    Market market = new Market("DASH_USDT", dash_usdt);
-                                    listMarket.add(market);
-
-                                    dbHandler.addMarket(exchange, market, 0);
-
-                                } catch (Exception e) {
-                                    e.getMessage();
-                                }
-
-                                exchange.setListMarket(listMarket);
-                                listExchanges.add(exchange);
-                            }
-
-                            setDefaultExchanges();
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                if (response.isSuccessful()) {
+                    DashControlPricesAnswer responseBody = response.body();
+                    if (responseBody != null) {
+                        initExchangeList(responseBody);
+                        return;
                     }
-                }, new Response.ErrorListener() {
+                }
+                logError();
+            }
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-                        error.getMessage();
-                    }
-                });
-        // Access the RequestQueue through your singleton class.
-        MySingleton.getInstance(mContext).addToRequestQueue(jsObjRequestPrice);
+            @Override
+            public void onFailure(@NonNull Call<DashControlPricesAnswer> call, @NonNull Throwable t) {
+                logError();
+            }
+
+            private void logError() {
+                Log.e(TAG, "Unable to get exchanges data");
+            }
+        });
+    }
+
+    private void initExchangeList(DashControlPricesAnswer responseBody) {
+        listExchanges = new ArrayList<>();
+        List<Market> listMarket = new ArrayList<>();
+        Set<DashControlPricesAnswer.DashControlExchange> responseExchangeSet = responseBody.getIntlExchanges();
+        for (DashControlPricesAnswer.DashControlExchange responseExchange : responseExchangeSet) {
+            Exchange exchange = new Exchange();
+            exchange.setName(responseExchange.getName());
+
+            Set<DashControlPricesAnswer.DashControlMarket> responseMarketSet = responseExchange.getMarkets();
+            for (DashControlPricesAnswer.DashControlMarket responseMarket : responseMarketSet) {
+                Market market = new Market(responseMarket.getName(), responseMarket.getPrice());
+                listMarket.add(market);
+                dbHandler.addMarket(exchange, market, 0);
+            }
+
+            exchange.setListMarket(listMarket);
+            listExchanges.add(exchange);
+        }
+        setDefaultExchanges();
     }
 
     private void setDefaultExchanges() {
