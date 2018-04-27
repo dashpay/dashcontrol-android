@@ -1,6 +1,6 @@
 package com.dash.dashapp.interfaces;
 
-import com.dash.dashapp.models.Proposal;
+import com.dash.dashapp.models.BudgetProposal;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProposalUpdateListener {
 
     void onUpdateStarted();
-    void onFirstBatchProposalsCompleted(List<Proposal> newsList);
+    void onFirstBatchProposalsCompleted(List<BudgetProposal> newsList);
     void onDatabaseUpdateCompleted();
 
 

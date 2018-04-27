@@ -1,5 +1,6 @@
 package com.dash.dashapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -8,14 +9,15 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.dash.dashapp.models.Proposal;
 import com.dash.dashapp.R;
+import com.dash.dashapp.models.BudgetProposal;
 
 import butterknife.BindView;
 
 public class ProposalDetailActivity extends BaseActivity {
 
-    private static final String CONTENT_PROPOSAL = "proposal";
+    public static final String CONTENT_PROPOSAL = "proposal";
+
     @BindView(R.id.pie_yes_no)
     ProgressBar pieYesNo;
     @BindView(R.id.approval_rate_textview)
@@ -49,6 +51,12 @@ public class ProposalDetailActivity extends BaseActivity {
     @BindView(R.id.button_no)
     Button buttonNo;
 
+    public static Intent createIntent(Context context, BudgetProposal proposal) {
+        Intent intent = new Intent(context, ProposalDetailActivity.class);
+        intent.putExtra(CONTENT_PROPOSAL, proposal);
+        return intent;
+    }
+
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_content_proposal;
@@ -65,34 +73,34 @@ public class ProposalDetailActivity extends BaseActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        Proposal proposal = (Proposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
+        BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
 
-        double ratioYes = ((double) proposal.getYes() / (proposal.getYes() + proposal.getNo())) * 100;
+        double ratioYes = ((double) budgetProposal.yesVotes / (budgetProposal.yesVotes + budgetProposal.noVotes)) * 100;
         int ratioYesInt = (int) ratioYes;
         pieYesNo.setProgress(ratioYesInt);
         approvalRateTextview.setText(ratioYesInt + "%");
 
-        textViewIdProposal.setText(proposal.getTitle());
+        textViewIdProposal.setText(budgetProposal.title);
 
-        textViewTitleProposal.setText(proposal.getTitle());
+        textViewTitleProposal.setText(budgetProposal.title);
 
-        textViewOwner.setText("Owned by " + proposal.getOwner_username());
+        textViewOwner.setText("Owned by " + budgetProposal.owner);
 
-        textViewTitle.setText(proposal.getTitle());
+        textViewTitle.setText(budgetProposal.title);
 
         // TODO textViewOneTimePayment.setText("TODO");
 
-        //TODO textViewMonthRemaining.setText(proposal.getVoting_deadline_human());
+        //TODO textViewMonthRemaining.setText(budgetProposal.getVoting_deadline_human());
 
-        textViewCompletedPayments.setText(proposal.getTotal_payment_count() + "");
+        textViewCompletedPayments.setText(budgetProposal.totalPaymentCount + "");
 
-        textViewYes.setText(proposal.getYes() + " Yes");
+        textViewYes.setText(budgetProposal.yesVotes + " Yes");
 
-        textViewNo.setText(proposal.getNo() + " No");
+        textViewNo.setText(budgetProposal.name + " No");
 
-        // TODO textViewAbstain.setText(proposal.getTitle());
+        // TODO textViewAbstain.setText(budgetProposal.getTitle());
 
-        // TODO RECUPERER LA PROP : textViewProposalDescription.setText(proposal.getTitle());
+        // TODO RECUPERER LA PROP : textViewProposalDescription.setText(budgetProposal.getTitle());
 
     }
 

@@ -24,6 +24,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         actionBar = Objects.requireNonNull(getSupportActionBar());
+        actionBar.setElevation(0);
     }
 
     protected void showBackAction() {

@@ -1,5 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Dash control</string>
     <string name="title_news">News</string>
     <string name="title_proposals">Proposals</string>
@@ -21,7 +20,7 @@
     <string name="ru">Russian</string>
     <string name="jp">Japanese</string>
     <string name="kr">Korean</string>
-    <string name="button_accept_proposal">Accept proposal</string>
+    <string name="button_accept_proposal">Accept budgetProposal</string>
     <string name="button_abstain">Abstain</string>
     <string name="button_no">No</string>
     <string name="title">Title</string>
@@ -29,6 +28,8 @@
     <string name="no_id">No id</string>
     <string name="no_title">No Title</string>
     <string name="no_owner">No owner</string>
+    <string name="total">Total</string>
+    <string name="allocated">Allocated</string>
     <string name="one_time_payment_tag">One-time payment</string>
     <string name="no_dash">0 DASH</string>
     <string name="completed_payment_tag">Completed payments</string>
@@ -40,13 +41,13 @@
     <string name="no_description">No description</string>
     <string name="search">search</string>
     <string name="default_percentage">0%</string>
-    <string name="no_title_entered_by_proposal_owner">No title entered by proposal owner</string>
+    <string name="no_title_entered_by_proposal_owner">No title entered by budgetProposal owner</string>
     <string name="textview_no_comments">No comments</string>
-    <string name="per_month">per month</string>
+    <string name="dash_per_month">Dash p/m</string>
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
-    <string name="dash" translatable="false">%1$d DASH</string>
+    <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
 
     <string name="radio_5m">5m</string>
@@ -68,7 +69,6 @@
     <string name="add_wallet">Add wallet</string>
 
 
-
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="hint_email">Email</string>
@@ -83,5 +83,11 @@
     <string name="lorem_ipsum_short">Lorem ipsum dolor sit amet.</string>
     <string name="lorem_ipsum_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="lorem_ipsum_longest">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta imperdiet viverra. Duis rhoncus nunc auctor sem volutpat rutrum. Duis nec est placerat, vestibulum enim at, sollicitudin odio. Suspendisse ut nulla porttitor.</string>
+
+    <string name="proposal_filter_current">Current</string>
+    <string name="proposal_filter_ongoing">Ongoing</string>
+    <string name="proposal_filter_past">Past</string>
+
+    <string name="superblocks_summary">%d Superblocks in %s %s</string>
 
 </resources>

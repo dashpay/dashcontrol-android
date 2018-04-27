@@ -7,11 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.models.Comment;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PriceChartData;
-import com.dash.dashapp.models.Proposal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,38 +184,38 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
     // PROPOSALS
-    public void addProposal(Proposal proposal) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_HASH, proposal.getHash());
-        values.put(COLUMN_NAME, proposal.getName());
-        values.put(COLUMN_URL, proposal.getUrl());
-        values.put(COLUMN_DW_URL, proposal.getDw_url());
-        values.put(COLUMN_DW_URL_COMMENTS, proposal.getDw_url_comments());
-        values.put(COLUMN_TITLE_PROP, proposal.getTitle());
-        values.put(COLUMN_DATE_ADDED, proposal.getDate_added());
-        values.put(COLUMN_DATE_ADDED_HUMAN, proposal.getDate_added_human());
-        values.put(COLUMN_DATE_END, proposal.getDate_end());
-        values.put(COLUMN_VOTING_DEADLINE_HUMAN, proposal.getVoting_deadline_human());
-        values.put(COLUMN_WILL_BE_FUNDED, proposal.isWill_be_funded());
-        values.put(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING, proposal.getRemaining_yes_votes_until_funding());
-        values.put(COLUMN_IN_NEXT_BUDGET, proposal.isIn_next_budget());
-        values.put(COLUMN_MONTHLY_AMOUNT, proposal.getMonthly_amount());
-        values.put(COLUMN_TOTAL_PAYMENT_COUNT, proposal.getTotal_payment_count());
-        values.put(COLUMN_REMAINING_PAYMENT_COUNT, proposal.getRemaining_payment_count());
-        values.put(COLUMN_YES, proposal.getYes());
-        values.put(COLUMN_NO, proposal.getNo());
-        values.put(COLUMN_ORDER, proposal.getOrder());
-        values.put(COLUMN_COMMENT_AMOUNT, proposal.getComment_amount());
-        values.put(COLUMN_OWNER_USERNAME, proposal.getOwner_username());
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(TABLE_PROPOSALS, null, values);
-        db.close();
+    public void addProposal(BudgetProposal budgetProposal) {
+//        ContentValues values = new ContentValues();
+//        values.put(COLUMN_HASH, budgetProposal.getHash());
+//        values.put(COLUMN_NAME, budgetProposal.getName());
+//        values.put(COLUMN_URL, budgetProposal.getUrl());
+//        values.put(COLUMN_DW_URL, budgetProposal.getDw_url());
+//        values.put(COLUMN_DW_URL_COMMENTS, budgetProposal.getDw_url_comments());
+//        values.put(COLUMN_TITLE_PROP, budgetProposal.getTitle());
+//        values.put(COLUMN_DATE_ADDED, budgetProposal.getDate_added());
+//        values.put(COLUMN_DATE_ADDED_HUMAN, budgetProposal.getDate_added_human());
+//        values.put(COLUMN_DATE_END, budgetProposal.getDate_end());
+//        values.put(COLUMN_VOTING_DEADLINE_HUMAN, budgetProposal.getVoting_deadline_human());
+//        values.put(COLUMN_WILL_BE_FUNDED, budgetProposal.isWill_be_funded());
+//        values.put(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING, budgetProposal.getRemaining_yes_votes_until_funding());
+//        values.put(COLUMN_IN_NEXT_BUDGET, budgetProposal.isIn_next_budget());
+//        values.put(COLUMN_MONTHLY_AMOUNT, budgetProposal.getMonthly_amount());
+//        values.put(COLUMN_TOTAL_PAYMENT_COUNT, budgetProposal.getTotal_payment_count());
+//        values.put(COLUMN_REMAINING_PAYMENT_COUNT, budgetProposal.getRemaining_payment_count());
+//        values.put(COLUMN_YES, budgetProposal.getYes());
+//        values.put(COLUMN_NO, budgetProposal.getNo());
+//        values.put(COLUMN_ORDER, budgetProposal.getOrder());
+//        values.put(COLUMN_COMMENT_AMOUNT, budgetProposal.getComment_amount());
+//        values.put(COLUMN_OWNER_USERNAME, budgetProposal.getOwner_username());
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        db.insert(TABLE_PROPOSALS, null, values);
+//        db.close();
     }
 
-    public List<Proposal> findAllProposals(String filter) {
+    public List<BudgetProposal> findAllProposals(String filter) {
         Log.d(TAG, "Find list proposals");
 
-        List<Proposal> proposalsList = new ArrayList<>();
+        List<BudgetProposal> proposalsList = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_PROPOSALS;
         if (filter != null) {
@@ -226,29 +226,29 @@ public class MyDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         while (cursor.moveToNext()) {
-            Proposal proposal = new Proposal();
-            proposal.setHash(cursor.getString(cursor.getColumnIndex(COLUMN_HASH)));
-            proposal.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
-            proposal.setUrl(cursor.getString(cursor.getColumnIndex(COLUMN_URL)));
-            proposal.setDw_url(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL)));
-            proposal.setDw_url_comments(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL_COMMENTS)));
-            proposal.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE_PROP)));
-            proposal.setDate_added(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED)));
-            proposal.setDate_added_human(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED_HUMAN)));
-            proposal.setDate_end(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_END)));
-            proposal.setVoting_deadline_human(cursor.getString(cursor.getColumnIndex(COLUMN_VOTING_DEADLINE_HUMAN)));
-            proposal.setWill_be_funded(cursor.getInt(cursor.getColumnIndex(COLUMN_WILL_BE_FUNDED)) != 0);
-            proposal.setRemaining_yes_votes_until_funding(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING)));
-            proposal.setIn_next_budget(cursor.getInt(cursor.getColumnIndex(COLUMN_IN_NEXT_BUDGET)) != 0);
-            proposal.setMonthly_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_MONTHLY_AMOUNT)));
-            proposal.setTotal_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_TOTAL_PAYMENT_COUNT)));
-            proposal.setRemaining_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_PAYMENT_COUNT)));
-            proposal.setYes(cursor.getInt(cursor.getColumnIndex(COLUMN_YES)));
-            proposal.setNo(cursor.getInt(cursor.getColumnIndex(COLUMN_NO)));
-            proposal.setOrder(cursor.getInt(cursor.getColumnIndex(COLUMN_ORDER)));
-            proposal.setComment_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_COMMENT_AMOUNT)));
-            proposal.setOwner_username(cursor.getString(cursor.getColumnIndex(COLUMN_OWNER_USERNAME)));
-            proposalsList.add(proposal);
+            BudgetProposal budgetProposal = new BudgetProposal();
+//            budgetProposal.setHash(cursor.getString(cursor.getColumnIndex(COLUMN_HASH)));
+//            budgetProposal.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
+//            budgetProposal.setUrl(cursor.getString(cursor.getColumnIndex(COLUMN_URL)));
+//            budgetProposal.setDw_url(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL)));
+//            budgetProposal.setDw_url_comments(cursor.getString(cursor.getColumnIndex(COLUMN_DW_URL_COMMENTS)));
+//            budgetProposal.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE_PROP)));
+//            budgetProposal.setDate_added(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED)));
+//            budgetProposal.setDate_added_human(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_ADDED_HUMAN)));
+//            budgetProposal.setDate_end(cursor.getString(cursor.getColumnIndex(COLUMN_DATE_END)));
+//            budgetProposal.setVoting_deadline_human(cursor.getString(cursor.getColumnIndex(COLUMN_VOTING_DEADLINE_HUMAN)));
+//            budgetProposal.setWill_be_funded(cursor.getInt(cursor.getColumnIndex(COLUMN_WILL_BE_FUNDED)) != 0);
+//            budgetProposal.setRemaining_yes_votes_until_funding(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_YES_VOTES_UNTIL_FUNDING)));
+//            budgetProposal.setIn_next_budget(cursor.getInt(cursor.getColumnIndex(COLUMN_IN_NEXT_BUDGET)) != 0);
+//            budgetProposal.setMonthly_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_MONTHLY_AMOUNT)));
+//            budgetProposal.setTotal_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_TOTAL_PAYMENT_COUNT)));
+//            budgetProposal.setRemaining_payment_count(cursor.getInt(cursor.getColumnIndex(COLUMN_REMAINING_PAYMENT_COUNT)));
+//            budgetProposal.setYes(cursor.getInt(cursor.getColumnIndex(COLUMN_YES)));
+//            budgetProposal.setNo(cursor.getInt(cursor.getColumnIndex(COLUMN_NO)));
+//            budgetProposal.setOrder(cursor.getInt(cursor.getColumnIndex(COLUMN_ORDER)));
+//            budgetProposal.setComment_amount(cursor.getInt(cursor.getColumnIndex(COLUMN_COMMENT_AMOUNT)));
+//            budgetProposal.setOwner_username(cursor.getString(cursor.getColumnIndex(COLUMN_OWNER_USERNAME)));
+            proposalsList.add(budgetProposal);
         }
         cursor.close();
         db.close();
@@ -258,20 +258,20 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     public boolean deleteProposal(String proposalHash) {
         boolean result = false;
-        String query = "SELECT *" +
-                " FROM " + TABLE_PROPOSALS +
-                " WHERE " + COLUMN_HASH + " =  '" + proposalHash + "';";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        Proposal proposal = new Proposal();
-        if (cursor.moveToFirst()) {
-            proposal.setHash(cursor.getString(0));
-            db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
-                    new String[]{String.valueOf(proposal.getHash())});
-            cursor.close();
-            result = true;
-        }
-        db.close();
+//        String query = "SELECT *" +
+//                " FROM " + TABLE_PROPOSALS +
+//                " WHERE " + COLUMN_HASH + " =  '" + proposalHash + "';";
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        Cursor cursor = db.rawQuery(query, null);
+//        BudgetProposal proposal = new BudgetProposal();
+//        if (cursor.moveToFirst()) {
+//            proposal.setHash(cursor.getString(0));
+//            db.delete(TABLE_PROPOSALS, COLUMN_HASH + " = ?",
+//                    new String[]{String.valueOf(proposal.getHash())});
+//            cursor.close();
+//            result = true;
+//        }
+//        db.close();
         return result;
     }
 
