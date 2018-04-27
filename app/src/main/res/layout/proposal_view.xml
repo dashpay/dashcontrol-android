@@ -73,9 +73,7 @@
                     android:layout_gravity="center_horizontal"
                     android:text="12"
                     android:textColor="@color/dash_blue"
-                    android:textSize="22sp"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:textSize="22sp" />
 
                 <TextView
                     android:id="@+id/per_month"

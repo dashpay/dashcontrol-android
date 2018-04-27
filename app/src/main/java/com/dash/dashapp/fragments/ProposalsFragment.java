@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filterable;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
@@ -26,12 +27,17 @@ import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.ProposalAdapter;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.BudgetApiAnswer;
+import com.dash.dashapp.api.data.DashBudget;
 import com.dash.dashapp.api.data.DashProposal;
 import com.dash.dashapp.models.BudgetProposal;
+import com.dash.dashapp.models.BudgetSummary;
 import com.dash.dashapp.view.ExpandableFiltersView;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -54,6 +60,15 @@ public class ProposalsFragment extends BaseFragment {
 
     @BindView(R.id.filters)
     ExpandableFiltersView filtersView;
+
+    @BindView(R.id.total_budget)
+    TextView totalBudgetView;
+
+    @BindView(R.id.allocated_budget)
+    TextView allocatedBudgetView;
+
+    @BindView(R.id.superblocks_summary)
+    TextView superblocksSummaryView;
 
     private MenuItem searchMenuItem;
 
@@ -164,9 +179,10 @@ public class ProposalsFragment extends BaseFragment {
         public void onResponse(@NonNull Call<BudgetApiAnswer> call, Response<BudgetApiAnswer> response) {
             if (response.isSuccessful()) {
                 BudgetApiAnswer budgetApiAnswer = Objects.requireNonNull(response.body());
+                display(budgetApiAnswer.dashBudget);
                 List<DashProposal> proposalList = Objects.requireNonNull(budgetApiAnswer.proposals);
                 display(new ArrayList<BudgetProposal.Convertible>(proposalList));
-                persist(proposalList);
+                persist(proposalList, budgetApiAnswer.dashBudget);
             }
             swipeRefreshLayout.setRefreshing(false);
         }
@@ -181,26 +197,46 @@ public class ProposalsFragment extends BaseFragment {
 
     private void displayFromCache() {
         try (Realm realm = Realm.getDefaultInstance()) {
-            RealmQuery<DashProposal> whereQuery = realm.where(DashProposal.class);
-            RealmResults<DashProposal> queryResult = whereQuery.findAll();
-            List<BudgetProposal.Convertible> proposalList = new ArrayList<BudgetProposal.Convertible>(queryResult);
+
+            RealmQuery<DashBudget> budgetWhereQuery = realm.where(DashBudget.class);
+            DashBudget budgetQueryResult = budgetWhereQuery.findFirst();
+            if (budgetQueryResult != null) {
+                display(budgetQueryResult);
+            }
+
+            RealmQuery<DashProposal> proposalsWhereQuery = realm.where(DashProposal.class);
+            RealmResults<DashProposal> proposalsQueryResult = proposalsWhereQuery.findAll();
+            List<BudgetProposal.Convertible> proposalList = new ArrayList<BudgetProposal.Convertible>(proposalsQueryResult);
             display(proposalList);
         }
     }
 
-    private void display(List<BudgetProposal.Convertible> blogNewsList) {
+    private void display(BudgetSummary.Convertible budgetSummary) {
+        BudgetSummary summary = budgetSummary.convert();
+        NumberFormat formatter = NumberFormat.getNumberInstance();
+        formatter.setMinimumFractionDigits(1);
+        formatter.setMaximumFractionDigits(1);
+        totalBudgetView.setText(formatter.format(summary.totalAmount));
+        allocatedBudgetView.setText(formatter.format(summary.allotedAmount));
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
+        String superblockSummary = getString(R.string.superblocks_summary, summary.superblock, summary.paymentDateHuman, dateFormatter.format(summary.paymentDate));
+        superblocksSummaryView.setText(superblockSummary);
+    }
+
+    private void display(List<BudgetProposal.Convertible> proposalList) {
         if (currentPage == 1) {
             proposalAdapter.clear();
             endlessScrollListener.resetState();
         }
         List<BudgetProposal> list = new ArrayList<>();
-        for (BudgetProposal.Convertible item : blogNewsList) {
+        for (BudgetProposal.Convertible item : proposalList) {
             list.add(item.convert());
         }
         proposalAdapter.addAll(list);
     }
 
-    private void persist(final List<DashProposal> proposalList) {
+    private void persist(final List<DashProposal> proposalList, final DashBudget dashBudget) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -209,6 +245,9 @@ public class ProposalsFragment extends BaseFragment {
                         realm.delete(DashProposal.class);
                     }
                     realm.insert(proposalList);
+
+                    realm.delete(DashBudget.class);
+                    realm.insert(dashBudget);
                 }
             });
         }

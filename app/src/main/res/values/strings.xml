@@ -28,6 +28,8 @@
     <string name="no_id">No id</string>
     <string name="no_title">No Title</string>
     <string name="no_owner">No owner</string>
+    <string name="total">Total</string>
+    <string name="allocated">Allocated</string>
     <string name="one_time_payment_tag">One-time payment</string>
     <string name="no_dash">0 DASH</string>
     <string name="completed_payment_tag">Completed payments</string>
@@ -85,5 +87,7 @@
     <string name="proposal_filter_current">Current</string>
     <string name="proposal_filter_ongoing">Ongoing</string>
     <string name="proposal_filter_past">Past</string>
+
+    <string name="superblocks_summary">%d Superblocks in %s %s</string>
 
 </resources>

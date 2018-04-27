@@ -13,7 +13,7 @@ public class BudgetApiAnswer {
     public String errorType;
 
     @SerializedName("budget")
-    public Budget budget;
+    public DashBudget dashBudget;
 
     @SerializedName("proposals")
     public List<DashProposal> proposals;
