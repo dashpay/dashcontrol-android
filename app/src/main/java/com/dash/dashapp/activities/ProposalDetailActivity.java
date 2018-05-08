@@ -3,9 +3,7 @@ package com.dash.dashapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,44 +14,38 @@ import butterknife.BindView;
 
 public class ProposalDetailActivity extends BaseActivity {
 
-    public static final String CONTENT_PROPOSAL = "proposal";
+    public static final String PROPOSAL_EXTRA = "proposal_extra";
 
-    @BindView(R.id.pie_yes_no)
-    ProgressBar pieYesNo;
-    @BindView(R.id.approval_rate_textview)
-    TextView approvalRateTextview;
-    @BindView(R.id.textView_id_proposal)
-    TextView textViewIdProposal;
-    @BindView(R.id.textView_title_proposal)
-    TextView textViewTitleProposal;
-    @BindView(R.id.textView_owner)
-    TextView textViewOwner;
-    @BindView(R.id.textView_title)
-    TextView textViewTitle;
-    @BindView(R.id.textView_one_time_payment)
-    TextView textViewOneTimePayment;
-    @BindView(R.id.textView_month_remaining)
-    TextView textViewMonthRemaining;
-    @BindView(R.id.textView_completed_payments)
-    TextView textViewCompletedPayments;
-    @BindView(R.id.textView_yes)
-    TextView textViewYes;
-    @BindView(R.id.textView_no)
-    TextView textViewNo;
-    @BindView(R.id.textView_abstain)
-    TextView textViewAbstain;
-    @BindView(R.id.textView_proposal_description)
-    TextView textViewProposalDescription;
-    @BindView(R.id.button_accept_proposal)
-    Button buttonAcceptProposal;
-    @BindView(R.id.button_abstain)
-    Button buttonAbstain;
-    @BindView(R.id.button_no)
-    Button buttonNo;
+    @BindView(R.id.yes_votes)
+    TextView yesVotesView;
+
+    @BindView(R.id.no_votes)
+    TextView noVotesView;
+
+    @BindView(R.id.abstain_votes)
+    TextView abstainVotesView;
+
+    @BindView(R.id.title)
+    TextView titleView;
+
+    @BindView(R.id.approval_progress)
+    ProgressBar yesVotesRatioView;
+
+    @BindView(R.id.approval_progress_value)
+    TextView yesVotesRatioValueView;
+
+    @BindView(R.id.owner)
+    TextView ownerView;
+
+    @BindView(R.id.completed_payments)
+    TextView completedPaymentsView;
+
+    @BindView(R.id.proposal_description)
+    TextView proposalDescriptionView;
 
     public static Intent createIntent(Context context, BudgetProposal proposal) {
         Intent intent = new Intent(context, ProposalDetailActivity.class);
-        intent.putExtra(CONTENT_PROPOSAL, proposal);
+        intent.putExtra(PROPOSAL_EXTRA, proposal);
         return intent;
     }
 
@@ -66,42 +58,31 @@ public class ProposalDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Get a support ActionBar corresponding to this toolbar
-        ActionBar ab = getSupportActionBar();
-
-        // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        showBackAction();
 
         Intent intent = getIntent();
-        BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
+        BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(PROPOSAL_EXTRA);
+        display(budgetProposal);
+    }
+
+    private void display(BudgetProposal budgetProposal) {
+
+        yesVotesView.setText(String.valueOf(budgetProposal.yesVotes));
+        noVotesView.setText(String.valueOf(budgetProposal.noVotes));
+        abstainVotesView.setText(String.valueOf(budgetProposal.abstainVotes));
+        titleView.setText(String.valueOf(budgetProposal.title));
 
         double ratioYes = ((double) budgetProposal.yesVotes / (budgetProposal.yesVotes + budgetProposal.noVotes)) * 100;
         int ratioYesInt = (int) ratioYes;
-        pieYesNo.setProgress(ratioYesInt);
-        approvalRateTextview.setText(ratioYesInt + "%");
+        yesVotesRatioView.setProgress(ratioYesInt);
+        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, ratioYesInt));
 
-        textViewIdProposal.setText(budgetProposal.title);
+        ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
 
-        textViewTitleProposal.setText(budgetProposal.title);
+        int completedPayments = budgetProposal.totalPaymentCount - budgetProposal.remainingPaymentCount;
+        completedPaymentsView.setText(getString(R.string.completed_payments_format, completedPayments, budgetProposal.monthlyAmount));
 
-        textViewOwner.setText("Owned by " + budgetProposal.owner);
-
-        textViewTitle.setText(budgetProposal.title);
-
-        // TODO textViewOneTimePayment.setText("TODO");
-
-        //TODO textViewMonthRemaining.setText(budgetProposal.getVoting_deadline_human());
-
-        textViewCompletedPayments.setText(budgetProposal.totalPaymentCount + "");
-
-        textViewYes.setText(budgetProposal.yesVotes + " Yes");
-
-        textViewNo.setText(budgetProposal.name + " No");
-
-        // TODO textViewAbstain.setText(budgetProposal.getTitle());
-
-        // TODO RECUPERER LA PROP : textViewProposalDescription.setText(budgetProposal.getTitle());
-
+//        proposalDescriptionView.setText(budgetProposal.);
     }
 
 
