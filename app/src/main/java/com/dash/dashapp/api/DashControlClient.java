@@ -1,6 +1,7 @@
 package com.dash.dashapp.api;
 
-import com.dash.dashapp.api.data.BudgetApiAnswer;
+import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
+import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
 import com.dash.dashapp.api.data.DashBlogNews;
 import com.dash.dashapp.api.service.DashBlogService;
 import com.dash.dashapp.api.service.DashCentralService;
@@ -67,7 +68,11 @@ public class DashControlClient {
         return dashBlogService.blogNews(page);
     }
 
-    public Call<BudgetApiAnswer> getDashProposals(int page) {
+    public Call<BudgetApiBudgetAnswer> getDashProposals(int page) {
         return dashCentralService.proposals();
+    }
+
+    public Call<BudgetApiProposalAnswer> getProposalDetails(String proposalHash) {
+        return dashCentralService.proposalDetails(proposalHash);
     }
 }

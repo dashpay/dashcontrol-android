@@ -26,7 +26,7 @@ import com.dash.dashapp.R;
 import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.ProposalAdapter;
 import com.dash.dashapp.api.DashControlClient;
-import com.dash.dashapp.api.data.BudgetApiAnswer;
+import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
 import com.dash.dashapp.api.data.DashBudget;
 import com.dash.dashapp.api.data.DashProposal;
 import com.dash.dashapp.models.BudgetProposal;
@@ -74,7 +74,7 @@ public class ProposalsFragment extends BaseFragment {
 
     private Unbinder unbinder;
 
-    private Call<BudgetApiAnswer> budgetProposalsCall;
+    private Call<BudgetApiBudgetAnswer> budgetProposalsCall;
 
     private ProposalAdapter proposalAdapter;
 
@@ -84,10 +84,6 @@ public class ProposalsFragment extends BaseFragment {
 
     private boolean inSearchMode = false;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public ProposalsFragment() {
     }
 
@@ -174,11 +170,11 @@ public class ProposalsFragment extends BaseFragment {
         budgetProposalsCall.enqueue(callback);
     }
 
-    Callback<BudgetApiAnswer> callback = new Callback<BudgetApiAnswer>() {
+    Callback<BudgetApiBudgetAnswer> callback = new Callback<BudgetApiBudgetAnswer>() {
         @Override
-        public void onResponse(@NonNull Call<BudgetApiAnswer> call, Response<BudgetApiAnswer> response) {
+        public void onResponse(@NonNull Call<BudgetApiBudgetAnswer> call, Response<BudgetApiBudgetAnswer> response) {
             if (response.isSuccessful()) {
-                BudgetApiAnswer budgetApiAnswer = Objects.requireNonNull(response.body());
+                BudgetApiBudgetAnswer budgetApiAnswer = Objects.requireNonNull(response.body());
                 display(budgetApiAnswer.dashBudget);
                 List<DashProposal> proposalList = Objects.requireNonNull(budgetApiAnswer.proposals);
                 display(new ArrayList<BudgetProposal.Convertible>(proposalList));
@@ -188,7 +184,7 @@ public class ProposalsFragment extends BaseFragment {
         }
 
         @Override
-        public void onFailure(@NonNull Call<BudgetApiAnswer> call, @NonNull Throwable t) {
+        public void onFailure(@NonNull Call<BudgetApiBudgetAnswer> call, @NonNull Throwable t) {
             Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
             displayFromCache();
             swipeRefreshLayout.setRefreshing(false);
