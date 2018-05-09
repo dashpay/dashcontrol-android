@@ -24,6 +24,7 @@ import com.dash.dashapp.models.BudgetProposal;
 import java.util.Objects;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +63,8 @@ public class ProposalDetailActivity extends BaseActivity {
     @BindView(R.id.proposal_description)
     WebView proposalDescriptionView;
 
+    BudgetProposal budgetProposal;
+
     public static Intent createIntent(Context context, BudgetProposal proposal) {
         Intent intent = new Intent(context, ProposalDetailActivity.class);
         intent.putExtra(PROPOSAL_EXTRA, proposal);
@@ -70,7 +73,7 @@ public class ProposalDetailActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResourceId() {
-        return R.layout.activity_content_proposal;
+        return R.layout.activity_proposal_details;
     }
 
     @Override
@@ -85,6 +88,12 @@ public class ProposalDetailActivity extends BaseActivity {
         BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(PROPOSAL_EXTRA);
         displayBasicInfo(budgetProposal);
         loadProposalDetails(budgetProposal.hash);
+    }
+
+    @OnClick({R.id.comments})
+    public void onCommentsClick() {
+        Intent proposalCommentsIntent = ProposalCommentsActivity.createIntent(this, budgetProposal);
+        startActivity(proposalCommentsIntent);
     }
 
     private void loadProposalDetails(String hash) {
@@ -107,15 +116,14 @@ public class ProposalDetailActivity extends BaseActivity {
     }
 
     private void displayBasicInfo(BudgetProposal budgetProposal) {
+        this.budgetProposal = budgetProposal;
         yesVotesView.setText(String.valueOf(budgetProposal.yesVotes));
         noVotesView.setText(String.valueOf(budgetProposal.noVotes));
         abstainVotesView.setText(String.valueOf(budgetProposal.abstainVotes));
         titleView.setText(String.valueOf(budgetProposal.title));
 
-        double ratioYes = ((double) budgetProposal.yesVotes / (budgetProposal.yesVotes + budgetProposal.noVotes)) * 100;
-        int ratioYesInt = (int) ratioYes;
-        yesVotesRatioView.setProgress(ratioYesInt);
-        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, ratioYesInt));
+        yesVotesRatioView.setProgress(budgetProposal.getRatioYes());
+        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, budgetProposal.getRatioYes()));
 
         ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
 

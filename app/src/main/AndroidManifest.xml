@@ -45,6 +45,10 @@
             android:configChanges="layoutDirection|locale"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activities.ProposalCommentsActivity"
+            android:configChanges="layoutDirection|locale"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.AddWalletActivity"
             android:configChanges="layoutDirection|locale"
             android:parentActivityName=".activities.MainActivity"

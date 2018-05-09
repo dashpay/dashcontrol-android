@@ -9,7 +9,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alert_message">Network is not available. Loading Offline Data.</string>
     <string name="alert_title">Error</string>
-    <string name="alert_positive">Ok</string>
+    <string name="alert_positive">@android:string/ok</string>
     <string name="title_activity_settings">Settings</string>
     <string name="language_preference" translatable="false">language_preference</string>
     <string name="eng">English</string>
@@ -24,6 +24,7 @@
     <string name="button_abstain">Abstain</string>
     <string name="button_no">No</string>
     <string name="title">Title</string>
+    <string name="proposal_owner">(proposal owner)</string>
     <string name="no_id">No id</string>
     <string name="no_title">No Title</string>
     <string name="no_owner">No owner</string>
@@ -51,9 +52,12 @@
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
+    <string name="join_the_discussion">Join the discussion</string>
+    <string name="in_replay_to">In replay to %s</string>
+    <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
-    <string name="simple_percentage_value">%1$d\%%</string>
+    <string name="simple_percentage_value">%d\%%</string>
 
     <string name="radio_5m">5m</string>
     <string name="radio_15m">15m</string>
@@ -94,5 +98,11 @@
     <string name="proposal_filter_past">Past</string>
 
     <string name="superblocks_summary">%d Superblocks in %s %s</string>
+
+    <plurals
+        name="comment_points">
+        <item quantity="one">%d point, %s</item>
+        <item quantity="other">%d points, %s</item>
+    </plurals>
 
 </resources>

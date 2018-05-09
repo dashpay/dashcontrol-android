@@ -51,7 +51,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/no_label"
-                android:text="687"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
@@ -62,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/no_label"
                 android:layout_centerHorizontal="true"
-                android:text="16"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
@@ -73,47 +71,16 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/abstain_label"
-                android:text="5"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
-
-            <include
-                android:id="@+id/proposal_progress_view"
-                layout="@layout/proposal_progress_light_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="16dp" />
-
-            <TextView
-                android:id="@+id/title"
-                style="@style/text_list_item_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/proposal_progress_view"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="@string/lorem_ipsum_longest"
-                android:textColor="@color/dash_blue"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/owner"
-                style="@style/text_title_small_grey"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/title"
-                android:text="@string/no_owner" />
-
-        </RelativeLayout>
+        <include
+            android:id="@+id/proposal_title_view"
+            layout="@layout/proposal_title_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -210,6 +177,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:ignore="WebViewLayout" />
+
+        <Button
+            android:id="@+id/comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comments" />
 
     </LinearLayout>
 
