@@ -19,4 +19,8 @@ public class BudgetProposalComment implements Serializable {
     public interface Convertible {
         BudgetProposalComment convert();
     }
+
+    public int getLevelAsInt() {
+        return Integer.parseInt(level);
+    }
 }

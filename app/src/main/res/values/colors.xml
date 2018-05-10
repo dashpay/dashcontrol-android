@@ -21,6 +21,7 @@
     <color name="bg_splash">#1c75bc</color>
 
     <color name="ripple_light">#40ffffff</color>
+    <color name="ripple_dark">#40000000</color>
 
     <color name="text_light">#ffffff</color>
     <color name="text_dark">#616b7d</color>

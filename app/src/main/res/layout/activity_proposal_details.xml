@@ -178,11 +178,51 @@
             android:layout_height="wrap_content"
             tools:ignore="WebViewLayout" />
 
-        <Button
-            android:id="@+id/comments"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Comments" />
+            android:padding="16dp">
+
+            <TextView
+                style="@style/text_content_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/join_the_discussion_title"
+                android:textColor="@color/dash_blue" />
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator5"
+            style="@style/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+        <RelativeLayout
+            android:id="@+id/comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selectable_item_background_dark"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/right_arrow_label"
+                android:text="@string/submit_comments"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/right_arrow_label"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_chevron_right_blue_24dp"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

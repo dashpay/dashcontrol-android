@@ -12,12 +12,13 @@ import android.widget.Toast;
 import com.dash.dashapp.R;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
-import com.dash.dashapp.api.data.DashProposalComment;
 import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.models.BudgetProposalComment;
 import com.dash.dashapp.view.ProposalCommentView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,8 +76,8 @@ public class ProposalCommentsActivity extends BaseActivity {
             public void onResponse(@NonNull Call<BudgetApiProposalAnswer> call, @NonNull Response<BudgetApiProposalAnswer> response) {
                 if (response.isSuccessful()) {
                     BudgetApiProposalAnswer proposalAnswer = Objects.requireNonNull(response.body());
-                    List<DashProposalComment> proposalComments = proposalAnswer.comments;
-                    displayComments(new ArrayList<BudgetProposalComment.Convertible>(proposalComments));
+                    List<BudgetProposalComment> proposalComments = proposalAnswer.convertComments();
+                    displayComments(proposalComments);
                 }
             }
 
@@ -94,22 +95,82 @@ public class ProposalCommentsActivity extends BaseActivity {
         ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
     }
 
-    private void displayComments(ArrayList<BudgetProposalComment.Convertible> commentList) {
+    private void displayComments(List<BudgetProposalComment> commentList) {
         commentsContainerView.removeAllViews();
-        BudgetProposalComment previousComment = null;
-        for (BudgetProposalComment.Convertible rawComment : commentList) {
-            BudgetProposalComment comment = rawComment.convert();
+        sortByOrder(commentList);
+
+        TreeNode<BudgetProposalComment> hierarchy = new TreeNode<>(null);
+        for (BudgetProposalComment comment : commentList) {
+            int level = comment.getLevelAsInt();
+            TreeNode<BudgetProposalComment> parent = hierarchy;
+            for (int i = 0; i < level; i++) {
+                parent = parent.getLastChild();
+            }
+            parent.addChild(comment);
+        }
+
+        List<TreeNode<BudgetProposalComment>> flattenHierarchy = hierarchy.flatten();
+        flattenHierarchy.remove(0);
+        for (TreeNode<BudgetProposalComment> commentNode : flattenHierarchy) {
+            BudgetProposalComment comment = commentNode.data;
             ProposalCommentView proposalCommentView = new ProposalCommentView(this);
             proposalCommentView.setAuthor(comment.username, comment.postedByOwner);
             proposalCommentView.setPoints(0, comment.dateHuman);
             proposalCommentView.setComment(comment.content);
 
-            if (!comment.level.equals("0") && (previousComment != null)) {
-                proposalCommentView.setInReplayTo(previousComment.username, previousComment.postedByOwner);
+            if (comment.getLevelAsInt() > 0) {
+                BudgetProposalComment parentComment = commentNode.parent.data;
+                proposalCommentView.setInReplayTo(parentComment.username, parentComment.postedByOwner);
             }
-            previousComment = comment;
-
             commentsContainerView.addView(proposalCommentView);
+        }
+    }
+
+    private void sortByOrder(List<BudgetProposalComment> commentList) {
+        Collections.sort(commentList, new Comparator<BudgetProposalComment>() {
+            @Override
+            public int compare(BudgetProposalComment o1, BudgetProposalComment o2) {
+                return Integer.compare(o1.order, o2.order);
+            }
+        });
+    }
+
+    private static class TreeNode<T> {
+
+        private T data;
+        private TreeNode<T> parent;
+        private List<TreeNode<T>> children;
+
+        TreeNode(T data) {
+            this.data = data;
+            this.children = new ArrayList<>();
+        }
+
+        TreeNode(T data, TreeNode<T> parent) {
+            this(data);
+            this.parent = parent;
+        }
+
+        void addChild(T child) {
+            TreeNode<T> treeNode = new TreeNode<>(child, this);
+            children.add(treeNode);
+        }
+
+        TreeNode<T> getLastChild() {
+            if (children.size() > 0) {
+                return children.get(children.size() - 1);
+            } else {
+                return null;
+            }
+        }
+
+        List<TreeNode<T>> flatten() {
+            List<TreeNode<T>> result = new ArrayList<>();
+            result.add(this);
+            for (TreeNode<T> child : children) {
+                result.addAll(child.flatten());
+            }
+            return result;
         }
     }
 }

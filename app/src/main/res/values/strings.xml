@@ -52,7 +52,9 @@
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
+    <string name="join_the_discussion_title">Join the discussion!</string>
     <string name="join_the_discussion">Join the discussion</string>
+    <string name="submit_comments">Submit your comments and exchange your ideas on this proposal</string>
     <string name="in_replay_to">In replay to %s</string>
     <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
