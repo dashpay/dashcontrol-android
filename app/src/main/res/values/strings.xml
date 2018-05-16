@@ -51,6 +51,7 @@
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
+    <string name="show_full_description">Show full description</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
     <string name="simple_percentage_value">%1$d\%%</string>

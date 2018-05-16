@@ -208,8 +208,16 @@
         <WebView
             android:id="@+id/proposal_description"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="256dp"
             tools:ignore="WebViewLayout" />
+
+        <Button
+            android:id="@+id/show_more"
+            style="@style/text_content_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/show_full_description" />
 
     </LinearLayout>
 
