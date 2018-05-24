@@ -1,38 +1,19 @@
 package com.dash.dashapp.models;
 
-import java.util.List;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
-/**
- * Created by sebas on 12/2/2017.
- */
+public class Exchange extends RealmObject {
 
-public class Exchange {
+    public String name;
+    public RealmList<Market> markets;
 
-    private String name;
-    private List<Market> listMarket;
-
-    public Exchange(String name, List<Market> listCurrencies) {
-        this.name = name;
-        this.listMarket = listCurrencies;
+    public interface Convertible {
+        Exchange convert();
     }
 
-    public Exchange() {
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Market> getListMarket() {
-        return listMarket;
-    }
-
-    public void setListMarket(List<Market> listCurrencies) {
-        this.listMarket = listCurrencies;
+    @Override
+    public String toString() {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

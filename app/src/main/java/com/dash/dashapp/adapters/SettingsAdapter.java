@@ -1,7 +1,6 @@
 package com.dash.dashapp.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.MainActivity;
 import com.dash.dashapp.models.SettingsModel;
-import com.dash.dashapp.utils.MyDBHandler;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 
 import java.util.List;
@@ -21,9 +18,9 @@ import java.util.List;
  * Github : @dbarretto
  */
 
-public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<SettingsModel>  mRows;
+    private List<SettingsModel> mRows;
     private Context context;
 
     public SettingsAdapter(List<SettingsModel> mRows, Context context) {
@@ -42,10 +39,10 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        SettingsViewHolder settingsViewHolder =  (SettingsViewHolder) holder;
+        SettingsViewHolder settingsViewHolder = (SettingsViewHolder) holder;
         SettingsModel settingsModel = (SettingsModel) mRows.get(position);
 
-        if(settingsViewHolder!=null && settingsModel != null){
+        if (settingsViewHolder != null && settingsModel != null) {
             CheckedTextView checkedTextView = settingsViewHolder.getmCheckedTextView();
             checkedTextView.setText(settingsModel.getTitle());
             final String url = settingsModel.getURL();
@@ -62,9 +59,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             });
 
-            if(url!=null && url.equals(SharedPreferencesManager.getLanguageRSS(context))){
+            if (url != null && url.equals(SharedPreferencesManager.getLanguageRSS(context))) {
                 checkedTextView.setChecked(true);
-            }else{
+            } else {
                 checkedTextView.setChecked(false);
             }
         }
@@ -75,13 +72,13 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mRows.size();
     }
 
-    private class SettingsViewHolder extends RecyclerView.ViewHolder{
+    private class SettingsViewHolder extends RecyclerView.ViewHolder {
 
         private CheckedTextView mCheckedTextView;
 
         public SettingsViewHolder(View itemView) {
             super(itemView);
-            mCheckedTextView =  (CheckedTextView) itemView.findViewById(R.id.list_item_checked_textview);
+            mCheckedTextView = (CheckedTextView) itemView.findViewById(R.id.list_item_checked_textview);
         }
 
         public CheckedTextView getmCheckedTextView() {
