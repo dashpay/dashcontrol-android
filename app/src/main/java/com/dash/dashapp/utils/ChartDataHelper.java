@@ -2,6 +2,7 @@ package com.dash.dashapp.utils;
 
 import android.support.annotation.NonNull;
 
+import com.dash.dashapp.api.data.ChartRecord;
 import com.dash.dashapp.models.PriceChartRecord;
 
 import java.util.ArrayList;
@@ -26,13 +27,15 @@ public class ChartDataHelper {
         }
     }
 
-    public static void persist(final List<PriceChartRecord.Convertible> chartRecordList) {
+    public static void persist(final String exchange, final String market, final List<ChartRecord> chartRecordList) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(@NonNull Realm realm) {
                     List<PriceChartRecord> chartPriceRecordList = new ArrayList<>();
-                    for (PriceChartRecord.Convertible chartRecord : chartRecordList) {
+                    for (ChartRecord chartRecord : chartRecordList) {
+                        chartRecord.exchange = exchange;
+                        chartRecord.market = market;
                         chartPriceRecordList.add(chartRecord.convert());
                     }
                     realm.insert(chartPriceRecordList);
@@ -78,11 +81,11 @@ public class ChartDataHelper {
         }
     }
 
-    public static List<PriceChartRecord> getChartData(String exchange, String market, long startTime) {
+    private static List<PriceChartRecord> getChartData(String exchange, String market, long startTime) {
         return getChartData(exchange, market, startTime, -1);
     }
 
-    public static List<PriceChartRecord> getChartData(String exchange, String market, long startTime, long endTime) {
+    private static List<PriceChartRecord> getChartData(String exchange, String market, long startTime, long endTime) {
         try (Realm realm = Realm.getDefaultInstance()) {
             RealmQuery<PriceChartRecord> query = realm.where(PriceChartRecord.class)
                     .equalTo(PriceChartRecord.Field.EXCHANGE, exchange)

@@ -109,12 +109,7 @@ public class ChartDataDownloader {
             responseBodyRecords = addMissingRecords(exchange, market, responseBodyRecords, startTime, endTime);
         }
 
-        for (ChartRecord record : responseBodyRecords) {
-            record.exchange = exchange;
-            record.market = market;
-        }
-
-        ChartDataHelper.persist(new ArrayList<PriceChartRecord.Convertible>(responseBodyRecords));
+        ChartDataHelper.persist(exchange, market, responseBodyRecords);
 
         if (historical && (endTime > (currentTimeUtc - COMPLETE_TIME_WINDOW))) {
             endTime -= PACKAGE_TIME_WINDOW;
