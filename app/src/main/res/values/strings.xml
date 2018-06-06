@@ -57,6 +57,7 @@
     <string name="submit_comments">Submit your comments and exchange your ideas on this proposal</string>
     <string name="in_replay_to">In replay to %s</string>
     <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
+    <string name="show_full_description">Show full description</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
     <string name="simple_percentage_value">%d\%%</string>

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -19,6 +21,7 @@ import com.dash.dashapp.R;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
 import com.dash.dashapp.helpers.AssetsHelper;
+import com.dash.dashapp.helpers.DimenHelper;
 import com.dash.dashapp.models.BudgetProposal;
 
 import java.util.Objects;
@@ -64,6 +67,9 @@ public class ProposalDetailActivity extends BaseActivity {
     WebView proposalDescriptionView;
 
     BudgetProposal budgetProposal;
+
+    private int targetWebViewHeightDp = -1;
+    private boolean webViewExpanded = false;
 
     public static Intent createIntent(Context context, BudgetProposal proposal) {
         Intent intent = new Intent(context, ProposalDetailActivity.class);
@@ -139,6 +145,24 @@ public class ProposalDetailActivity extends BaseActivity {
         }
     }
 
+    @OnClick(R.id.show_more)
+    public void onShowMoreClick(View view) {
+        if (targetWebViewHeightDp == 0) {
+            return;
+        }
+        int targetHeight;
+        if (webViewExpanded) {
+            targetHeight = DimenHelper.dpToPx(256);
+            webViewExpanded = false;
+        } else {
+            targetHeight = DimenHelper.dpToPx(targetWebViewHeightDp);
+            webViewExpanded = true;
+            view.setVisibility(View.GONE);
+        }
+        proposalDescriptionView.setLayoutParams(
+                new LinearLayout.LayoutParams(getResources().getDisplayMetrics().widthPixels, targetHeight));
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView(final WebView webView) {
         webView.getSettings().setDomStorageEnabled(true);
@@ -150,20 +174,26 @@ public class ProposalDetailActivity extends BaseActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                webView.loadUrl("javascript:AdjustSizeScript.resizeToWrapContentHeight(document.body.getBoundingClientRect().height)");
+                webView.loadUrl("javascript:SaveTargetHeightScript.saveHeight(document.body.getBoundingClientRect().height)");
                 super.onPageFinished(view, url);
             }
         });
-        webView.addJavascriptInterface(this, "AdjustSizeScript");
+        webView.addJavascriptInterface(this, "SaveTargetHeightScript");
+
+        disableScrollingWhenWebViewCollapsed();
     }
 
     @JavascriptInterface
-    public void resizeToWrapContentHeight(final float height) {
-        runOnUiThread(new Runnable() {
+    public void saveHeight(final float height) {
+        targetWebViewHeightDp = (int) height;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void disableScrollingWhenWebViewCollapsed() {
+        proposalDescriptionView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void run() {
-                proposalDescriptionView.setLayoutParams(
-                        new LinearLayout.LayoutParams(getResources().getDisplayMetrics().widthPixels, (int) (height * getResources().getDisplayMetrics().density)));
+            public boolean onTouch(View v, MotionEvent event) {
+                return !webViewExpanded && (event.getAction() == MotionEvent.ACTION_MOVE);
             }
         });
     }
