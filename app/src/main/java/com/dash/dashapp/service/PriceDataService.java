@@ -100,8 +100,8 @@ public class PriceDataService extends Service {
     }
 
     private void syncNextMarketChartData() {
-        Pair<String, String> exchangeMarket = chartDataSyncQueue.poll();
-        if (exchangeMarket != null) {
+        if (chartDataSyncQueue.size() > 0) {
+            Pair<String, String> exchangeMarket = chartDataSyncQueue.poll();
             String exchange = exchangeMarket.first;
             String market = exchangeMarket.second;
             ChartDataDownloader chartDataDownloader = new ChartDataDownloader(chartDownloadCallback);
@@ -113,6 +113,15 @@ public class PriceDataService extends Service {
         @Override
         public void onFinished(String exchange, String market) {
             syncNextMarketChartData();
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            if (t != null) {
+                Log.e(TAG, t.getMessage());
+            } else {
+                Log.e(TAG, "Error downloading chart data");
+            }
         }
     };
 

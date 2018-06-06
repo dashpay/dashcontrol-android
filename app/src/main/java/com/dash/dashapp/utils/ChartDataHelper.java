@@ -44,7 +44,7 @@ public class ChartDataHelper {
         }
     }
 
-    public void clearDatabase(final String exchange, final String market) {
+    public static void clearDatabase(final String exchange, final String market) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override

@@ -78,31 +78,33 @@ public class ChartDataDownloader {
                     DashControlChartDataAnswer responseBody = response.body();
                     if (responseBody != null) {
                         List<ChartRecord> responseBodyRecords = responseBody.getRecords();
-                        saveChartData(exchange, market, startTime, endTime, responseBodyRecords, historical);
+                        Log.d(TAG, String.format(Locale.getDefault(), "downloaded %d records", responseBodyRecords.size()));
+                        if (responseBodyRecords.size() > 0) {
+                            saveChartData(exchange, market, startTime, endTime, responseBodyRecords, historical);
+                            downloadingNextChunkOrFinish(exchange, market, endTime, historical);
+                        } else {
+                            Log.d(TAG, String.format(Locale.getDefault(), "downloading finished (%s) (%s) - no more data", exchange, market));
+                            callback.onFinished(exchange, market);
+                        }
                     }
                     return;
                 }
-                logError(null);
+                handleError(null);
             }
 
             @Override
             public void onFailure(@NonNull Call<DashControlChartDataAnswer> call, @NonNull Throwable t) {
-                logError(t);
+                handleError(t);
             }
         });
     }
 
-    private void logError(Throwable t) {
-        if (t != null) {
-            Log.e(ChartDataDownloader.class.getCanonicalName(), t.getMessage());
-        } else {
-            Log.e(ChartDataDownloader.class.getCanonicalName(), "error");
-        }
+    private void handleError(Throwable t) {
+        callback.onFailure(t);
     }
 
     private void saveChartData(String exchange, String market,
                                long startTime, long endTime, List<ChartRecord> responseBodyRecords, boolean historical) {
-
         if (historical) {
             responseBodyRecords = addMissingHistoricalRecords(exchange, market, responseBodyRecords, endTime);
         } else {
@@ -110,7 +112,9 @@ public class ChartDataDownloader {
         }
 
         ChartDataHelper.persist(exchange, market, responseBodyRecords);
+    }
 
+    private void downloadingNextChunkOrFinish(String exchange, String market, long endTime, boolean historical) {
         if (historical && (endTime > (currentTimeUtc - COMPLETE_TIME_WINDOW))) {
             endTime -= PACKAGE_TIME_WINDOW;
             downloadHistorical(exchange, market, endTime);
@@ -189,5 +193,7 @@ public class ChartDataDownloader {
 
     public interface DownloadCallback {
         void onFinished(String exchange, String market);
+
+        void onFailure(Throwable t);
     }
 }
