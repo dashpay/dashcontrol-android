@@ -1,65 +1,64 @@
 package com.dash.dashapp.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
+import android.widget.Toast;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.activities.AddMasternodeActivity;
 import com.dash.dashapp.activities.AddWalletActivity;
-import com.dash.dashapp.adapters.MasternodeView;
-import com.dash.dashapp.adapters.WalletView;
-import com.dash.dashapp.helpers.ApiHelper;
-import com.dash.dashapp.helpers.WalletSharedPreferenceHelper;
-import com.dash.dashapp.models.Masternode;
-import com.dash.dashapp.models.Wallet;
-import com.dash.dashapp.models.WalletBalance;
-import com.github.clans.fab.FloatingActionButton;
+import com.dash.dashapp.adapters.PortfolioChildView;
+import com.dash.dashapp.adapters.PortfolioParentView;
+import com.dash.dashapp.api.DashControlClient;
+import com.dash.dashapp.api.data.InsightResponse;
+import com.dash.dashapp.models.PortfolioEntry;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PortfolioFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PortfolioFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class PortfolioFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-    private ExpandablePlaceHolderView mExpandableView;
-    private static HashMap<String, Double> wallet_map;
+    private static final int REQUEST_ADD_WALLET = 100;
+    private static final int REQUEST_EDIT_WALLET = 200;
+    private static final int REQUEST_ADD_MASTERNODE = 300;
 
+    @BindView(R.id.floating_menu)
+    FloatingActionMenu floatingMenu;
+
+    @BindView(R.id.expandable_list)
+    ExpandablePlaceHolderView portfolioListView;
+
+    private PortfolioParentView walletParentView;
+    private PortfolioParentView masternodeParentView;
+
+    private Unbinder unbinder;
 
     public PortfolioFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PortfolioFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PortfolioFragment newInstance() {
         PortfolioFragment fragment = new PortfolioFragment();
         Bundle args = new Bundle();
@@ -68,118 +67,48 @@ public class PortfolioFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        wallet_map = new HashMap<>();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        mExpandableView = (ExpandablePlaceHolderView) view.findViewById(R.id.masternodeWalletExpandableView);
+        masternodeParentView = new PortfolioParentView(getString(R.string.portfolio_my_masternodes));
+        walletParentView = new PortfolioParentView(getString(R.string.portfolio_my_wallets));
 
-        // creating floating button menu
-        final FloatingActionMenu fam = (FloatingActionMenu) view.findViewById(R.id.menu_masternode_wallet);
-        AnimatorSet set = new AnimatorSet();
-
-        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleX", 1.0f, 0.2f);
-        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleY", 1.0f, 0.2f);
-
-        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleX", 0.2f, 1.0f);
-        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(fam.getMenuIconView(), "scaleY", 0.2f, 1.0f);
-
-        scaleOutX.setDuration(50);
-        scaleOutY.setDuration(50);
-
-        scaleInX.setDuration(150);
-        scaleInY.setDuration(150);
-
-        scaleInX.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                fam.getMenuIconView().setImageResource(fam.isOpened()
-                        ? R.drawable.ic_add_white_24px : R.drawable.ic_close_white_24dp);
-            }
-        });
-
-        set.play(scaleOutX).with(scaleOutY);
-        set.play(scaleInX).with(scaleInY).after(scaleOutX);
-        set.setInterpolator(new OvershootInterpolator(2));
-
-        fam.setIconToggleAnimatorSet(set);
-
-
-        final FloatingActionButton addMasternode = (FloatingActionButton) view.findViewById(R.id.button_add_masternode);
-        addMasternode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddMasternodeActivity.class);
-                startActivityForResult(intent,100);
-            }
-        });
-
-
-        final FloatingActionButton addWallet = (FloatingActionButton) view.findViewById(R.id.button_add_wallet);
-        addWallet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddWalletActivity.class);
-                startActivityForResult(intent,200);
-            }
-        });
-
-
-        // Inflate the layout for this fragment
         return view;
+    }
+
+    @OnClick(R.id.add_wallet)
+    public void onAddWalletClick() {
+        Intent intent = AddWalletActivity.createIntent(getActivity());
+        startActivityForResult(intent, REQUEST_ADD_WALLET);
+    }
+
+    @OnClick(R.id.add_masternode)
+    public void onAddMasternodeClick() {
+        Intent intent = new Intent(getActivity(), AddMasternodeActivity.class);
+        startActivityForResult(intent, REQUEST_ADD_MASTERNODE);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (wallet_map == null) wallet_map = new HashMap<>();
-        reload_wallets();
-        refreshViews();
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        reloadPortfolio();
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public void startActivityForResult(Intent intent, int requestCode) {
+        floatingMenu.close(false);
+        super.startActivityForResult(intent, requestCode);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    public void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
@@ -187,45 +116,99 @@ public class PortfolioFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 100 || requestCode == 200) {
-        if(resultCode == getActivity().RESULT_OK){
-            reload_wallets();
-            if(mExpandableView!=null) mExpandableView.removeAllViews();
-            refreshViews();
-        }
+        if (requestCode == REQUEST_ADD_WALLET || requestCode == REQUEST_ADD_MASTERNODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                reloadPortfolio();
+            }
         }
     }
 
-    private void reload_wallets() {
-        Set<String> address_book = WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().getWallet_address_book();
-        if (address_book != null) {
-            try {
-                List<WalletBalance> walletBalanceList = ApiHelper.getPriceForWalletOrMasterNode(address_book.toArray(new String[address_book.size()]));
-                if (walletBalanceList != null && !walletBalanceList.isEmpty()) {
-                    if (wallet_map == null) wallet_map = new HashMap<>();
-                    wallet_map.clear();
-                    for (WalletBalance walletBalance : walletBalanceList) {
-                        wallet_map.put(walletBalance.getAddress(), walletBalance.getAmount());
+    private void reloadPortfolio() {
+        refreshViews();
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmQuery<PortfolioEntry> whereQuery = realm.where(PortfolioEntry.class);
+            RealmResults<PortfolioEntry> queryResult = whereQuery.findAll();
+            List<PortfolioEntry> portfolioEntries = new ArrayList<>(queryResult);
+            final Call<List<InsightResponse>> utxoCall = DashControlClient.getInstance().getUtxos(portfolioEntries);
+            utxoCall.enqueue(new Callback<List<InsightResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<InsightResponse>> call, @NonNull Response<List<InsightResponse>> response) {
+                    if (response.isSuccessful()) {
+                        final List<InsightResponse> utxoList = Objects.requireNonNull(response.body());
+                        updateBalances(utxoList);
+                        refreshViews();
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                @Override
+                public void onFailure(@NonNull Call<List<InsightResponse>> call, @NonNull Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void updateBalances(final List<InsightResponse> utxoList) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    PortfolioEntry portfolioEntry = null;
+                    for (InsightResponse utxo : utxoList) {
+                        if (portfolioEntry == null || !portfolioEntry.pubKey.equals(utxo.address)) {
+                            portfolioEntry = realm.where(PortfolioEntry.class)
+                                    .equalTo(PortfolioEntry.Field.PUB_KEY, utxo.address)
+                                    .findFirst();
+                            if (portfolioEntry == null) {
+                                continue;
+                            }
+                            portfolioEntry.balance = 0;
+                        }
+                        portfolioEntry.balance += utxo.satoshis;
+                    }
+                }
+            });
+        }
+    }
+
+    private void refreshViews() {
+        clearPortfolioListView();
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmResults<PortfolioEntry> portfolioEntriesQueryResult = realm.where(PortfolioEntry.class)
+                    .equalTo(PortfolioEntry.Field.TYPE, PortfolioEntry.Type.WALLET.name())
+                    .findAll();
+            List<PortfolioEntry> portfolioEntries = realm.copyFromRealm(portfolioEntriesQueryResult);
+            long balance = 0;
+            for (PortfolioEntry entry : portfolioEntries) {
+                portfolioListView.addChildView(walletParentView, new PortfolioChildView(entry, onItemClickListener));
+                balance += entry.balance;
+            }
+            walletParentView.setBalance(balance);
+            if (portfolioEntries.size() > 0) {
+                expandWalletParentView();
             }
         }
     }
 
-    private void refreshViews(){
-        for (Map.Entry<String, Double> wallet : wallet_map.entrySet()) {
-            String key = wallet.getKey();
-            Double value = wallet.getValue();
-            if (value != null) {
-                if (value > 1000) {
-                    mExpandableView.addView(new MasternodeView(getContext(), new Masternode(key + " : " + value + " DASH")));
-                } else {
-                    mExpandableView.addView(new WalletView(getContext(), new Wallet(key + " : " + value + " DASH")));
-                }
-            }
+    private PortfolioChildView.OnItemClickListener onItemClickListener = new PortfolioChildView.OnItemClickListener() {
+        @Override
+        public void onItemClick(PortfolioEntry entry) {
+            Intent intent = AddWalletActivity.createIntent(getActivity(), entry.id);
+            startActivityForResult(intent, REQUEST_EDIT_WALLET);
         }
+    };
 
+    private void clearPortfolioListView() {
+        portfolioListView.removeAllViews();
+        portfolioListView.addView(masternodeParentView);
+        portfolioListView.addView(walletParentView);
+    }
+
+    private void expandWalletParentView() {
+        try {
+            portfolioListView.expand(walletParentView);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

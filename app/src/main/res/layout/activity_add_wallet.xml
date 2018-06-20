@@ -1,85 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.dash.dashapp.activities.AddWalletActivity">
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Adress"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/addressWalletEditText"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:hint="Your Dash Public Key"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView10"
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:textColorHint="@color/white">
+
+                <EditText
+                    android:id="@+id/input_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_wallet_label_hint"
+                    android:inputType="textFilter"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_public_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                app:layout_constraintTop_toBottomOf="@id/input_layout_label">
+
+                <EditText
+                    android:id="@+id/input_public_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_wallet_public_key_hint"
+                    android:inputType="textFilter"
+                    android:textColor="@color/white">
+
+                    <requestFocus />
+
+                </EditText>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/scan_qr_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selectable_item_background_light"
+                android:drawableEnd="@drawable/ic_keyboard_arrow_right_white_24dp"
+                android:drawablePadding="8dp"
+                android:drawableStart="@drawable/ic_crop_free_black_24dp"
+                android:padding="16dp"
+                android:text="@string/add_wallet_scan_qr_code"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_layout_public_key" />
+
+            <Switch
+                android:id="@+id/payment_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/add_wallet_payment_notification"
+                android:textColor="@color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scan_qr_code" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/add_wallet_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="32dp"
-        android:text="Payment Notification"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addressWalletEditText" />
-
-    <ToggleButton
-        android:id="@+id/paymentNotificationToggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:text="ToggleButton"
-        app:layout_constraintBottom_toBottomOf="@+id/textView10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView10" />
-
-    <TextView
-        android:id="@+id/qrCodeImport"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:drawableEnd="@drawable/ic_keyboard_arrow_right_black_24dp"
-        android:drawableStart="@drawable/ic_crop_free_black_24dp"
-        android:text="QR Code Import"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView10" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="180dp" />
-
-    <Button
-        android:id="@+id/btn_AddWallet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Add Wallet"
+        android:src="@drawable/ic_check_white_24dp"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/qrCodeImport"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPrimaryDark"
+        fab:fab_colorRipple="@color/primary_material_dark_1"
+        fab:fab_label="@string/add_wallet"
+        fab:fab_size="normal" />
 
 </android.support.constraint.ConstraintLayout>

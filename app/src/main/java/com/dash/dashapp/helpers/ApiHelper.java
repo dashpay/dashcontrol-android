@@ -1,15 +1,9 @@
 package com.dash.dashapp.helpers;
 
-import com.dash.dashapp.models.WalletBalance;
 import com.dash.dashapp.utils.DeviceInfoUtil;
 import com.dash.dashapp.utils.HttpUtil;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
-
 import okhttp3.Response;
 
 /**
@@ -70,34 +64,5 @@ public class ApiHelper {
         String response = HttpUtil.executePostWithAuthentication(device_id, password, url, params);
 //        Log.d(TAG, "createPriceAlert: " + response);
         System.out.println(response);
-    }
-
-    public static List<WalletBalance> getPriceForWalletOrMasterNode(String... addresses) throws IOException {
-        String params = null;
-        for (String address : addresses) {
-            params = address + ",";
-        }
-        if (params != null && params.endsWith(",")) {
-            params = params.substring(0, params.length() - 1);
-        }
-
-        String url = "http://insight.dash.org/insight-api-dash/addrs/" + params + "/utxo";
-        String url_fallback = "https://insight.dash.siampm.com/api/addrs/" + params + "/utxo";
-
-        List<WalletBalance> walletBalanceList = null;
-        Type listType = new TypeToken<List<WalletBalance>>() {
-        }.getType();
-
-        Response response = HttpUtil.executeGet(url);
-
-        if (response != null && response.isSuccessful()) {
-            walletBalanceList = new Gson().fromJson(response.body().string(), listType);
-        } else {
-            Response response_fallback = HttpUtil.executeGet(url_fallback);
-            if (response_fallback != null && response_fallback.isSuccessful()) {
-                walletBalanceList = new Gson().fromJson(response.body().string(), listType);
-            }
-        }
-        return walletBalanceList;
     }
 }
