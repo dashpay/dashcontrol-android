@@ -64,9 +64,20 @@
     <string name="radio_2w">2w</string>
     <string name="radio_1m">1m</string>
     <string name="radio_3m">3m</string>
-    <string name="my_masternode">My masternode</string>
+
+    <string name="portfolio_my_wallets">My Wallets</string>
+    <string name="portfolio_my_masternodes">My Masternodes</string>
+
     <string name="add_masternode">Add masternode</string>
+
     <string name="add_wallet">Add wallet</string>
+    <string name="add_wallet_default_label_format">Wallet %d</string>
+    <string name="add_wallet_label_hint">Wallet label</string>
+    <string name="add_wallet_public_key_hint">Your Dash public key</string>
+    <string name="add_wallet_payment_notification">Payment Notification</string>
+    <string name="add_wallet_scan_qr_code">Scan QR code</string>
+    <string name="add_wallet_empty_address">Address cannot be empty</string>
+    <string name="add_wallet_public_key_already_added">Public Key already added as %s</string>
 
 
     <string name="hello_world">Hello world!</string>
@@ -84,10 +95,25 @@
     <string name="lorem_ipsum_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="lorem_ipsum_longest">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta imperdiet viverra. Duis rhoncus nunc auctor sem volutpat rutrum. Duis nec est placerat, vestibulum enim at, sollicitudin odio. Suspendisse ut nulla porttitor.</string>
 
+    <string name="not_yet_supported">Not yet supported</string>
+
     <string name="proposal_filter_current">Current</string>
     <string name="proposal_filter_ongoing">Ongoing</string>
     <string name="proposal_filter_past">Past</string>
 
     <string name="superblocks_summary">%d Superblocks in %s %s</string>
+
+    <string name="chart_marker_date">Date: %s</string>
+    <string name="chart_marker_open">Open: %f</string>
+    <string name="chart_marker_close">Close: %f</string>
+    <string name="chart_marker_high">High: %f</string>
+    <string name="chart_marker_low">Low: %f</string>
+    <string name="chart_marker_volume_dash">Vol1 : %f</string>
+    <string name="chart_marker_volume">Vol2 : %f</string>
+
+    <plurals name="comment_points">
+        <item quantity="one">%d point, %s</item>
+        <item quantity="other">%d points, %s</item>
+    </plurals>
 
 </resources>

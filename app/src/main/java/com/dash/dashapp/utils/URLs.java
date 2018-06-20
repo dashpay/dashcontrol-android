@@ -6,7 +6,8 @@ package com.dash.dashapp.utils;
 
 public class URLs {
 
-    private final static String BASE_URL_DASH_CONTROL = "https://dashpay.info/api/v0/";
+//    public final static String BASE_URL_DASH_CONTROL_DEV = "https://dev.dashpay.info/api/v0/";
+    public final static String BASE_URL_DASH_CONTROL = "https://dashpay.info/api/v0/";
 
     private final static String BASE_DASH_URL = "https://www.dash.org/";
 
@@ -27,4 +28,6 @@ public class URLs {
 
     public static final String DASH_BLOG_API = "https://www2.dash.org/";
     public static final String DASH_CENTRAL_API = "https://www.dashcentral.org/api/v1/";
+
+    public final static String DASH_INSIGHT_API = "https://insight.dash.org/insight-api-dash/";
 }

@@ -11,7 +11,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.helpers.WalletSharedPreferenceHelper;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -19,7 +18,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 public class AddMasternodeActivity extends BaseActivity {
-
 
     @BindView(R.id.adressEditText)
     EditText addressEditText;
@@ -57,7 +55,7 @@ public class AddMasternodeActivity extends BaseActivity {
             public void onClick(View v) {
                 String address = addressEditText.getText().toString().trim();
                 if(address!=null && !address.isEmpty()){
-                    WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().addWalletToAddressBook(address);
+//                    WalletSharedPreferenceHelper.getWalletSharedPreferenceHelper().addWalletToAddressBook(address);
                     Intent data = new Intent();
                     setResult(RESULT_OK,data);
                     finish();

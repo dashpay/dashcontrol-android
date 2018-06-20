@@ -2,8 +2,11 @@ package com.dash.dashapp.api;
 
 import com.dash.dashapp.api.data.BudgetApiAnswer;
 import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.api.data.InsightResponse;
 import com.dash.dashapp.api.service.DashBlogService;
 import com.dash.dashapp.api.service.DashCentralService;
+import com.dash.dashapp.api.service.DashInsightService;
+import com.dash.dashapp.models.PortfolioEntry;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
@@ -23,6 +26,7 @@ public class DashControlClient {
 
     private final DashBlogService dashBlogService;
     private final DashCentralService dashCentralService;
+    private final DashInsightService dashInsightService;
 
     private static final DashControlClient INSTANCE = new DashControlClient();
 
@@ -57,6 +61,14 @@ public class DashControlClient {
                 .build();
 
         dashCentralService = retrofit.create(DashCentralService.class);
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.DASH_INSIGHT_API)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        dashInsightService = retrofit.create(DashInsightService.class);
     }
 
     public static DashControlClient getInstance() {
@@ -69,5 +81,17 @@ public class DashControlClient {
 
     public Call<BudgetApiAnswer> getDashProposals(int page) {
         return dashCentralService.proposals();
+    }
+
+    public Call<List<InsightResponse>> getUtxos(List<PortfolioEntry> portfolioEntries) {
+        StringBuilder addrsBuilder = new StringBuilder();
+        for (PortfolioEntry entry : portfolioEntries) {
+            if (addrsBuilder.length() > 0) {
+                addrsBuilder.append(",");
+            }
+            addrsBuilder.append(entry.pubKey);
+        }
+        String addrs = addrsBuilder.toString();
+        return dashInsightService.utxos(addrs);
     }
 }
