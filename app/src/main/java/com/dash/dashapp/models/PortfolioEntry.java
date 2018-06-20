@@ -19,9 +19,13 @@ public class PortfolioEntry extends RealmObject implements Serializable {
 
     public String pubKey;
 
+    public String votingKey;
+
     public String label;
 
     public long balance;
+
+    public boolean includeEarnings;
 
     private String type;
 

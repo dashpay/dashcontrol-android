@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="@color/dark_background"
         android:clipToPadding="false"
-        android:paddingBottom="96dp"
+        android:paddingBottom="64dp"
         android:scrollbars="vertical"
         tools:listitem="@layout/portfolio_parent_view" />
 

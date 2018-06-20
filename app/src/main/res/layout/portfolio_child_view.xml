@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/title"
-            android:drawableEnd="@drawable/ic_dash_d_unit"
+            android:drawableStart="@drawable/ic_dash_d_unit"
             android:drawablePadding="4dp"
             android:drawableTint="@color/semi_grey"
             android:text="0.00000000"

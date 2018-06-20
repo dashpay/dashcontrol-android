@@ -39,7 +39,9 @@
     <string name="no_no">0 No</string>
     <string name="no_abstain">0 Abstain</string>
     <string name="no_description">No description</string>
-    <string name="search">search</string>
+    <string name="search">Search</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">No title entered by budgetProposal owner</string>
     <string name="textview_no_comments">No comments</string>
@@ -65,20 +67,23 @@
     <string name="radio_1m">1m</string>
     <string name="radio_3m">3m</string>
 
-    <string name="portfolio_my_wallets">My Wallets</string>
-    <string name="portfolio_my_masternodes">My Masternodes</string>
-
-    <string name="add_masternode">Add masternode</string>
-
-    <string name="add_wallet">Add wallet</string>
-    <string name="add_wallet_default_label_format">Wallet %d</string>
-    <string name="add_wallet_label_hint">Wallet label</string>
-    <string name="add_wallet_public_key_hint">Your Dash public key</string>
-    <string name="add_wallet_payment_notification">Payment Notification</string>
-    <string name="add_wallet_scan_qr_code">Scan QR code</string>
-    <string name="add_wallet_empty_address">Address cannot be empty</string>
-    <string name="add_wallet_public_key_already_added">Public Key already added as %s</string>
-
+    <string name="add_portfolio_entry_my_wallets">My Wallets</string>
+    <string name="add_portfolio_entry_my_masternodes">My Masternodes</string>
+    <string name="add_portfolio_entry_add_masternode">Add Masternode</string>
+    <string name="add_portfolio_entry_add_wallet">Add Wallet</string>
+    <string name="add_portfolio_entry_edit_masternode">Edit Masternode</string>
+    <string name="add_portfolio_entry_edit_wallet">Edit Wallet</string>
+    <string name="add_portfolio_entry_label_hint">Label</string>
+    <string name="add_portfolio_entry_address_hint">Address</string>
+    <string name="add_portfolio_entry_voting_key_hint">Voting key</string>
+    <string name="add_portfolio_entry_payment_notification">Payment Notification</string>
+    <string name="add_portfolio_entry_include_masternode_earnings">Include Masternode earnings</string>
+    <string name="add_portfolio_entry_scan_qr_code">Scan QR code</string>
+    <string name="add_portfolio_entry_import_using_qr_code">Import using QR code</string>
+    <string name="add_portfolio_entry_wallet_label_format">Wallet %d</string>
+    <string name="add_portfolio_entry_masternode_label_format">Masternode %d</string>
+    <string name="add_portfolio_entry_empty_address">Address cannot be empty</string>
+    <string name="add_portfolio_entry_public_key_already_added">Address already added as %s</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

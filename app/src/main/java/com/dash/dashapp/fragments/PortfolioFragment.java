@@ -13,8 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.AddMasternodeActivity;
-import com.dash.dashapp.activities.AddWalletActivity;
+import com.dash.dashapp.activities.AddPortfolioEntryActivity;
 import com.dash.dashapp.adapters.PortfolioChildView;
 import com.dash.dashapp.adapters.PortfolioParentView;
 import com.dash.dashapp.api.DashControlClient;
@@ -41,8 +40,8 @@ import retrofit2.Response;
 public class PortfolioFragment extends Fragment {
 
     private static final int REQUEST_ADD_WALLET = 100;
-    private static final int REQUEST_EDIT_WALLET = 200;
     private static final int REQUEST_ADD_MASTERNODE = 300;
+    private static final int REQUEST_EDIT_ENTRY = 200;
 
     @BindView(R.id.floating_menu)
     FloatingActionMenu floatingMenu;
@@ -72,21 +71,21 @@ public class PortfolioFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_portfolio, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        masternodeParentView = new PortfolioParentView(getString(R.string.portfolio_my_masternodes));
-        walletParentView = new PortfolioParentView(getString(R.string.portfolio_my_wallets));
+        masternodeParentView = new PortfolioParentView(getString(R.string.add_portfolio_entry_my_masternodes));
+        walletParentView = new PortfolioParentView(getString(R.string.add_portfolio_entry_my_wallets));
 
         return view;
     }
 
     @OnClick(R.id.add_wallet)
     public void onAddWalletClick() {
-        Intent intent = AddWalletActivity.createIntent(getActivity());
+        Intent intent = AddPortfolioEntryActivity.createIntent(getActivity(), PortfolioEntry.Type.WALLET);
         startActivityForResult(intent, REQUEST_ADD_WALLET);
     }
 
     @OnClick(R.id.add_masternode)
     public void onAddMasternodeClick() {
-        Intent intent = new Intent(getActivity(), AddMasternodeActivity.class);
+        Intent intent = AddPortfolioEntryActivity.createIntent(getActivity(), PortfolioEntry.Type.MASTERNODE);
         startActivityForResult(intent, REQUEST_ADD_MASTERNODE);
     }
 
@@ -115,11 +114,8 @@ public class PortfolioFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_ADD_WALLET || requestCode == REQUEST_ADD_MASTERNODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                reloadPortfolio();
-            }
+        if (resultCode == Activity.RESULT_OK) {
+            reloadPortfolio();
         }
     }
 
@@ -175,17 +171,26 @@ public class PortfolioFragment extends Fragment {
         clearPortfolioListView();
         try (Realm realm = Realm.getDefaultInstance()) {
             RealmResults<PortfolioEntry> portfolioEntriesQueryResult = realm.where(PortfolioEntry.class)
-                    .equalTo(PortfolioEntry.Field.TYPE, PortfolioEntry.Type.WALLET.name())
                     .findAll();
             List<PortfolioEntry> portfolioEntries = realm.copyFromRealm(portfolioEntriesQueryResult);
-            long balance = 0;
+            long walletsBalance = 0L;
+            long masternodesBalance = 0L;
             for (PortfolioEntry entry : portfolioEntries) {
-                portfolioListView.addChildView(walletParentView, new PortfolioChildView(entry, onItemClickListener));
-                balance += entry.balance;
+                PortfolioEntry.Type entryType = entry.getType();
+                PortfolioParentView parentView;
+                if (entryType == PortfolioEntry.Type.MASTERNODE) {
+                    parentView = masternodeParentView;
+                    masternodesBalance += entry.balance;
+                } else {
+                    parentView = walletParentView;
+                    walletsBalance += entry.balance;
+                }
+                portfolioListView.addChildView(parentView, new PortfolioChildView(entry, onItemClickListener));
             }
-            walletParentView.setBalance(balance);
+            walletParentView.setBalance(walletsBalance);
+            masternodeParentView.setBalance(masternodesBalance);
             if (portfolioEntries.size() > 0) {
-                expandWalletParentView();
+                expandParentViews();
             }
         }
     }
@@ -193,8 +198,8 @@ public class PortfolioFragment extends Fragment {
     private PortfolioChildView.OnItemClickListener onItemClickListener = new PortfolioChildView.OnItemClickListener() {
         @Override
         public void onItemClick(PortfolioEntry entry) {
-            Intent intent = AddWalletActivity.createIntent(getActivity(), entry.id);
-            startActivityForResult(intent, REQUEST_EDIT_WALLET);
+            Intent intent = AddPortfolioEntryActivity.createIntent(getActivity(), entry);
+            startActivityForResult(intent, REQUEST_EDIT_ENTRY);
         }
     };
 
@@ -204,11 +209,12 @@ public class PortfolioFragment extends Fragment {
         portfolioListView.addView(walletParentView);
     }
 
-    private void expandWalletParentView() {
+    private void expandParentViews() {
         try {
+            portfolioListView.expand(masternodeParentView);
             portfolioListView.expand(walletParentView);
-        } catch (Resources.NotFoundException e) {
-            e.printStackTrace();
+        } catch (Resources.NotFoundException ignored) {
+            // ignore
         }
     }
 }
