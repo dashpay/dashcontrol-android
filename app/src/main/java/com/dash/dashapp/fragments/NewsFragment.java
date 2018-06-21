@@ -141,9 +141,11 @@ public class NewsFragment extends Fragment {
 
         @Override
         public void onFailure(@NonNull Call<List<DashBlogNews>> call, @NonNull Throwable t) {
-            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            displayFromCache();
-            swipeRefreshLayout.setRefreshing(false);
+            if (!call.isCanceled()) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                displayFromCache();
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }
     };
 
