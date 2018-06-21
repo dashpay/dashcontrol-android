@@ -50,7 +50,7 @@
             app:backgroundTint="@color/dash_blue"
             fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/semi_grey"
-            fab:fab_label="Add Masternode"
+            fab:fab_label="@string/add_portfolio_entry_add_masternode"
             fab:fab_size="normal" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -61,7 +61,7 @@
             app:backgroundTint="@color/dash_blue"
             fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/semi_white"
-            fab:fab_label="@string/add_wallet"
+            fab:fab_label="@string/add_portfolio_entry_add_wallet"
             fab:fab_size="normal" />
 
     </com.github.clans.fab.FloatingActionMenu>
