@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.2'
         classpath 'com.google.gms:google-services:3.2.0' // google-services plugin
-        classpath "io.realm:realm-gradle-plugin:5.0.1"
+        classpath "io.realm:realm-gradle-plugin:5.3.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -20,7 +20,7 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven { url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo' }
+        maven { url 'https://github.com/WickeDev/stetho-realm/raw/master/maven-repo' }
     }
 }
 

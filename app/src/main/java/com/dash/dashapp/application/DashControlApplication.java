@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 /**
  * Created by sebas on 9/18/2017.
@@ -56,12 +57,22 @@ public class DashControlApplication extends Application {
 
     private void initRealm() {
         Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+
+        Realm.setDefaultConfiguration(config);
+
+        RealmInspectorModulesProvider realmInspector = RealmInspectorModulesProvider.builder(this)
+                .withDeleteIfMigrationNeeded(true)
+                .build();
+
         Stetho.initialize(
                 Stetho.newInitializerBuilder(this)
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                        .build()
-        );
+                        .enableWebKitInspector(realmInspector)
+                        .build());
     }
 
     private void pickDefaultLanguage() {

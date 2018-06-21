@@ -137,6 +137,7 @@ public class PriceDataService extends Service {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(@NonNull Realm realm) {
+                    realm.delete(Market.class);
                     realm.delete(Exchange.class);
                     realm.insert(exchanges);
                 }
@@ -151,6 +152,19 @@ public class PriceDataService extends Service {
                     .findAll();
             List<Exchange> queryResultUnmanagedCopy = realm.copyFromRealm(queryResult);
             return new ArrayList<>(queryResultUnmanagedCopy);
+        }
+    }
+
+    public static Exchange findDefaultExchange() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            Exchange defaultMarket = realm
+                    .where(Exchange.class)
+                    .equalTo(Exchange.Field.MARKETS_IS_DEFAULT, true)
+                    .findFirst();
+            if (defaultMarket != null) {
+                return realm.copyFromRealm(defaultMarket);
+            }
+            return null;
         }
     }
 
