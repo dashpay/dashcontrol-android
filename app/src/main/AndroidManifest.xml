@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dash.dashapp">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,7 +16,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/dash_launcher"
         android:label="@string/app_name"
-        android:logo="@drawable/logo"
+        android:logo="@drawable/ic_dash_d_white_24dp"
         android:roundIcon="@mipmap/dash_launcher"
         android:supportsRtl="true"
         android:theme="@style/Dash_theme">
@@ -49,15 +50,11 @@
             android:configChanges="layoutDirection|locale"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.AddWalletActivity"
+            android:name=".activities.AddPortfolioEntryActivity"
             android:configChanges="layoutDirection|locale"
             android:parentActivityName=".activities.MainActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.AddMasternodeActivity"
-            android:configChanges="layoutDirection|locale"
-            android:parentActivityName=".activities.MainActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
             android:name=".activities.AuthenticationActivity"
             android:configChanges="layoutDirection|locale|orientation"
@@ -70,6 +67,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
 
         <service android:name=".service.fcm.DashControlFirebaseMessagingService">
             <intent-filter>

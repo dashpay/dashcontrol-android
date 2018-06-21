@@ -9,13 +9,17 @@
 
 
     <com.mindorks.placeholderview.ExpandablePlaceHolderView
-        android:id="@+id/masternodeWalletExpandableView"
+        android:id="@+id/expandable_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:background="@color/dark_background"
+        android:clipToPadding="false"
+        android:paddingBottom="64dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/portfolio_parent_view" />
 
     <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu_masternode_wallet"
+        android:id="@+id/floating_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -32,39 +36,34 @@
         fab:fab_colorNormal="@color/colorPrimary"
         fab:fab_colorPressed="@color/colorPrimaryDark"
         fab:fab_colorRipple="@color/primary_material_dark_1"
-        fab:menu_colorNormal="@color/colorPrimary"
+        fab:menu_colorNormal="@color/dash_blue"
         fab:menu_colorPressed="@color/colorPrimaryDark"
         fab:menu_colorRipple="@color/primary_material_dark_1"
         fab:menu_fab_label="Cancel"
         fab:menu_fab_size="normal">
 
-
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/button_add_masternode"
+            android:id="@+id/add_masternode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/logo"
-            app:backgroundTint="@color/colorPrimary"
-            fab:fab_colorNormal="@color/colorPrimary"
-            fab:fab_colorPressed="@color/colorPrimaryDark"
-            fab:fab_colorRipple="@color/primary_material_dark_1"
-            fab:fab_label="Add Masternode"
-            fab:fab_size="mini" />
-
+            android:src="@drawable/ic_dash_d_dash_blue_24dp"
+            app:backgroundTint="@color/dash_blue"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/semi_grey"
+            fab:fab_label="@string/add_portfolio_entry_add_masternode"
+            fab:fab_size="normal" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/button_add_wallet"
+            android:id="@+id/add_wallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_account_balance_wallet_white_24dp"
-            app:backgroundTint="@color/colorPrimary"
-            fab:fab_colorNormal="@color/colorPrimary"
-            fab:fab_colorPressed="@color/colorPrimaryDark"
-            fab:fab_colorRipple="@color/primary_material_dark_1"
-            fab:fab_label="Add Wallet"
-            fab:fab_size="mini" />
+            android:src="@drawable/ic_wallet_dash_blue_24dp"
+            app:backgroundTint="@color/dash_blue"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/semi_white"
+            fab:fab_label="@string/add_portfolio_entry_add_wallet"
+            fab:fab_size="normal" />
 
     </com.github.clans.fab.FloatingActionMenu>
-
 
 </android.support.constraint.ConstraintLayout>

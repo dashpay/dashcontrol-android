@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.dash.dashapp.activities.AddPortfolioEntryActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="64dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:textColorHint="@color/white">
+
+                <EditText
+                    android:id="@+id/input_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_portfolio_entry_label_hint"
+                    android:inputType="textFilter"
+                    android:maxLength="128"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_public_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                app:layout_constraintTop_toBottomOf="@id/input_layout_label">
+
+                <EditText
+                    android:id="@+id/input_public_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_portfolio_entry_address_hint"
+                    android:inputType="textFilter"
+                    android:textColor="@color/white">
+
+                    <requestFocus />
+
+                </EditText>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_voting_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                app:layout_constraintTop_toBottomOf="@id/input_layout_public_key">
+
+                <EditText
+                    android:id="@+id/input_voting_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_portfolio_entry_voting_key_hint"
+                    android:inputType="textFilter"
+                    android:textColor="@color/white">
+
+                </EditText>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Switch
+                android:id="@+id/payment_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foreground="@drawable/selectable_item_background_light"
+                android:padding="16dp"
+                android:text="@string/add_portfolio_entry_payment_notification"
+                android:textColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/input_layout_voting_key" />
+
+            <Switch
+                android:id="@+id/include_masternode_earnings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foreground="@drawable/selectable_item_background_light"
+                android:padding="16dp"
+                android:text="@string/add_portfolio_entry_include_masternode_earnings"
+                android:textColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/payment_notification" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/scan_qr_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_qrcode"
+        app:backgroundTint="@color/colorPrimary"
+        app:fab_label="@string/add_portfolio_entry_import_using_qr_code"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPrimaryDark"
+        fab:fab_colorRipple="@color/primary_material_dark_1"
+        fab:fab_size="normal" />
+
+</android.support.constraint.ConstraintLayout>

@@ -1,14 +1,26 @@
 <resources>
 
-    <style name="Dash_theme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/primary_material_dark_1</item>
-        <item name="android:colorAccent">@color/primary_material_dark_1</item>
-        <item name="android:colorBackground">@android:color/background_light</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-        <item name="android:colorForeground">@color/primary_material_dark_1</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
+    <style name="Dash_theme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/dash_blue</item>
+        <item name="android:colorPrimaryDark">@color/dash_blue_dark</item>
+        <item name="android:colorAccent">@color/white</item>
+
+        <item name="colorPrimary">@color/dash_blue</item>
+
+        <item name="android:navigationBarColor">@color/dash_blue_dark</item>
+
+        <item name="android:colorBackground">@color/dash_blue</item>
+        <item name="android:colorForeground">@color/white</item>
+
+        <item name="android:windowBackground">@color/dark_background</item>
+
+        <item name="colorControlActivated">@color/dash_blue</item>
+        <item name="colorControlHighlight">@color/dash_blue</item>
+        <item name="colorControlNormal">@color/semi_grey</item>
+        <item name="colorSwitchThumbNormal">@color/deep_blue</item>
+
+        <item name="android:textColorHint">@color/semi_grey</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
     <style name="text_list_item_title" parent="android:Widget.TextView">
