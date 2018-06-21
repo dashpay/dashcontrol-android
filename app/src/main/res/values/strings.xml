@@ -67,6 +67,9 @@
     <string name="radio_1m">1m</string>
     <string name="radio_3m">3m</string>
 
+    <string name="portfolio_your_dash">Your Dash</string>
+    <string name="portfolio_usd_value">Value in USD</string>
+
     <string name="add_portfolio_entry_my_wallets">My Wallets</string>
     <string name="add_portfolio_entry_my_masternodes">My Masternodes</string>
     <string name="add_portfolio_entry_add_masternode">Add Masternode</string>

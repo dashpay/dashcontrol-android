@@ -1,21 +1,72 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootPortfolio"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.dash.dashapp.fragments.PortfolioFragment">
 
+    <RelativeLayout
+        android:id="@+id/portfolio_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dash_blue"
+        android:paddingBottom="8dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/your_dash_label"
+            style="@style/text_small_semi_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/portfolio_your_dash" />
+
+        <TextView
+            android:id="@+id/usd_value_label"
+            style="@style/text_small_semi_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/portfolio_usd_value" />
+
+        <TextView
+            android:id="@+id/your_dash"
+            style="@style/text_content_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/your_dash_label"
+            android:drawablePadding="4dp"
+            android:drawableStart="@drawable/ic_dash_d_unit_18dp"
+            android:drawableTint="@color/white"
+            android:text="0.0000"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/usd_value"
+            style="@style/text_content_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/usd_value_label"
+            android:text="$ 0.00"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+
+    </RelativeLayout>
 
     <com.mindorks.placeholderview.ExpandablePlaceHolderView
         android:id="@+id/expandable_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/dark_background"
         android:clipToPadding="false"
         android:paddingBottom="64dp"
         android:scrollbars="vertical"
+        app:layout_constraintTop_toBottomOf="@id/portfolio_header"
         tools:listitem="@layout/portfolio_parent_view" />
 
     <com.github.clans.fab.FloatingActionMenu
@@ -27,20 +78,20 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_add_white_24px"
+        app:fab_colorNormal="@color/colorPrimary"
+        app:fab_colorPressed="@color/colorPrimaryDark"
+        app:fab_colorRipple="@color/primary_material_dark_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        fab:fab_colorNormal="@color/colorPrimary"
-        fab:fab_colorPressed="@color/colorPrimaryDark"
-        fab:fab_colorRipple="@color/primary_material_dark_1"
-        fab:menu_colorNormal="@color/dash_blue"
-        fab:menu_colorPressed="@color/colorPrimaryDark"
-        fab:menu_colorRipple="@color/primary_material_dark_1"
-        fab:menu_fab_label="Cancel"
-        fab:menu_fab_size="normal">
+        app:menu_colorNormal="@color/dash_blue"
+        app:menu_colorPressed="@color/colorPrimaryDark"
+        app:menu_colorRipple="@color/primary_material_dark_1"
+        app:menu_fab_label="Cancel"
+        app:menu_fab_size="normal">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/add_masternode"
@@ -48,10 +99,10 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_dash_d_dash_blue_24dp"
             app:backgroundTint="@color/dash_blue"
-            fab:fab_colorNormal="@color/white"
-            fab:fab_colorPressed="@color/semi_grey"
-            fab:fab_label="@string/add_portfolio_entry_add_masternode"
-            fab:fab_size="normal" />
+            app:fab_colorNormal="@color/white"
+            app:fab_colorPressed="@color/semi_grey"
+            app:fab_label="@string/add_portfolio_entry_add_masternode"
+            app:fab_size="normal" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/add_wallet"
@@ -59,10 +110,10 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_wallet_dash_blue_24dp"
             app:backgroundTint="@color/dash_blue"
-            fab:fab_colorNormal="@color/white"
-            fab:fab_colorPressed="@color/semi_white"
-            fab:fab_label="@string/add_portfolio_entry_add_wallet"
-            fab:fab_size="normal" />
+            app:fab_colorNormal="@color/white"
+            app:fab_colorPressed="@color/semi_white"
+            app:fab_label="@string/add_portfolio_entry_add_wallet"
+            app:fab_size="normal" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

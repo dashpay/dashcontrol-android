@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
@@ -22,8 +23,11 @@ import com.dash.dashapp.models.PortfolioEntry;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -42,6 +46,12 @@ public class PortfolioFragment extends Fragment {
     private static final int REQUEST_ADD_WALLET = 100;
     private static final int REQUEST_ADD_MASTERNODE = 300;
     private static final int REQUEST_EDIT_ENTRY = 200;
+
+    @BindView(R.id.your_dash)
+    TextView yourDashView;
+
+    @BindView(R.id.usd_value)
+    TextView usdValueView;
 
     @BindView(R.id.floating_menu)
     FloatingActionMenu floatingMenu;
@@ -192,7 +202,17 @@ public class PortfolioFragment extends Fragment {
             if (portfolioEntries.size() > 0) {
                 expandParentViews();
             }
+            updateHeader(masternodesBalance + walletsBalance);
         }
+    }
+
+    private void updateHeader(long duffsBalance) {
+        float dashBalance = duffsBalance / 100000000F;
+        String balanceFormat = String.format(Locale.US, "%.4f", dashBalance);
+        yourDashView.setText(balanceFormat);
+        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
+        format.setCurrency(Currency.getInstance(Locale.US));
+        usdValueView.setText(format.format(dashBalance * 345));
     }
 
     private PortfolioChildView.OnItemClickListener onItemClickListener = new PortfolioChildView.OnItemClickListener() {
