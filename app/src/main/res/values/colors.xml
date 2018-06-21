@@ -13,6 +13,8 @@
     <color name="white">#ffffff</color>
     <color name="semi_white">#ccffffff</color>
 
+    <color name="semi_grey">#88a0a0a0</color>
+
     <color name="dash_blue">#1d71b8</color>
     <color name="theme_red">#ff2566</color>
     <color name="theme_green">#8bcb00</color>

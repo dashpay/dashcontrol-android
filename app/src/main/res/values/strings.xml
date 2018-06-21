@@ -90,4 +90,12 @@
 
     <string name="superblocks_summary">%d Superblocks in %s %s</string>
 
+    <string name="chart_marker_date">Date: %s</string>
+    <string name="chart_marker_open">Open: %f</string>
+    <string name="chart_marker_close">Close: %f</string>
+    <string name="chart_marker_high">High: %f</string>
+    <string name="chart_marker_low">Low: %f</string>
+    <string name="chart_marker_volume_dash">Vol1 : %f</string>
+    <string name="chart_marker_volume">Vol2 : %f</string>
+
 </resources>
