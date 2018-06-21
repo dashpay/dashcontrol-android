@@ -1,44 +1,19 @@
 package com.dash.dashapp.models;
 
-/**
- * Created by sebas on 12/2/2017.
- */
+import io.realm.RealmObject;
 
-public class Market {
-    private String name;
-    private double price;
-    private int isDefault;
+public class Market extends RealmObject {
 
-    public Market(String name, double price) {
-        this.name = name;
-        this.price = price;
+    public String name;
+    public double price;
+    public boolean isDefault;
+
+    public interface Convertible {
+        Market convert();
     }
 
-    public Market() {
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getIsDefault() {
-        return isDefault;
-    }
-
-    public void setIsDefault(int isDefault) {
-        this.isDefault = isDefault;
+    @Override
+    public String toString() {
+        return name.replace("_", "/");
     }
 }
