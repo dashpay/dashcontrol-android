@@ -19,6 +19,7 @@ import com.dash.dashapp.adapters.PortfolioChildView;
 import com.dash.dashapp.adapters.PortfolioParentView;
 import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.InsightResponse;
+import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PortfolioEntry;
 import com.github.clans.fab.FloatingActionMenu;
 import com.mindorks.placeholderview.ExpandablePlaceHolderView;
@@ -208,11 +209,25 @@ public class PortfolioFragment extends Fragment {
 
     private void updateHeader(long duffsBalance) {
         float dashBalance = duffsBalance / 100000000F;
-        String balanceFormat = String.format(Locale.US, "%.4f", dashBalance);
+        String balanceFormat = String.format(Locale.US, "%.2f", dashBalance);
         yourDashView.setText(balanceFormat);
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
         format.setCurrency(Currency.getInstance(Locale.US));
-        usdValueView.setText(format.format(dashBalance * 345));
+        double price = dashUsdPrice();
+        usdValueView.setText(format.format(dashBalance * price));
+    }
+
+    private double dashUsdPrice() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            Market defaultMarket = realm
+                    .where(Market.class)
+                    .equalTo(Market.Field.NAME, "DASH_USD")
+                    .findFirst();
+            if (defaultMarket != null) {
+                return defaultMarket.price;
+            }
+            return 0;
+        }
     }
 
     private PortfolioChildView.OnItemClickListener onItemClickListener = new PortfolioChildView.OnItemClickListener() {
