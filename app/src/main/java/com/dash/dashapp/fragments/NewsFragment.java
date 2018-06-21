@@ -255,17 +255,16 @@ public class NewsFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        if (blogNewsCall != null) {
-            blogNewsCall.cancel();
-        }
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        blogNewsCall = null;
+        cancelRequest();
         unbinder.unbind();
+    }
+
+    private void cancelRequest() {
+        if (blogNewsCall != null) {
+            blogNewsCall.cancel();
+            blogNewsCall = null;
+        }
     }
 }

@@ -185,9 +185,11 @@ public class ProposalsFragment extends BaseFragment {
 
         @Override
         public void onFailure(@NonNull Call<BudgetApiBudgetAnswer> call, @NonNull Throwable t) {
-            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            displayFromCache();
-            swipeRefreshLayout.setRefreshing(false);
+            if (!call.isCanceled()) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+                displayFromCache();
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }
     };
 
@@ -322,17 +324,16 @@ public class ProposalsFragment extends BaseFragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        if (budgetProposalsCall != null) {
-            budgetProposalsCall.cancel();
-        }
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        budgetProposalsCall = null;
+        cancelRequest();
         unbinder.unbind();
+    }
+
+    private void cancelRequest() {
+        if (budgetProposalsCall != null) {
+            budgetProposalsCall.cancel();
+            budgetProposalsCall = null;
+        }
     }
 }
