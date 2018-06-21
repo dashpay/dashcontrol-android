@@ -50,7 +50,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/yes_label"
-                android:text="6651.8"
+                android:drawablePadding="4dp"
+                android:drawableStart="@drawable/ic_dash_d_unit_18dp"
+                android:text="0.00"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
@@ -61,7 +63,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/allocated"
-                android:text="3711.6"
+                android:drawablePadding="4dp"
+                android:drawableStart="@drawable/ic_dash_d_unit_18dp"
+                android:text="0.00"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
