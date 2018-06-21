@@ -1,119 +1,200 @@
 package com.dash.dashapp.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.view.MenuItem;
-import android.widget.Button;
+import android.support.annotation.NonNull;
+import android.view.MotionEvent;
+import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dash.dashapp.R;
+import com.dash.dashapp.api.DashControlClient;
+import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
+import com.dash.dashapp.helpers.AssetsHelper;
+import com.dash.dashapp.helpers.DimenHelper;
 import com.dash.dashapp.models.BudgetProposal;
 
+import java.util.Objects;
+
 import butterknife.BindView;
+import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProposalDetailActivity extends BaseActivity {
 
-    public static final String CONTENT_PROPOSAL = "proposal";
+    public static final String PROPOSAL_EXTRA = "proposal_extra";
 
-    @BindView(R.id.pie_yes_no)
-    ProgressBar pieYesNo;
-    @BindView(R.id.approval_rate_textview)
-    TextView approvalRateTextview;
-    @BindView(R.id.textView_id_proposal)
-    TextView textViewIdProposal;
-    @BindView(R.id.textView_title_proposal)
-    TextView textViewTitleProposal;
-    @BindView(R.id.textView_owner)
-    TextView textViewOwner;
-    @BindView(R.id.textView_title)
-    TextView textViewTitle;
-    @BindView(R.id.textView_one_time_payment)
-    TextView textViewOneTimePayment;
-    @BindView(R.id.textView_month_remaining)
-    TextView textViewMonthRemaining;
-    @BindView(R.id.textView_completed_payments)
-    TextView textViewCompletedPayments;
-    @BindView(R.id.textView_yes)
-    TextView textViewYes;
-    @BindView(R.id.textView_no)
-    TextView textViewNo;
-    @BindView(R.id.textView_abstain)
-    TextView textViewAbstain;
-    @BindView(R.id.textView_proposal_description)
-    TextView textViewProposalDescription;
-    @BindView(R.id.button_accept_proposal)
-    Button buttonAcceptProposal;
-    @BindView(R.id.button_abstain)
-    Button buttonAbstain;
-    @BindView(R.id.button_no)
-    Button buttonNo;
+    private static final String DESCRIPTION_CONTENT_MIME_TYPE = "text/html; charset=utf-8";
+    private static final String DESCRIPTION_CONTENT_ENCODING = "utf-8";
+
+    @BindView(R.id.yes_votes)
+    TextView yesVotesView;
+
+    @BindView(R.id.no_votes)
+    TextView noVotesView;
+
+    @BindView(R.id.abstain_votes)
+    TextView abstainVotesView;
+
+    @BindView(R.id.title)
+    TextView titleView;
+
+    @BindView(R.id.approval_progress)
+    ProgressBar yesVotesRatioView;
+
+    @BindView(R.id.approval_progress_value)
+    TextView yesVotesRatioValueView;
+
+    @BindView(R.id.owner)
+    TextView ownerView;
+
+    @BindView(R.id.completed_payments)
+    TextView completedPaymentsView;
+
+    @BindView(R.id.proposal_description)
+    WebView proposalDescriptionView;
+
+    BudgetProposal budgetProposal;
+
+    private int targetWebViewHeightDp = -1;
+    private boolean webViewExpanded = false;
 
     public static Intent createIntent(Context context, BudgetProposal proposal) {
         Intent intent = new Intent(context, ProposalDetailActivity.class);
-        intent.putExtra(CONTENT_PROPOSAL, proposal);
+        intent.putExtra(PROPOSAL_EXTRA, proposal);
         return intent;
     }
 
     @Override
     protected int getLayoutResourceId() {
-        return R.layout.activity_content_proposal;
+        return R.layout.activity_proposal_details;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Get a support ActionBar corresponding to this toolbar
-        ActionBar ab = getSupportActionBar();
+        showBackAction();
 
-        // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        setupWebView(proposalDescriptionView);
 
         Intent intent = getIntent();
-        BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(CONTENT_PROPOSAL);
-
-        double ratioYes = ((double) budgetProposal.yesVotes / (budgetProposal.yesVotes + budgetProposal.noVotes)) * 100;
-        int ratioYesInt = (int) ratioYes;
-        pieYesNo.setProgress(ratioYesInt);
-        approvalRateTextview.setText(ratioYesInt + "%");
-
-        textViewIdProposal.setText(budgetProposal.title);
-
-        textViewTitleProposal.setText(budgetProposal.title);
-
-        textViewOwner.setText("Owned by " + budgetProposal.owner);
-
-        textViewTitle.setText(budgetProposal.title);
-
-        // TODO textViewOneTimePayment.setText("TODO");
-
-        //TODO textViewMonthRemaining.setText(budgetProposal.getVoting_deadline_human());
-
-        textViewCompletedPayments.setText(budgetProposal.totalPaymentCount + "");
-
-        textViewYes.setText(budgetProposal.yesVotes + " Yes");
-
-        textViewNo.setText(budgetProposal.name + " No");
-
-        // TODO textViewAbstain.setText(budgetProposal.getTitle());
-
-        // TODO RECUPERER LA PROP : textViewProposalDescription.setText(budgetProposal.getTitle());
-
+        BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(PROPOSAL_EXTRA);
+        displayBasicInfo(budgetProposal);
+        loadProposalDetails(budgetProposal.hash);
     }
 
+    @OnClick({R.id.comments})
+    public void onCommentsClick() {
+        Intent proposalCommentsIntent = ProposalCommentsActivity.createIntent(this, budgetProposal);
+        startActivity(proposalCommentsIntent);
+    }
 
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    private void loadProposalDetails(String hash) {
+        Call<BudgetApiProposalAnswer> proposalDetails = DashControlClient.getInstance().getProposalDetails(hash);
+        proposalDetails.enqueue(new Callback<BudgetApiProposalAnswer>() {
+            @Override
+            public void onResponse(@NonNull Call<BudgetApiProposalAnswer> call, @NonNull Response<BudgetApiProposalAnswer> response) {
+                if (response.isSuccessful()) {
+                    BudgetApiProposalAnswer proposalAnswer = Objects.requireNonNull(response.body());
+                    BudgetProposal proposal = proposalAnswer.proposal.convert();
+                    displayDetails(proposal);
+                }
+            }
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+            @Override
+            public void onFailure(@NonNull Call<BudgetApiProposalAnswer> call, @NonNull Throwable t) {
+                Toast.makeText(ProposalDetailActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
-            default:
-                return super.onOptionsItemSelected(item);
+    private void displayBasicInfo(BudgetProposal budgetProposal) {
+        this.budgetProposal = budgetProposal;
+        yesVotesView.setText(String.valueOf(budgetProposal.yesVotes));
+        noVotesView.setText(String.valueOf(budgetProposal.noVotes));
+        abstainVotesView.setText(String.valueOf(budgetProposal.abstainVotes));
+        titleView.setText(String.valueOf(budgetProposal.title));
+
+        yesVotesRatioView.setProgress(budgetProposal.getRatioYes());
+        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, budgetProposal.getRatioYes()));
+
+        ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
+
+        int completedPayments = budgetProposal.totalPaymentCount - budgetProposal.remainingPaymentCount;
+        completedPaymentsView.setText(getString(R.string.completed_payments_format, completedPayments, budgetProposal.monthlyAmount));
+    }
+
+    private void displayDetails(BudgetProposal budgetProposal) {
+        displayBasicInfo(budgetProposal);
+        if (budgetProposal.descriptionHtml != null) {
+            String completeDescription = AssetsHelper.applyProposalDescriptionTemplate(ProposalDetailActivity.this, budgetProposal.descriptionHtml);
+            proposalDescriptionView.loadData(completeDescription, DESCRIPTION_CONTENT_MIME_TYPE, DESCRIPTION_CONTENT_ENCODING);
         }
+    }
+
+    @OnClick(R.id.show_more)
+    public void onShowMoreClick(View view) {
+        if (targetWebViewHeightDp == 0) {
+            return;
+        }
+        int targetHeight;
+        if (webViewExpanded) {
+            targetHeight = DimenHelper.dpToPx(256);
+            webViewExpanded = false;
+        } else {
+            targetHeight = DimenHelper.dpToPx(targetWebViewHeightDp);
+            webViewExpanded = true;
+            view.setVisibility(View.GONE);
+        }
+        proposalDescriptionView.setLayoutParams(
+                new LinearLayout.LayoutParams(getResources().getDisplayMetrics().widthPixels, targetHeight));
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void setupWebView(final WebView webView) {
+        webView.getSettings().setDomStorageEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                webView.loadUrl("javascript:SaveTargetHeightScript.saveHeight(document.body.getBoundingClientRect().height)");
+                super.onPageFinished(view, url);
+            }
+        });
+        webView.addJavascriptInterface(this, "SaveTargetHeightScript");
+
+        disableScrollingWhenWebViewCollapsed();
+    }
+
+    @JavascriptInterface
+    public void saveHeight(final float height) {
+        targetWebViewHeightDp = (int) height;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void disableScrollingWhenWebViewCollapsed() {
+        proposalDescriptionView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return !webViewExpanded && (event.getAction() == MotionEvent.ACTION_MOVE);
+            }
+        });
     }
 }

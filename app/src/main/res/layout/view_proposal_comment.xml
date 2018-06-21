@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/lightest_grey"
+    android:orientation="vertical"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp">
+
+    <TextView
+        android:id="@+id/in_replay_to"
+        style="@style/text_list_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingBottom="8dp"
+        android:text="@string/in_replay_to"
+        android:textColor="@color/text_dark"
+        android:textSize="14sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/vote_up"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:foreground="@drawable/selectable_item_background_light"
+            android:src="@drawable/ic_vote_up_gray_24dp"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/vote_down"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_below="@+id/vote_up"
+            android:foreground="@drawable/selectable_item_background_light"
+            android:src="@drawable/ic_vote_down_gray_24dp"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:id="@+id/author_container"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_toEndOf="@id/vote_up"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/author"
+                style="@style/text_list_item_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/lorem_ipsum_long"
+                android:textColor="@color/dash_blue"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/is_proposal_owner"
+                style="@style/text_list_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:text="@string/proposal_owner"
+                android:textColor="@color/dash_blue" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/points"
+            style="@style/text_list_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/author_container"
+            android:layout_gravity="center_vertical"
+            android:layout_toEndOf="@+id/vote_up"
+            android:text="@string/lorem_ipsum_short"
+            android:textColor="@color/text_dark" />
+
+        <TextView
+            android:id="@+id/comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/points"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:layout_toEndOf="@+id/vote_up"
+            android:text="@string/lorem_ipsum_short"
+            android:textColor="@color/text_dark"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        style="@style/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

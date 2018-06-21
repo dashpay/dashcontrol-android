@@ -54,7 +54,7 @@ public class BudgetProposal extends BudgetApiAnswer {
         public boolean inNextBudget;
 
         @SerializedName("monthly_amount")
-        public float monthlyAmount;
+        public int monthlyAmount;
 
         @SerializedName("total_payment_count")
         public int totalPaymentCount;
