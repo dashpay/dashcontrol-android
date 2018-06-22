@@ -96,9 +96,6 @@ public class AddPortfolioEntryActivity extends BaseActivity {
             includeEarningsView.setChecked(editedPortfolioEntry.includeEarnings);
         } else {
             labelView.setText(entryDefaultName());
-            addressView.setText(null);
-            votingKeyView.setText(null);
-            includeEarningsView.setChecked(false);
         }
     }
 
