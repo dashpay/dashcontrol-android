@@ -28,4 +28,6 @@ public class URLs {
 
     public static final String DASH_BLOG_API = "https://www2.dash.org/";
     public static final String DASH_CENTRAL_API = "https://www.dashcentral.org/api/v1/";
+
+    public final static String DASH_INSIGHT_API = "https://insight.dash.org/insight-api-dash/";
 }
