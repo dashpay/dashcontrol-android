@@ -1,5 +1,7 @@
 package com.dash.dashapp.api.data;
 
+import android.util.Base64;
+
 import com.dash.dashapp.models.BudgetProposal;
 import com.google.gson.annotations.SerializedName;
 
@@ -79,6 +81,12 @@ public class DashProposal extends RealmObject
     @SerializedName("owner_username")
     private String owner;
 
+    @SerializedName("description_base64_bb")
+    private String descriptionBase64Bb;
+
+    @SerializedName("description_base64_html")
+    private String descriptionBase64Html;
+
     @Override
     public BudgetProposal convert() {
         BudgetProposal budgetProposal = new BudgetProposal();
@@ -104,6 +112,9 @@ public class DashProposal extends RealmObject
         budgetProposal.order = order;
         budgetProposal.commentAmount = commentAmount;
         budgetProposal.owner = owner;
+        if (descriptionBase64Html != null) {
+            budgetProposal.descriptionHtml = new String(Base64.decode(descriptionBase64Html, Base64.DEFAULT));
+        }
         return budgetProposal;
     }
 }

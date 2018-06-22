@@ -29,15 +29,6 @@ public class ApiTest {
     }
 
     @Test
-    public void executeGetWalletPrice() throws Exception {
-        List<WalletBalance> walletBalanceList = ApiHelper.getPriceForWalletOrMasterNode("XbxSUCvMN1bCCTWguGLFcWbaNZkQS4XjEy,XbxSUCvMN1bCCTWguGLFcWbaNZkQS4XjEy,XbxSUCvMN1bCCTWguGLFcWbaNZkQS4XjEy,XbxSUCvMN1bCCTWguGLFcWbaNZkQS4XjEy");
-        assertNotNull(walletBalanceList);
-        for(WalletBalance walletBalance:walletBalanceList){
-            System.out.println(walletBalance.getAddress()+":"+walletBalance.getAmount());
-        }
-    }
-
-    @Test
     public void executeRegistrationPost() throws Exception {
         String uuid = RandomGenerator.generateDeviceId();
         String password = RandomGenerator.generatePassword();

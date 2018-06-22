@@ -4,14 +4,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.dash.dashapp.R;
 import com.dash.dashapp.fragments.NewsFragment;
 import com.dash.dashapp.fragments.PortfolioFragment;
 import com.dash.dashapp.fragments.PriceFragment;
 import com.dash.dashapp.fragments.ProposalsFragment;
-import com.dash.dashapp.R;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -67,13 +70,11 @@ public class MainActivity extends BaseActivity implements
         proposalFragment = ProposalsFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
 
-        //getSupportActionBar().setDisplayUseLogoEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.logo);
+        ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar());
+        supportActionBar.setDisplayShowHomeEnabled(true);
+        supportActionBar.setIcon(R.drawable.ic_dash_d_white_24dp);
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-
+        supportActionBar.setDisplayShowTitleEnabled(false);
     }
 
     @Override

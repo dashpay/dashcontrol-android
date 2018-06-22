@@ -28,6 +28,7 @@ public class BudgetProposal implements Serializable {
     public int order;
     public int commentAmount;
     public String owner;
+    public String descriptionHtml;
 
     public interface Convertible {
         BudgetProposal convert();

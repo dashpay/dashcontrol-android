@@ -6,103 +6,116 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.annotation.NonNull;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.dash.dashapp.R;
+import com.dash.dashapp.charting.CustomXAxisRenderer;
+import com.dash.dashapp.charting.GraphXAxisValueFormatter;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
-import com.dash.dashapp.models.PriceChartData;
+import com.dash.dashapp.models.PriceChartRecord;
+import com.dash.dashapp.service.PriceDataService;
+import com.dash.dashapp.utils.ChartDataHelper;
 import com.dash.dashapp.utils.DateUtil;
-import com.dash.dashapp.utils.MyDBHandler;
-import com.dash.dashapp.utils.MySingleton;
-import com.dash.dashapp.utils.URLs;
-import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.CombinedData;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemSelected;
+import butterknife.Unbinder;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PriceFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PriceFragment extends BaseFragment {
 
-    private static final String TAG = "PriceFragment";
-    @BindView(R.id.spinnerExchanges)
-    Spinner spinnerExchanges;
-    @BindView(R.id.spinnerMarket)
-    Spinner spinnerMarket;
-    @BindView(R.id.priceTextview)
-    TextView priceTextview;
-    @BindView(R.id.chart1)
-    CandleStickChart mChart;
-    @BindView(R.id.radioGroup_scale)
-    RadioGroup timeFrameRadioGroup;
-    @BindView(R.id.radioGroup_gap)
-    RadioGroup gapRadioGroup;
-    @BindView(R.id.radio1d)
-    RadioButton oneDayRadioButton;
-    @BindView(R.id.radio24h)
-    RadioButton twentyFourHoursRadioButton;
-    @BindView(R.id.radio6h)
-    RadioButton sixHoursRadioButton;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd h:mm a", Locale.US);
 
+    @BindView(R.id.price)
+    TextView priceView;
 
-    private OnFragmentInteractionListener mListener;
+    @BindView(R.id.marker_data)
+    View markerDataView;
 
-    private Exchange currentExchange = new Exchange();
-    private Market currentMarket = new Market();
+    @BindView(R.id.marker_time)
+    TextView markerTimeView;
 
-    private long timeFrame = 0;
-    private long gap = 0;
+    @BindView(R.id.marker_open)
+    TextView markerOpenView;
 
-    private MyDBHandler dbHandler;
+    @BindView(R.id.marker_close)
+    TextView markerCloseView;
 
-    private List<Exchange> listExchange;
+    @BindView(R.id.marker_high)
+    TextView markerHighView;
 
+    @BindView(R.id.marker_low)
+    TextView markerLowView;
+
+    @BindView(R.id.marker_volume_dash)
+    TextView markerVolumeDashView;
+
+    @BindView(R.id.marker_volume_pair)
+    TextView markerVolumePairView;
+
+    @BindView(R.id.exchanges_spinner)
+    Spinner exchangesSpinnerView;
+
+    @BindView(R.id.market_spinner)
+    Spinner marketSpinnerView;
+
+    @BindView(R.id.chart)
+    CombinedChart chartView;
+
+    @BindView(R.id.time_frame_group)
+    RadioGroup timeFrameGroupView;
+
+    @BindView(R.id.candlestick_group)
+    RadioGroup candlestickGroupView;
+
+    @BindView(R.id.radio_1d)
+    RadioButton oneDayRadioView;
+
+    @BindView(R.id.radio_24h)
+    RadioButton twentyFourHoursRadioView;
+
+    @BindView(R.id.radio_6h)
+    RadioButton sixHoursRadioView;
+
+    private Unbinder unbinder;
 
     public PriceFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PriceFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PriceFragment newInstance() {
         PriceFragment fragment = new PriceFragment();
         Bundle args = new Bundle();
@@ -111,396 +124,273 @@ public class PriceFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_price, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        ButterKnife.bind(this, view);
+        setupSpinnersAndPrice();
 
-        timeFrameRadioGroup.check(R.id.radio6h);
-        gapRadioGroup.check(R.id.radio5m);
-
-        timeFrame = DateUtil.SIX_HOURS_INTERVAL;
-        oneDayRadioButton.setEnabled(false);
-
-        gap = DateUtil.FIVE_MINUTES_GAP;
-
-        dbHandler = new MyDBHandler(getContext(), null);
-
-        setRadioGroupListeners();
-
-        setSpinnerAndPrices();
+        timeFrameGroupView.setOnCheckedChangeListener(timeFrameOnCheckedChangeListener);
+        candlestickGroupView.setOnCheckedChangeListener(candlestickOnCheckedChangeListener);
 
         return view;
     }
 
-    private void setRadioGroupListeners() {
+    private RadioGroup.OnCheckedChangeListener timeFrameOnCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            RadioButton checkedRadioButton = group.findViewById(checkedId);
+            boolean isChecked = checkedRadioButton.isChecked();
+            if (isChecked) {
+                boolean selected6hOr24h = (checkedId == R.id.radio_6h || checkedId == R.id.radio_24h);
+                oneDayRadioView.setEnabled(!selected6hOr24h);
 
-        // This overrides the radiogroup onCheckListener
-        timeFrameRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
-                // This puts the value (true/false) into the variable
-                boolean isChecked = checkedRadioButton.isChecked();
-                // If the radiobutton that has changed in check state is now checked...
-                if (isChecked) {
-                    // Changes the textview's text to "Checked: example radiobutton text"
-                    Log.d(TAG, checkedRadioButton.getText() + "");
-
-                    String selectedtimeFrame = checkedRadioButton.getText() + "";
-
-                    switch (selectedtimeFrame) {
-                        case DateUtil.SIX_HOURS_INTERVAL_STRING:
-                            timeFrame = DateUtil.SIX_HOURS_INTERVAL;
-                            oneDayRadioButton.setEnabled(false);
-                            break;
-
-                        case DateUtil.TWENTY_FOUR_HOURS_INTERVAL_STRING:
-                            timeFrame = DateUtil.TWENTY_FOUR_HOURS_INTERVAL;
-                            oneDayRadioButton.setEnabled(false);
-                            break;
-
-                        case DateUtil.TWO_DAYS_INTERVAL_STRING:
-                            timeFrame = DateUtil.TWO_DAYS_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-
-                        case DateUtil.FOUR_DAYS_INTERVAL_STRING:
-                            timeFrame = DateUtil.FOUR_DAYS_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-
-                        case DateUtil.ONE_WEEK_INTERVAL_STRING:
-                            timeFrame = DateUtil.ONE_WEEK_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-
-                        case DateUtil.TWO_WEEKS_INTERVAL_STRING:
-                            timeFrame = DateUtil.TWO_WEEKS_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-
-                        case DateUtil.ONE_MONTH_INTERVAL_STRING:
-                            timeFrame = DateUtil.ONE_MONTH_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-
-                        case DateUtil.THREE_MONTHS_INTERVAL_STRING:
-                            timeFrame = DateUtil.THREE_MONTHS_INTERVAL;
-                            if (!oneDayRadioButton.isEnabled())
-                                oneDayRadioButton.setEnabled(true);
-                            break;
-                        default:
-                            break;
-                    }
-                    drawChart(timeFrame, gap, currentExchange, currentMarket);
-                }
+                drawChart();
             }
-        });
+        }
+    };
 
-        // This overrides the radiogroup onCheckListener
-        gapRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = group.findViewById(checkedId);
-                // This puts the value (true/false) into the variable
-                boolean isChecked = checkedRadioButton.isChecked();
-                // If the radiobutton that has changed in check state is now checked...
-                if (isChecked) {
-                    // Changes the textview's text to "Checked: example radiobutton text"
-                    Log.d(TAG, checkedRadioButton.getText() + "");
+    private RadioGroup.OnCheckedChangeListener candlestickOnCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            RadioButton checkedRadioButton = group.findViewById(checkedId);
+            boolean isChecked = checkedRadioButton.isChecked();
+            if (isChecked) {
+                boolean selected24h = (checkedId == R.id.radio_1d);
+                twentyFourHoursRadioView.setEnabled(!selected24h);
+                sixHoursRadioView.setEnabled(!selected24h);
 
-                    String selectedtimeFrame = checkedRadioButton.getText() + "";
-
-                    switch (selectedtimeFrame) {
-                        case DateUtil.FIVE_MINUTES_GAP_STRING:
-                            gap = DateUtil.FIVE_MINUTES_GAP;
-                            if (!twentyFourHoursRadioButton.isEnabled())
-                                twentyFourHoursRadioButton.setEnabled(true);
-                            if (!sixHoursRadioButton.isEnabled())
-                                sixHoursRadioButton.setEnabled(true);
-                            break;
-                        case DateUtil.FIFTEEN_MINUTES_GAP_STRING:
-                            gap = DateUtil.FIFTEEN_MINUTES_GAP;
-                            if (!twentyFourHoursRadioButton.isEnabled())
-                                twentyFourHoursRadioButton.setEnabled(true);
-                            if (!sixHoursRadioButton.isEnabled())
-                                sixHoursRadioButton.setEnabled(true);
-                            break;
-                        case DateUtil.THIRTY_MINUTES_GAP_STRING:
-                            gap = DateUtil.THIRTY_MINUTES_GAP;
-                            if (!twentyFourHoursRadioButton.isEnabled())
-                                twentyFourHoursRadioButton.setEnabled(true);
-                            if (!sixHoursRadioButton.isEnabled())
-                                sixHoursRadioButton.setEnabled(true);
-                            break;
-                        case DateUtil.TWO_HOURS_GAP_STRING:
-                            gap = DateUtil.TWO_HOURS_GAP;
-                            if (!twentyFourHoursRadioButton.isEnabled())
-                                twentyFourHoursRadioButton.setEnabled(true);
-                            if (!sixHoursRadioButton.isEnabled())
-                                sixHoursRadioButton.setEnabled(true);
-                            break;
-                        case DateUtil.FOUR_HOURS_GAP_STRING:
-                            gap = DateUtil.FOUR_HOURS_GAP;
-                            if (!twentyFourHoursRadioButton.isEnabled())
-                                twentyFourHoursRadioButton.setEnabled(true);
-                            if (!sixHoursRadioButton.isEnabled())
-                                sixHoursRadioButton.setEnabled(true);
-                            break;
-                        case DateUtil.TWENTY_FOUR_HOURS_GAP_STRING:
-                            gap = DateUtil.TWENTY_FOUR_HOURS_GAP;
-                            twentyFourHoursRadioButton.setEnabled(false);
-                            sixHoursRadioButton.setEnabled(false);
-                            break;
-                        default:
-                            break;
-                    }
-                    drawChart(timeFrame, gap, currentExchange, currentMarket);
-                }
+                drawChart();
             }
-        });
+        }
+    };
+
+    private void drawChart() {
+
+        int checkedCandlestickRadioId = candlestickGroupView.getCheckedRadioButtonId();
+        ChartDataHelper.Candlestick candlestick = candlestickButtonMap.get(checkedCandlestickRadioId);
+
+        int checkedTimeFrameRadioId = timeFrameGroupView.getCheckedRadioButtonId();
+        ChartDataHelper.TimeFrame timeFrame = timeFrameButtonMap.get(checkedTimeFrameRadioId);
+
+        String exchange = ((Exchange) exchangesSpinnerView.getSelectedItem()).name;
+        Market market = (Market) marketSpinnerView.getSelectedItem();
+
+        priceView.setText(String.valueOf(market.price));
+
+        drawChart(timeFrame, candlestick, exchange, market.name);
     }
 
-    private void drawChart(long timeframe, long gap, Exchange exchange, Market market) {
+    private void drawChart(ChartDataHelper.TimeFrame timeFrame, ChartDataHelper.Candlestick candlestick, String exchange, String market) {
 
         long currentDate = System.currentTimeMillis();
+        long startDate = DateUtil.roundDownToNearest(currentDate - timeFrame.getDuration(), candlestick.getDuration());
 
-        long startDate = currentDate - timeframe;
-        long endDate = currentDate;
+        List<PriceChartRecord> priceChartRecordList = ChartDataHelper.getChartData(exchange, market, startDate, candlestick);
+        if (priceChartRecordList.size() != 0) {
 
-        List<PriceChartData> priceChartDataList = dbHandler.findPriceChart(startDate, endDate, gap, exchange, market);
+            List<CandleEntry> candleEntries = new ArrayList<>();
+            List<BarEntry> volumeEntries = new ArrayList<>();
+            List<Long> xVals = new ArrayList<>();
 
-        Log.d("DateDebug", "Reading database startDate : " + DateUtil.getDate(startDate));
-        Log.d("DateDebug", "Reading database endDate : " + DateUtil.getDate(endDate));
-
-        if (priceChartDataList.size() != 0) {
-
-            mChart.setBackgroundColor(Color.WHITE);
-            mChart.getDescription().setEnabled(false);
-
-            // if more than 60 entries are displayed in the chart, no values will be
-            // drawn
-            mChart.setMaxVisibleValueCount(60);
-
-            // scaling can now only be done on x- and y-axis separately
-            mChart.setPinchZoom(false);
-
-            mChart.setDrawGridBackground(false);
-
-            XAxis xAxis = mChart.getXAxis();
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxis.setDrawGridLines(false);
-
-            YAxis leftAxis = mChart.getAxisLeft();
-//        leftAxis.setEnabled(false);
-            leftAxis.setLabelCount(7, false);
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setDrawAxisLine(false);
-
-            YAxis rightAxis = mChart.getAxisRight();
-            rightAxis.setEnabled(false);
-
-            mChart.getLegend().setEnabled(false);
-
-
-            //Setting the data
-            mChart.resetTracking();
-
-            List<CandleEntry> yVals1 = new ArrayList<>();
-
-            long xAxisValue = 0;
-
-            for (int i = 0; i < priceChartDataList.size(); i++) {
-
-                PriceChartData pcd = priceChartDataList.get(i);
-
-                //float val = (float) pcd.getVolume();
-
-                float high = (float) pcd.getHigh();
-                float low = (float) pcd.getLow();
-
-                float open = (float) pcd.getOpen();
-                float close = (float) pcd.getClose();
-
-                xAxisValue += (gap / 1000 / 60);
-
-                yVals1.add(new CandleEntry(
-                        i,
-                        high,
-                        low,
-                        open,
-                        close,
-                        getResources().getDrawable(R.drawable.star)
-                ));
-
-                Log.d(TAG, " open : " + open + " / close : " + close);
+            for (int i = 0; i < priceChartRecordList.size(); i++) {
+                PriceChartRecord record = priceChartRecordList.get(i);
+                xVals.add(record.time);
+                volumeEntries.add(new BarEntry(i, record.volume));
+                candleEntries.add(new CandleEntry(i, record.high, record.low, record.open, record.close, record));
             }
 
-            CandleDataSet set1 = new CandleDataSet(yVals1, "Data Set");
+            setupChart(xVals);
 
-            set1.setDrawIcons(false);
-            set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-//        set1.setColor(Color.rgb(80, 80, 80));
-            set1.setShadowColor(Color.DKGRAY);
-            set1.setShadowWidth(0.7f);
-            set1.setDecreasingColor(Color.RED);
-            set1.setDecreasingPaintStyle(Paint.Style.FILL);
-            set1.setIncreasingColor(Color.rgb(122, 242, 84));
-            set1.setIncreasingPaintStyle(Paint.Style.FILL);
-            set1.setNeutralColor(Color.BLUE);
-            //set1.setHighlightLineWidth(1f);
+            CandleDataSet candleDataSet = new CandleDataSet(candleEntries, null);
 
-            CandleData data = new CandleData(set1);
+            candleDataSet.setDrawIcons(false);
+            candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+            candleDataSet.setShadowColor(Color.WHITE);
+            candleDataSet.setShadowWidth(0.7f);
+            candleDataSet.setDecreasingColor(Color.RED);
+            candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+            candleDataSet.setIncreasingColor(Color.rgb(122, 242, 84));
+            candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+            candleDataSet.setNeutralColor(Color.BLUE);
 
-            mChart.setData(data);
-            mChart.invalidate();
+            CandleData candleData = new CandleData(candleDataSet);
+
+            BarDataSet volumeDataSet = new BarDataSet(volumeEntries, null);
+            volumeDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+            volumeDataSet.setColor(Color.DKGRAY);
+            BarData volumeBarData = new BarData(volumeDataSet);
+
+            CombinedData combinedData = new CombinedData();
+            combinedData.setData(candleData);
+            combinedData.setData(volumeBarData);
+
+            chartView.setData(combinedData);
+            chartView.invalidate();
 
         } else {
-            AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
-            alertDialog.setTitle("Error");
-            alertDialog.setMessage("There's no data with current parameters");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            AlertDialog.Builder builder;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            } else {
+                builder = new AlertDialog.Builder(getContext());
+            }
+            builder.setTitle("Error");
+            builder.setMessage("There's no data with current parameters");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    private void setupChart(List<Long> xVals) {
+        chartView.setBackgroundResource(R.color.dark_background);
+        chartView.setNoDataTextColor(Color.WHITE);
+        chartView.getDescription().setEnabled(false);
+        chartView.setMaxVisibleValueCount(20);
+        chartView.setPinchZoom(false);
+        chartView.setDrawGridBackground(false);
+        chartView.getLegend().setEnabled(false);
+
+        chartView.getXAxis().setLabelCount(4);
+        chartView.getXAxis().setTextColor(Color.WHITE);
+
+        chartView.getAxisLeft().setTextColor(Color.WHITE);
+        chartView.getAxisRight().setTextColor(Color.GRAY);
+
+        XAxis xAxis = chartView.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(24);
+
+        xAxis.setValueFormatter(new GraphXAxisValueFormatter(xVals));
+        chartView.setXAxisRenderer(new CustomXAxisRenderer(chartView));
+
+        YAxis leftAxis = chartView.getAxisLeft();
+        leftAxis.setLabelCount(7, false);
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setDrawAxisLine(true);
+
+        YAxis rightAxis = chartView.getAxisRight();
+        rightAxis.setLabelCount(7, false);
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setDrawAxisLine(true);
+        rightAxis.setSpaceBottom(0);
+
+        chartView.setOnChartValueSelectedListener(onChartValueSelectedListener);
+        chartView.resetTracking();
+    }
+
+    private OnChartValueSelectedListener onChartValueSelectedListener = new OnChartValueSelectedListener() {
+        @Override
+        public void onValueSelected(Entry e, Highlight h) {
+            markerDataView.setVisibility(View.VISIBLE);
+            Object data = e.getData();
+            if (data != null) {
+                PriceChartRecord record = (PriceChartRecord) data;
+                markerOpenView.setText(getString(R.string.chart_marker_open, record.open));
+                markerCloseView.setText(getString(R.string.chart_marker_close, record.close));
+                markerHighView.setText(getString(R.string.chart_marker_high, record.high));
+                markerLowView.setText(getString(R.string.chart_marker_low, record.low));
+                markerTimeView.setText(getString(R.string.chart_marker_date, DATE_FORMAT.format(new Date(record.time))));
+                markerVolumeDashView.setText(getString(R.string.chart_marker_volume_dash, record.volume));
+                markerVolumePairView.setText(getString(R.string.chart_marker_volume, record.pairVolume));
+            }
         }
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+        @Override
+        public void onNothingSelected() {
+            markerDataView.setVisibility(View.GONE);
         }
+    };
+
+    @OnClick(R.id.marker_data)
+    public void onMarkerDataClick(View view) {
+        view.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    private void setSpinnerAndPrices() {
-
-        listExchange = dbHandler.findExchanges();
-
-        List<String> listExchangesString = new ArrayList<>();
-        List<String> listMarketString = new ArrayList<>();
-
-        for (Exchange exchange : listExchange){
-            listExchangesString.add(exchange.getName());
-            for (Market market : exchange.getListMarket()){
-                listMarketString.add(market.getName());
-                if (market.getIsDefault() == 1){
-                    currentExchange = exchange;
-                    currentMarket = market;
-                    priceTextview.setText(market.getPrice() + "");
+    private void setupSpinnersAndPrice() {
+        List<Exchange> listExchange = PriceDataService.findExchanges();
+        Exchange defaultExchange = null;
+        for (Exchange exchange : listExchange) {
+            for (Market market : exchange.markets) {
+                if (market.isDefault) {
+                    defaultExchange = exchange;
+                    break;
                 }
             }
         }
 
-        ArrayAdapter<String> adapterExchanges = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listExchangesString);
-        spinnerExchanges.setAdapter(adapterExchanges);
+        final Context context = Objects.requireNonNull(getContext());
 
-        ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
-        spinnerMarket.setAdapter(adapterMarket);
-
-        int defaultExchangePosition = adapterExchanges.getPosition(currentExchange.getName());
-        spinnerExchanges.setSelection(defaultExchangePosition);
-
-        int defaultMarketPosition = adapterExchanges.getPosition(currentMarket.getName());
-        spinnerMarket.setSelection(defaultMarketPosition);
-
-        drawChart(timeFrame, gap, currentExchange, currentMarket);
-
-        spinnerExchanges.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                // your code here
-                currentExchange = listExchange.get(position);
-
-                List<String> listMarketString = new ArrayList<>();
-
-                for (int j = 0; j < currentExchange.getListMarket().size(); j++) {
-                    listMarketString.add(currentExchange.getListMarket().get(j).getName());
-                }
-
-                ArrayAdapter<String> adapterMarket = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, listMarketString);
-
-                spinnerMarket.setAdapter(adapterMarket);
-                spinnerMarket.setSelection(0);
-                currentMarket = currentExchange.getListMarket().get(0);
-                priceTextview.setText(currentMarket.getPrice() + "");
-
-
-                //drawChart(timeFrame, gap, currentExchange, currentMarket);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
-        });
-
-
-        spinnerMarket.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                currentMarket = currentExchange.getListMarket().get(position);
-                priceTextview.setText(currentMarket.getPrice() + "");
-
-                //drawChart(timeFrame, gap, currentExchange, currentMarket);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
-        });
-
+        ArrayAdapter<Exchange> exchangesAdapter = new ArrayAdapter<>(context, R.layout.view_spinner_item, listExchange);
+        exchangesAdapter.setDropDownViewResource(R.layout.view_spinner_drop_down_item);
+        exchangesSpinnerView.setAdapter(exchangesAdapter);
+        int defaultExchangePosition = exchangesAdapter.getPosition(defaultExchange);
+        exchangesSpinnerView.setSelection(defaultExchangePosition);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @OnItemSelected(R.id.exchanges_spinner)
+    public void onExchangesItemSelected() {
+        Exchange exchange = (Exchange) exchangesSpinnerView.getSelectedItem();
+        setupMarketSpinner(exchange);
+    }
+
+    @OnItemSelected(R.id.market_spinner)
+    public void onMarketItemSelected() {
+        drawChart();
+    }
+
+    private void setupMarketSpinner(Exchange exchange) {
+        Context context = Objects.requireNonNull(getContext());
+
+        ArrayAdapter<Market> marketsAdapter = new ArrayAdapter<>(context, R.layout.view_spinner_item, exchange.markets);
+        marketsAdapter.setDropDownViewResource(R.layout.view_spinner_drop_down_item);
+
+        Market selectMarket = exchange.markets.get(0);
+        for (Market market : exchange.markets) {
+            if (market.isDefault) {
+                selectMarket = market;
+                break;
+            }
+        }
+
+        marketSpinnerView.setAdapter(marketsAdapter);
+        int defaultMarketPosition = marketsAdapter.getPosition(selectMarket);
+        marketSpinnerView.setSelection(defaultMarketPosition);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
+    }
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private static SparseArray<ChartDataHelper.Candlestick> candlestickButtonMap = new SparseArray<>();
+    private static SparseArray<ChartDataHelper.TimeFrame> timeFrameButtonMap = new SparseArray<>();
+
+    static {
+        candlestickButtonMap.append(R.id.radio_5m, ChartDataHelper.Candlestick.FIVE_MINUTES);
+        candlestickButtonMap.append(R.id.radio_15m, ChartDataHelper.Candlestick.FIFTEEN_MINUTES);
+        candlestickButtonMap.append(R.id.radio_30m, ChartDataHelper.Candlestick.THIRTY_MINUTES);
+        candlestickButtonMap.append(R.id.radio_2h, ChartDataHelper.Candlestick.TWO_HOURS);
+        candlestickButtonMap.append(R.id.radio_4h, ChartDataHelper.Candlestick.FOUR_HOURS);
+        candlestickButtonMap.append(R.id.radio_1d, ChartDataHelper.Candlestick.TWENTY_FOUR_HOURS);
+
+        timeFrameButtonMap.append(R.id.radio_6h, ChartDataHelper.TimeFrame.SIX_HOURS);
+        timeFrameButtonMap.append(R.id.radio_24h, ChartDataHelper.TimeFrame.TWENTY_FOUR_HOURS);
+        timeFrameButtonMap.append(R.id.radio_2d, ChartDataHelper.TimeFrame.TWO_DAYS);
+        timeFrameButtonMap.append(R.id.radio_4d, ChartDataHelper.TimeFrame.FOUR_DAYS);
+        timeFrameButtonMap.append(R.id.radio_1w, ChartDataHelper.TimeFrame.ONE_WEEK);
+        timeFrameButtonMap.append(R.id.radio_2w, ChartDataHelper.TimeFrame.TWO_WEEKS);
+        timeFrameButtonMap.append(R.id.radio_1m, ChartDataHelper.TimeFrame.ONE_MONTH);
+        timeFrameButtonMap.append(R.id.radio_3m, ChartDataHelper.TimeFrame.THREE_MONTHS);
     }
 }

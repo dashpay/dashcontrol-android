@@ -9,7 +9,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alert_message">Network is not available. Loading Offline Data.</string>
     <string name="alert_title">Error</string>
-    <string name="alert_positive">Ok</string>
+    <string name="alert_positive">@android:string/ok</string>
     <string name="title_activity_settings">Settings</string>
     <string name="language_preference" translatable="false">language_preference</string>
     <string name="eng">English</string>
@@ -24,10 +24,11 @@
     <string name="button_abstain">Abstain</string>
     <string name="button_no">No</string>
     <string name="title">Title</string>
-    <string name="proposal_description_tag">PROPOSAL DESCRIPTION</string>
+    <string name="proposal_owner">(proposal owner)</string>
     <string name="no_id">No id</string>
     <string name="no_title">No Title</string>
     <string name="no_owner">No owner</string>
+    <string name="owner_format">Owner %1$s</string>
     <string name="total">Total</string>
     <string name="allocated">Allocated</string>
     <string name="one_time_payment_tag">One-time payment</string>
@@ -35,11 +36,17 @@
     <string name="completed_payment_tag">Completed payments</string>
     <string name="no_month_remaining">No month remaining</string>
     <string name="no_dash_payment">0 totaling in 0 DASH</string>
+    <string name="completed_payments_format">%1$d totaling in %2$.2f DASH</string>
     <string name="no_yes">0 Yes</string>
     <string name="no_no">0 No</string>
     <string name="no_abstain">0 Abstain</string>
+    <string name="votes_yes">Yes</string>
+    <string name="votes_no">No</string>
+    <string name="votes_abstain">Abstain</string>
     <string name="no_description">No description</string>
-    <string name="search">search</string>
+    <string name="search">Search</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">No title entered by budgetProposal owner</string>
     <string name="textview_no_comments">No comments</string>
@@ -47,8 +54,15 @@
     <string name="month_remaining">%1$d month remaining</string>
     <string name="months_remaining">%1$d months remaining</string>
     <string name="comments">%1$d comments</string>
+    <string name="join_the_discussion_title">Join the discussion!</string>
+    <string name="join_the_discussion">Join the discussion</string>
+    <string name="submit_comments">Submit your comments and exchange your ideas on this proposal</string>
+    <string name="in_replay_to">In replay to %s</string>
+    <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
+    <string name="show_full_description">Show full description</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="by">by %1$s</string>
+    <string name="simple_percentage_value">%d\%%</string>
 
     <string name="radio_5m">5m</string>
     <string name="radio_15m">15m</string>
@@ -64,10 +78,27 @@
     <string name="radio_2w">2w</string>
     <string name="radio_1m">1m</string>
     <string name="radio_3m">3m</string>
-    <string name="my_masternode">My masternode</string>
-    <string name="add_masternode">Add masternode</string>
-    <string name="add_wallet">Add wallet</string>
 
+    <string name="portfolio_your_dash">Your Dash</string>
+    <string name="portfolio_usd_value">Value in USD</string>
+
+    <string name="add_portfolio_entry_my_wallets">My Wallets</string>
+    <string name="add_portfolio_entry_my_masternodes">My Masternodes</string>
+    <string name="add_portfolio_entry_add_masternode">Add Masternode</string>
+    <string name="add_portfolio_entry_add_wallet">Add Wallet</string>
+    <string name="add_portfolio_entry_edit_masternode">Edit Masternode</string>
+    <string name="add_portfolio_entry_edit_wallet">Edit Wallet</string>
+    <string name="add_portfolio_entry_label_hint">Label</string>
+    <string name="add_portfolio_entry_address_hint">Address</string>
+    <string name="add_portfolio_entry_voting_key_hint">Voting key</string>
+    <string name="add_portfolio_entry_payment_notification">Payment Notification</string>
+    <string name="add_portfolio_entry_include_masternode_earnings">Include Masternode earnings</string>
+    <string name="add_portfolio_entry_scan_qr_code">Scan QR code</string>
+    <string name="add_portfolio_entry_import_using_qr_code">Import using QR code</string>
+    <string name="add_portfolio_entry_wallet_label_format">Wallet %d</string>
+    <string name="add_portfolio_entry_masternode_label_format">Masternode %d</string>
+    <string name="add_portfolio_entry_empty_address">Address cannot be empty</string>
+    <string name="add_portfolio_entry_public_key_already_added">Address already added as %s</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -84,10 +115,26 @@
     <string name="lorem_ipsum_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="lorem_ipsum_longest">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta imperdiet viverra. Duis rhoncus nunc auctor sem volutpat rutrum. Duis nec est placerat, vestibulum enim at, sollicitudin odio. Suspendisse ut nulla porttitor.</string>
 
+    <string name="not_yet_supported">Not yet supported</string>
+
     <string name="proposal_filter_current">Current</string>
     <string name="proposal_filter_ongoing">Ongoing</string>
     <string name="proposal_filter_past">Past</string>
 
     <string name="superblocks_summary">%d Superblocks in %s %s</string>
+
+    <string name="chart_marker_date">Date: %s</string>
+    <string name="chart_marker_open">Open: %f</string>
+    <string name="chart_marker_close">Close: %f</string>
+    <string name="chart_marker_high">High: %f</string>
+    <string name="chart_marker_low">Low: %f</string>
+    <string name="chart_marker_volume_dash">Vol1 : %f</string>
+    <string name="chart_marker_volume">Vol2 : %f</string>
+
+    <plurals
+        name="comment_points">
+        <item quantity="one">%d point, %s</item>
+        <item quantity="other">%d points, %s</item>
+    </plurals>
 
 </resources>
