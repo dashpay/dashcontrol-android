@@ -50,14 +50,4 @@
         </RelativeLayout>
     </FrameLayout>
 
-    <ImageView
-        android:id="@+id/cached"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="end"
-        android:padding="2dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_storage_24dp"
-        tools:ignore="ContentDescription" />
-
 </android.support.v7.widget.CardView>

@@ -6,9 +6,7 @@ import com.dash.dashapp.models.BlogNews;
 
 import java.util.Date;
 
-import io.realm.RealmObject;
-
-public class DashBlogNews extends RealmObject implements BlogNews.Convertible {
+public class DashBlogNews implements BlogNews.Convertible {
 
     public String title;
     public String url;
@@ -27,7 +25,6 @@ public class DashBlogNews extends RealmObject implements BlogNews.Convertible {
         blogNews.url = url;
         blogNews.image = image;
         blogNews.date = date;
-        blogNews.cached = false;
         return blogNews;
     }
 }

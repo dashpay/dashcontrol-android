@@ -1,30 +1,28 @@
 package com.dash.dashapp.adapters;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.models.BlogNews;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
-public class BlogNewsAdapter extends RecyclerView.Adapter<BlogNewsHolder> implements Filterable {
+public class BlogNewsAdapter extends RealmRecyclerViewAdapter<BlogNews, BlogNewsHolder> {
 
     private static final int VIEW_TYPE_LATEST = 0;
     private static final int VIEW_TYPE_REGULAR = 1;
 
-    private List<BlogNews> blogNewsList;
-    private List<BlogNews> referenceBlogNewsList;
+    private boolean highlightFirstEntry;
 
-    public BlogNewsAdapter() {
-        this.blogNewsList = new ArrayList<>();
-        this.referenceBlogNewsList = new ArrayList<>();
+    public BlogNewsAdapter(@Nullable OrderedRealmCollection<BlogNews> data, boolean highlightFirstEntry) {
+        super(data, true);
+        setHasStableIds(true);
+        this.highlightFirstEntry = highlightFirstEntry;
     }
 
     @NonNull
@@ -48,50 +46,22 @@ public class BlogNewsAdapter extends RecyclerView.Adapter<BlogNewsHolder> implem
 
     @Override
     public void onBindViewHolder(@NonNull BlogNewsHolder holder, int position) {
-        BlogNews blogNews = blogNewsList.get(position);
+        BlogNews blogNews = getItem(position);
         holder.bind(blogNews);
-//        holder.setItemClickListener(new ItemClickListener() {
-//            @Override
-//            public void onItemClick(View v, int pos) {
-//                Snackbar.make(v, players.get(pos).getName(), Snackbar.LENGTH_SHORT).show();
-//            }
-//        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return blogNewsList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if (highlightFirstEntry && position == 0) {
             return VIEW_TYPE_LATEST;
         } else {
             return VIEW_TYPE_REGULAR;
         }
     }
 
-    public void clear() {
-        blogNewsList.clear();
-        referenceBlogNewsList.clear();
-        notifyDataSetChanged();
-    }
-
-    public void addAll(List<BlogNews> newBlogNewsList) {
-        blogNewsList.addAll(newBlogNewsList);
-        referenceBlogNewsList.addAll(newBlogNewsList);
-        notifyDataSetChanged();
-    }
-
     @Override
-    public Filter getFilter() {
-        return new BlogNewsFilter(referenceBlogNewsList) {
-            @Override
-            protected void publishResults(List<BlogNews> blogNewsFilteredList) {
-                blogNewsList = blogNewsFilteredList;
-                notifyDataSetChanged();
-            }
-        };
+    public long getItemId(int index) {
+        //noinspection ConstantConditions
+        return getItem(index).getId();
     }
 }
