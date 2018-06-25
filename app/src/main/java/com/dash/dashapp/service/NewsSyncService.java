@@ -115,7 +115,7 @@ public class NewsSyncService extends Service {
         } else {
             unsavedNewsList = new ArrayList<>();
             for (BlogNews news : newsList) {
-                if (!isSaved(news.date, news.title)) {
+                if (!isSaved(news.getDate(), news.getTitle())) {
                     unsavedNewsList.add(news);
                 }
             }

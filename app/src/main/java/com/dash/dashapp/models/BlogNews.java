@@ -18,21 +18,53 @@ public class BlogNews extends RealmObject {
     @PrimaryKey
     private long id = PrimaryKeyFactory.nextKey(BlogNews.class);
 
-    public String title;
-    public String url;
-    public String image;
-    public Date date;
+    private String title;
+    private String url;
+    private String image;
+    private Date date;
 
     public long getId() {
         return id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     public String getImageUrl() {
-        return (URLs.DASH_BLOG_API + image).replace("//", "/");
+        return URLs.DASH_BLOG_API + getImage().substring(1);
     }
 
     public String getBlogPostUrl() {
-        return (URLs.DASH_BLOG_API + url).replace("//", "/");
+        return URLs.DASH_BLOG_API + getUrl().substring(1);
     }
 
     public interface Convertible {

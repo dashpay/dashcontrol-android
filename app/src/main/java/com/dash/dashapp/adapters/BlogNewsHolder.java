@@ -48,13 +48,13 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder {
     public void bind(BlogNews blogNews) {
         this.blogNews = blogNews;
 
-        String titleHtml = blogNews.title;
+        String titleHtml = blogNews.getTitle();
         titleView.setText(Html.fromHtml(titleHtml));
 
-        SimpleDateFormat newsDateFormat = new SimpleDateFormat("MMM dd, YYYY", Locale.US);
-        dateView.setText(newsDateFormat.format(blogNews.date));
+        SimpleDateFormat newsDateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+        dateView.setText(newsDateFormat.format(blogNews.getDate()));
 
-        if (blogNews.image != null) {
+        if (blogNews.getImage() != null) {
             GlideApp.with(context)
                     .load(blogNews.getImageUrl())
                     .error(R.drawable.ic_broken_image_24dp)
@@ -65,15 +65,15 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder {
 
     @OnClick
     public void onClick() {
-        if (!TextUtils.isEmpty(blogNews.url)) {
-            Intent intent = SimpleWebViewActivity.createIntent(context, blogNews.title, blogNews.getBlogPostUrl());
+        if (!TextUtils.isEmpty(blogNews.getUrl())) {
+            Intent intent = SimpleWebViewActivity.createIntent(context, blogNews.getTitle(), blogNews.getBlogPostUrl());
             context.startActivity(intent);
         }
     }
 
     @OnLongClick
     public boolean onLongClick() {
-        if (!TextUtils.isEmpty(blogNews.url)) {
+        if (!TextUtils.isEmpty(blogNews.getUrl())) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blogNews.getBlogPostUrl()));
             context.startActivity(browserIntent);
             return true;

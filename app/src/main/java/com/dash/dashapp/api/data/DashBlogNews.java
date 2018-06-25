@@ -21,10 +21,10 @@ public class DashBlogNews implements BlogNews.Convertible {
     @Override
     public BlogNews convert() {
         BlogNews blogNews = new BlogNews();
-        blogNews.title = getTitle();
-        blogNews.url = url;
-        blogNews.image = image;
-        blogNews.date = date;
+        blogNews.setTitle(getTitle());
+        blogNews.setUrl(url);
+        blogNews.setImage(image);
+        blogNews.setDate(date);
         return blogNews;
     }
 }
