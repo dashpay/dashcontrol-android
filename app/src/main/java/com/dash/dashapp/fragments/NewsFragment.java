@@ -65,8 +65,6 @@ public class NewsFragment extends Fragment {
 
     private Realm realm;
 
-    private boolean inSearchMode = false;
-
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
