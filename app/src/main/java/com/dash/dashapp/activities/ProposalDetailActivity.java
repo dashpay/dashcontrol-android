@@ -93,7 +93,7 @@ public class ProposalDetailActivity extends BaseActivity {
         Intent intent = getIntent();
         BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(PROPOSAL_EXTRA);
         displayBasicInfo(budgetProposal);
-        loadProposalDetails(budgetProposal.hash);
+        loadProposalDetails(budgetProposal.getHash());
     }
 
     @OnClick({R.id.comments})
@@ -123,24 +123,24 @@ public class ProposalDetailActivity extends BaseActivity {
 
     private void displayBasicInfo(BudgetProposal budgetProposal) {
         this.budgetProposal = budgetProposal;
-        yesVotesView.setText(String.valueOf(budgetProposal.yesVotes));
-        noVotesView.setText(String.valueOf(budgetProposal.noVotes));
-        abstainVotesView.setText(String.valueOf(budgetProposal.abstainVotes));
-        titleView.setText(String.valueOf(budgetProposal.title));
+        yesVotesView.setText(String.valueOf(budgetProposal.getYesVotes()));
+        noVotesView.setText(String.valueOf(budgetProposal.getNoVotes()));
+        abstainVotesView.setText(String.valueOf(budgetProposal.getAbstainVotes()));
+        titleView.setText(String.valueOf(budgetProposal.getTitle()));
 
         yesVotesRatioView.setProgress(budgetProposal.getRatioYes());
         yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, budgetProposal.getRatioYes()));
 
-        ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
+        ownerView.setText(getString(R.string.owner_format, budgetProposal.getOwner()));
 
-        int completedPayments = budgetProposal.totalPaymentCount - budgetProposal.remainingPaymentCount;
-        completedPaymentsView.setText(getString(R.string.completed_payments_format, completedPayments, budgetProposal.monthlyAmount));
+        int completedPayments = budgetProposal.getTotalPaymentCount() - budgetProposal.getRemainingPaymentCount();
+        completedPaymentsView.setText(getString(R.string.completed_payments_format, completedPayments, budgetProposal.getMonthlyAmount()));
     }
 
     private void displayDetails(BudgetProposal budgetProposal) {
         displayBasicInfo(budgetProposal);
-        if (budgetProposal.descriptionHtml != null) {
-            String completeDescription = AssetsHelper.applyProposalDescriptionTemplate(ProposalDetailActivity.this, budgetProposal.descriptionHtml);
+        if (budgetProposal.getDescriptionHtml() != null) {
+            String completeDescription = AssetsHelper.applyProposalDescriptionTemplate(ProposalDetailActivity.this, budgetProposal.getDescriptionHtml());
             proposalDescriptionView.loadData(completeDescription, DESCRIPTION_CONTENT_MIME_TYPE, DESCRIPTION_CONTENT_ENCODING);
         }
     }

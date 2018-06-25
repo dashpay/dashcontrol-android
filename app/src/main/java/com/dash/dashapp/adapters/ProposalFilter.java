@@ -29,7 +29,7 @@ public abstract class ProposalFilter extends Filter {
         if (!TextUtils.isEmpty(constraint)) {
             constraint = constraint.toString().toUpperCase();
             for (BudgetProposal item : referenceBudgetProposalList) {
-                if (item.title.toUpperCase().contains(constraint)) {
+                if (item.getTitle().toUpperCase().contains(constraint)) {
                     filteredBlogNews.add(item);
                 }
             }

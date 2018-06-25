@@ -66,7 +66,7 @@ public class ProposalCommentsActivity extends BaseActivity {
         Intent intent = getIntent();
         BudgetProposal budgetProposal = (BudgetProposal) intent.getSerializableExtra(PROPOSAL_EXTRA);
         displayBasicInfo(budgetProposal);
-        loadProposalComments(budgetProposal.hash);
+        loadProposalComments(budgetProposal.getHash());
     }
 
     private void loadProposalComments(String hash) {
@@ -89,10 +89,10 @@ public class ProposalCommentsActivity extends BaseActivity {
     }
 
     private void displayBasicInfo(BudgetProposal budgetProposal) {
-        titleView.setText(String.valueOf(budgetProposal.title));
+        titleView.setText(String.valueOf(budgetProposal.getTitle()));
         yesVotesRatioView.setProgress(budgetProposal.getRatioYes());
         yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, budgetProposal.getRatioYes()));
-        ownerView.setText(getString(R.string.owner_format, budgetProposal.owner));
+        ownerView.setText(getString(R.string.owner_format, budgetProposal.getOwner()));
     }
 
     private void displayComments(List<BudgetProposalComment> commentList) {

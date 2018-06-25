@@ -10,7 +10,10 @@ import retrofit2.http.Query;
 public interface DashCentralService {
 
     @GET("budget")
-    Call<BudgetApiBudgetAnswer> proposals();
+    Call<BudgetApiBudgetAnswer> budget();
+
+    @GET("budgethistory")
+    Call<BudgetApiBudgetAnswer> budgetHistory();
 
     @GET("proposal")
     Call<BudgetApiProposalAnswer> proposalDetails(

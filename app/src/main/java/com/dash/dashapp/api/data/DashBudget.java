@@ -5,10 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
-import io.realm.RealmObject;
-
-public class DashBudget extends RealmObject
-        implements BudgetSummary.Convertible {
+public class DashBudget implements BudgetSummary.Convertible {
 
     @SerializedName("total_amount")
     private float totalAmount;
@@ -29,11 +26,11 @@ public class DashBudget extends RealmObject
     @Override
     public BudgetSummary convert() {
         BudgetSummary budgetSummary = new BudgetSummary();
-        budgetSummary.totalAmount = totalAmount;
-        budgetSummary.allotedAmount = allotedAmount;
-        budgetSummary.paymentDate = paymentDate;
-        budgetSummary.paymentDateHuman = paymentDateHuman;
-        budgetSummary.superblock = superblock;
+        budgetSummary.setTotalAmount(totalAmount);
+        budgetSummary.setAllotedAmount(allotedAmount);
+        budgetSummary.setPaymentDate(paymentDate);
+        budgetSummary.setPaymentDateHuman(paymentDateHuman);
+        budgetSummary.setSuperblock(superblock);
         return budgetSummary;
     }
 }

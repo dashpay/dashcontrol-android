@@ -2,7 +2,6 @@ package com.dash.dashapp.api;
 
 import android.support.annotation.NonNull;
 
-import com.dash.dashapp.api.data.BudgetApiAnswer;
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
 import com.dash.dashapp.api.data.DashBlogNews;
@@ -14,9 +13,9 @@ import com.dash.dashapp.api.data.InsightResponse;
 import com.dash.dashapp.api.service.DashBlogService;
 import com.dash.dashapp.api.service.DashCentralService;
 import com.dash.dashapp.api.service.DashControlService;
+import com.dash.dashapp.api.service.DashInsightService;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
-import com.dash.dashapp.api.service.DashInsightService;
 import com.dash.dashapp.models.PortfolioEntry;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -114,8 +113,8 @@ public class DashControlClient {
         return dashBlogService.blogNews(page);
     }
 
-    public Call<BudgetApiBudgetAnswer> getDashProposals(int page) {
-        return dashCentralService.proposals();
+    public Call<BudgetApiBudgetAnswer> getDashProposals() {
+        return dashCentralService.budget();
     }
 
     public void getPrices(final Callback<List<Exchange>> callback) {

@@ -43,9 +43,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -166,7 +163,7 @@ public class ProposalsFragment extends BaseFragment {
     }
 
     private void loadNextPage() {
-        budgetProposalsCall = DashControlClient.getInstance().getDashProposals(++currentPage);
+        budgetProposalsCall = DashControlClient.getInstance().getDashProposals();
         budgetProposalsCall.enqueue(callback);
     }
 
@@ -194,19 +191,19 @@ public class ProposalsFragment extends BaseFragment {
     };
 
     private void displayFromCache() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-
-            RealmQuery<DashBudget> budgetWhereQuery = realm.where(DashBudget.class);
-            DashBudget budgetQueryResult = budgetWhereQuery.findFirst();
-            if (budgetQueryResult != null) {
-                display(budgetQueryResult);
-            }
-
-            RealmQuery<DashProposal> proposalsWhereQuery = realm.where(DashProposal.class);
-            RealmResults<DashProposal> proposalsQueryResult = proposalsWhereQuery.findAll();
-            List<BudgetProposal.Convertible> proposalList = new ArrayList<BudgetProposal.Convertible>(proposalsQueryResult);
-            display(proposalList);
-        }
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//
+//            RealmQuery<DashBudget> budgetWhereQuery = realm.where(DashBudget.class);
+//            DashBudget budgetQueryResult = budgetWhereQuery.findFirst();
+//            if (budgetQueryResult != null) {
+//                display(budgetQueryResult);
+//            }
+//
+//            RealmQuery<DashProposal> proposalsWhereQuery = realm.where(DashProposal.class);
+//            RealmResults<DashProposal> proposalsQueryResult = proposalsWhereQuery.findAll();
+//            List<BudgetProposal.Convertible> proposalList = new ArrayList<BudgetProposal.Convertible>(proposalsQueryResult);
+//            display(proposalList);
+//        }
     }
 
     private void display(BudgetSummary.Convertible budgetSummary) {
@@ -214,11 +211,11 @@ public class ProposalsFragment extends BaseFragment {
         NumberFormat formatter = NumberFormat.getNumberInstance();
         formatter.setMinimumFractionDigits(1);
         formatter.setMaximumFractionDigits(1);
-        totalBudgetView.setText(formatter.format(summary.totalAmount));
-        allocatedBudgetView.setText(formatter.format(summary.allotedAmount));
+        totalBudgetView.setText(formatter.format(summary.getTotalAmount()));
+        allocatedBudgetView.setText(formatter.format(summary.getAllotedAmount()));
 
         SimpleDateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
-        String superblockSummary = getString(R.string.superblocks_summary, summary.superblock, summary.paymentDateHuman, dateFormatter.format(summary.paymentDate));
+        String superblockSummary = getString(R.string.superblocks_summary, summary.getSuperblock(), summary.getPaymentDateHuman(), dateFormatter.format(summary.getPaymentDate()));
         superblocksSummaryView.setText(superblockSummary);
     }
 
@@ -235,20 +232,20 @@ public class ProposalsFragment extends BaseFragment {
     }
 
     private void persist(final List<DashProposal> proposalList, final DashBudget dashBudget) {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(@NonNull Realm realm) {
-                    if (currentPage == 1) {
-                        realm.delete(DashProposal.class);
-                    }
-                    realm.insert(proposalList);
-
-                    realm.delete(DashBudget.class);
-                    realm.insert(dashBudget);
-                }
-            });
-        }
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//            realm.executeTransaction(new Realm.Transaction() {
+//                @Override
+//                public void execute(@NonNull Realm realm) {
+//                    if (currentPage == 1) {
+//                        realm.delete(DashProposal.class);
+//                    }
+//                    realm.insert(proposalList);
+//
+//                    realm.delete(DashBudget.class);
+//                    realm.insert(dashBudget);
+//                }
+//            });
+//        }
     }
 
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
