@@ -85,6 +85,7 @@
             </intent-filter>
         </service>
         <service android:name=".service.PriceDataService" />
+        <service android:name=".service.NewsSyncService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
