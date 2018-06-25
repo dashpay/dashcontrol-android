@@ -224,7 +224,7 @@ public class PortfolioFragment extends Fragment {
                     .equalTo(Market.Field.NAME, "DASH_USD")
                     .findFirst();
             if (defaultMarket != null) {
-                return defaultMarket.price;
+                return realm.copyFromRealm(defaultMarket).price;
             }
             return 0;
         }
