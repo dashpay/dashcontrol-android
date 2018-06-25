@@ -7,7 +7,9 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 
 import com.dash.dashapp.activities.SettingsActivity;
+import com.dash.dashapp.service.NewsSyncService;
 import com.dash.dashapp.service.PriceDataService;
+import com.dash.dashapp.utils.PrimaryKeyFactory;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.Stetho;
@@ -19,11 +21,8 @@ import java.util.Map;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-/**
- * Created by sebas on 9/18/2017.
- */
 public class DashControlApplication extends Application {
-    private static final String TAG = "DashControlApplication";
+
     private Locale locale = null;
 
     private static Context mContext;
@@ -42,17 +41,17 @@ public class DashControlApplication extends Application {
         super.onCreate();
 
         mContext = getApplicationContext();
-
         pickDefaultLanguage();
-
         initRealm();
-
-        startPriceChartService();
+        startDataSyncServices();
     }
 
-    public void startPriceChartService() {
-        Intent intent = new Intent(this, PriceDataService.class);
-        startService(intent);
+    public void startDataSyncServices() {
+        Intent newsSyncServiceIntent = new Intent(this, NewsSyncService.class);
+        startService(newsSyncServiceIntent);
+
+        Intent priceDataServiceIntent = new Intent(this, PriceDataService.class);
+        startService(priceDataServiceIntent);
     }
 
     private void initRealm() {
@@ -63,6 +62,10 @@ public class DashControlApplication extends Application {
                 .build();
 
         Realm.setDefaultConfiguration(config);
+
+        try (Realm realm = Realm.getDefaultInstance()) {
+            PrimaryKeyFactory.init(realm);
+        }
 
         RealmInspectorModulesProvider realmInspector = RealmInspectorModulesProvider.builder(this)
                 .withDeleteIfMigrationNeeded(true)

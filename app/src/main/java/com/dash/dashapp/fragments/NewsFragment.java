@@ -1,11 +1,13 @@
 package com.dash.dashapp.fragments;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,48 +21,49 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.BlogNewsAdapter;
-import com.dash.dashapp.api.DashControlClient;
-import com.dash.dashapp.api.data.DashBlogNews;
+import com.dash.dashapp.events.NewsSyncCompleteEvent;
+import com.dash.dashapp.events.NewsSyncFailedEvent;
 import com.dash.dashapp.models.BlogNews;
+import com.dash.dashapp.service.NewsSyncService;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.realm.Sort;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 public class NewsFragment extends Fragment {
 
     @BindView(R.id.news_list)
-    RecyclerView blogNewsRecyclerView;
+    RecyclerView newsRecyclerView;
 
     @BindView(R.id.container)
     SwipeRefreshLayout swipeRefreshLayout;
+
+    private LinearLayoutManager layoutManager;
 
     private MenuItem searchMenuItem;
 
     private Unbinder unbinder;
 
-    private Call<List<DashBlogNews>> blogNewsCall;
-
-    private BlogNewsAdapter blogNewsAdapter;
-    private EndlessRecyclerViewScrollListener endlessScrollListener;
-
-    private int currentPage = 0;
+    private Realm realm;
 
     private boolean inSearchMode = false;
 
@@ -79,32 +82,30 @@ public class NewsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        realm = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_news_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        blogNewsRecyclerView.setLayoutManager(layoutManager);
-        blogNewsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        blogNewsRecyclerView.setHasFixedSize(true);
-        endlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                if (!inSearchMode) {
-                    loadNextPage();
-                }
-            }
-        };
-        blogNewsRecyclerView.addOnScrollListener(endlessScrollListener);
-
-        blogNewsAdapter = new BlogNewsAdapter();
-        blogNewsRecyclerView.setAdapter(blogNewsAdapter);
-
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         swipeRefreshLayout.canChildScrollUp();
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
+        if (isNewsSyncServiceRunning()) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
         setHasOptionsMenu(true);
 
@@ -114,74 +115,42 @@ public class NewsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadFirstPage();
+        setupNewsRecycler();
     }
 
-    private void loadFirstPage() {
-        currentPage = 0;
-        swipeRefreshLayout.setRefreshing(true);
-        loadNextPage();
+    private void setupNewsRecycler() {
+        layoutManager = new LinearLayoutManager(getActivity());
+        newsRecyclerView.setLayoutManager(layoutManager);
+        newsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        newsRecyclerView.setHasFixedSize(true);
+
+        displayNews(null);
     }
 
-    private void loadNextPage() {
-        blogNewsCall = DashControlClient.getInstance().getBlogNews(++currentPage);
-        blogNewsCall.enqueue(blogNewsCallCallback);
-    }
+    private void displayNews(String searchTerm) {
 
-    Callback<List<DashBlogNews>> blogNewsCallCallback = new Callback<List<DashBlogNews>>() {
-        @Override
-        public void onResponse(@NonNull Call<List<DashBlogNews>> call, @NonNull Response<List<DashBlogNews>> response) {
-            if (response.isSuccessful()) {
-                List<DashBlogNews> blogNewsList = Objects.requireNonNull(response.body());
-                display(new ArrayList<BlogNews.Convertible>(blogNewsList));
-                persist(blogNewsList);
-            }
-            swipeRefreshLayout.setRefreshing(false);
+        RealmQuery<BlogNews> newsQuery = realm.where(BlogNews.class)
+                .sort(BlogNews.Field.DATE, Sort.DESCENDING);
+
+        boolean searchMode = (searchTerm != null);
+        if (searchMode) {
+            newsQuery = newsQuery.like(BlogNews.Field.TITLE, "*" + searchTerm + "*");
         }
 
-        @Override
-        public void onFailure(@NonNull Call<List<DashBlogNews>> call, @NonNull Throwable t) {
-            if (!call.isCanceled()) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                displayFromCache();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }
-    };
+        RealmResults<BlogNews> blogNewsResult = newsQuery.findAll();
 
-    private void displayFromCache() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            RealmQuery<DashBlogNews> whereQuery = realm.where(DashBlogNews.class);
-            RealmResults<DashBlogNews> queryResult = whereQuery.findAll();
-            List<BlogNews.Convertible> blogNewsList = new ArrayList<BlogNews.Convertible>(queryResult);
-            display(blogNewsList);
-        }
-    }
-
-    private void display(List<BlogNews.Convertible> blogNewsList) {
-        if (currentPage == 1) {
-            blogNewsAdapter.clear();
-            endlessScrollListener.resetState();
-        }
-        List<BlogNews> list = new ArrayList<>();
-        for (BlogNews.Convertible item : blogNewsList) {
-            list.add(item.convert());
-        }
-        blogNewsAdapter.addAll(list);
-    }
-
-    private void persist(final List<DashBlogNews> blogNewsList) {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(@NonNull Realm realm) {
-                    if (currentPage == 1) {
-                        realm.delete(DashBlogNews.class);
-                    }
-                    realm.insert(blogNewsList);
+        BlogNewsAdapter newsRealmAdapter = new BlogNewsAdapter(blogNewsResult, !searchMode);
+        newsRecyclerView.setAdapter(newsRealmAdapter);
+        blogNewsResult.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<BlogNews>>() {
+            @Override
+            public void onChange(@NonNull RealmResults<BlogNews> blogNews, @NonNull OrderedCollectionChangeSet changeSet) {
+                int lastCompletelyVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+                // we don't want to scroll top automatically if user manually scrolled down
+                if (lastCompletelyVisibleItemPosition < 3) {
+                    newsRecyclerView.scrollToPosition(0);
                 }
-            });
-        }
+            }
+        });
     }
 
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
@@ -190,7 +159,12 @@ public class NewsFragment extends Fragment {
             if (searchMenuItem != null) {
                 searchMenuItem.collapseActionView();
             }
-            loadFirstPage();
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                Intent intent = new Intent(activity, NewsSyncService.class);
+                activity.startService(intent);
+                swipeRefreshLayout.setRefreshing(true);
+            }
         }
     };
 
@@ -209,26 +183,24 @@ public class NewsFragment extends Fragment {
         searchMenuItem.setShowAsAction(searchMenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | searchMenuItem.SHOW_AS_ACTION_IF_ROOM);
         searchMenuItem.setActionView(searchView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            private boolean searching;
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                ((Filterable) blogNewsRecyclerView.getAdapter()).getFilter().filter(newText);
+            public boolean onQueryTextChange(String newQuery) {
+                if (searching || newQuery.length() > 2) {
+                    searching = true;
+                    displayNews(newQuery);
+                }
+                if (newQuery.length() == 0) {
+                    searching = false;
+                }
                 return false;
-            }
-        });
-        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewDetachedFromWindow(View arg0) {
-                inSearchMode = false;
-            }
-
-            @Override
-            public void onViewAttachedToWindow(View arg0) {
-                inSearchMode = true;
             }
         });
     }
@@ -246,6 +218,32 @@ public class NewsFragment extends Fragment {
         }
     }
 
+    private boolean isNewsSyncServiceRunning() {
+        Context context = Objects.requireNonNull(getContext());
+        ActivityManager manager = Objects.requireNonNull((ActivityManager) context.getSystemService(ACTIVITY_SERVICE));
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (NewsSyncService.class.getCanonicalName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewsSyncCompleteEvent(NewsSyncCompleteEvent event) {
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewsSyncFailedEvent(NewsSyncFailedEvent event) {
+        Throwable cause = event.getCause();
+        if (cause != null) {
+            Toast.makeText(getContext(), cause.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
     public void onStop() {
         if (swipeRefreshLayout != null) {
@@ -253,20 +251,18 @@ public class NewsFragment extends Fragment {
             swipeRefreshLayout.destroyDrawingCache();
             swipeRefreshLayout.clearAnimation();
         }
+        EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        cancelRequest();
-        unbinder.unbind();
-    }
-
-    private void cancelRequest() {
-        if (blogNewsCall != null) {
-            blogNewsCall.cancel();
-            blogNewsCall = null;
+        if (searchMenuItem != null) {
+            searchMenuItem.collapseActionView();
         }
+        newsRecyclerView.setAdapter(null);
+        realm.close();
+        unbinder.unbind();
     }
 }

@@ -35,9 +35,6 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.thumbnail)
     public ImageView thumbnailView;
 
-    @BindView(R.id.cached)
-    public ImageView cachedView;
-
     private Context context;
 
     private BlogNews blogNews;
@@ -64,8 +61,6 @@ public class BlogNewsHolder extends RecyclerView.ViewHolder {
                     .transition(GenericTransitionOptions.with(android.R.anim.fade_in))
                     .into(thumbnailView);
         }
-
-        cachedView.setVisibility(blogNews.cached ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
     @OnClick
