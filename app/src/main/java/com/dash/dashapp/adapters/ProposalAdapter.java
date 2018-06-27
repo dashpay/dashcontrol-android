@@ -1,37 +1,21 @@
 package com.dash.dashapp.adapters;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.models.BudgetProposal;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
-public class ProposalAdapter extends RecyclerView.Adapter<ProposalHolder> implements Filterable {
+public class ProposalAdapter extends RealmRecyclerViewAdapter<BudgetProposal, ProposalHolder> {
 
-    private List<BudgetProposal> budgetProposalList;
-    private List<BudgetProposal> referenceBudgetProposalList;
-
-    private boolean showOnlyOngoing = false;
-    private boolean showOnlyPast = false;
-    private CharSequence recentFilterConstraint;
-
-    public void setPropertyFilters(boolean showOnlyOngoing, boolean showOnlyPast) {
-        this.showOnlyOngoing = showOnlyOngoing;
-        this.showOnlyPast = showOnlyPast;
-        getFilter().filter(recentFilterConstraint);
-    }
-
-    public ProposalAdapter() {
-        this.budgetProposalList = new ArrayList<>();
-        this.referenceBudgetProposalList = new ArrayList<>();
+    public ProposalAdapter(@Nullable OrderedRealmCollection<BudgetProposal> data) {
+        super(data, true);
     }
 
     @NonNull
@@ -44,36 +28,7 @@ public class ProposalAdapter extends RecyclerView.Adapter<ProposalHolder> implem
 
     @Override
     public void onBindViewHolder(@NonNull ProposalHolder holder, int position) {
-        BudgetProposal budgetProposal = budgetProposalList.get(position);
+        BudgetProposal budgetProposal = getItem(position);
         holder.bind(budgetProposal);
-    }
-
-    @Override
-    public int getItemCount() {
-        return budgetProposalList.size();
-    }
-
-    public void clear() {
-        budgetProposalList.clear();
-        referenceBudgetProposalList.clear();
-        notifyDataSetChanged();
-    }
-
-    public void addAll(List<BudgetProposal> budgetProposalList) {
-        this.budgetProposalList.addAll(budgetProposalList);
-        referenceBudgetProposalList.addAll(budgetProposalList);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public Filter getFilter() {
-        return new ProposalFilter(referenceBudgetProposalList, showOnlyOngoing, showOnlyPast) {
-            @Override
-            protected void publishResults(CharSequence constraint, List<BudgetProposal> budgetProposalFilteredList) {
-                recentFilterConstraint = constraint;
-                budgetProposalList = budgetProposalFilteredList;
-                notifyDataSetChanged();
-            }
-        };
     }
 }

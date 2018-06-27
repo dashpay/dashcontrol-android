@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 
 import com.dash.dashapp.activities.SettingsActivity;
+import com.dash.dashapp.service.BudgetSyncService;
 import com.dash.dashapp.service.NewsSyncService;
 import com.dash.dashapp.service.PriceDataService;
 import com.dash.dashapp.utils.PrimaryKeyFactory;
@@ -49,6 +50,9 @@ public class DashControlApplication extends Application {
     public void startDataSyncServices() {
         Intent newsSyncServiceIntent = new Intent(this, NewsSyncService.class);
         startService(newsSyncServiceIntent);
+
+        Intent budgetSyncServiceIntent = new Intent(this, BudgetSyncService.class);
+        startService(budgetSyncServiceIntent);
 
         Intent priceDataServiceIntent = new Intent(this, PriceDataService.class);
         startService(priceDataServiceIntent);

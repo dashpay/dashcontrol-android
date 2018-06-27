@@ -9,7 +9,7 @@ public class BudgetProposal extends BudgetApiAnswer {
     @SerializedName("proposals")
     public Proposal[] proposals;
 
-    static class Proposal implements com.dash.dashapp.models.BudgetProposal.Convertible {
+    static class Proposal {
 
         @SerializedName("hash")
         public String hash;
@@ -80,7 +80,6 @@ public class BudgetProposal extends BudgetApiAnswer {
         @SerializedName("owner_username")
         public String owner;
 
-        @Override
         public com.dash.dashapp.models.BudgetProposal convert() {
             com.dash.dashapp.models.BudgetProposal budgetProposal = new com.dash.dashapp.models.BudgetProposal();
             budgetProposal.setHash(hash);

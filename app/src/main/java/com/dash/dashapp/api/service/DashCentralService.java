@@ -1,6 +1,7 @@
 package com.dash.dashapp.api.service;
 
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
+import com.dash.dashapp.api.data.BudgetApiBudgetHistoryAnswer;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
 
 import retrofit2.Call;
@@ -13,7 +14,7 @@ public interface DashCentralService {
     Call<BudgetApiBudgetAnswer> budget();
 
     @GET("budgethistory")
-    Call<BudgetApiBudgetAnswer> budgetHistory();
+    Call<BudgetApiBudgetHistoryAnswer> budgetHistory();
 
     @GET("proposal")
     Call<BudgetApiProposalAnswer> proposalDetails(

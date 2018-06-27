@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,34 +19,39 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.ProposalAdapter;
-import com.dash.dashapp.api.DashControlClient;
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
-import com.dash.dashapp.api.data.DashBudget;
-import com.dash.dashapp.api.data.DashProposal;
+import com.dash.dashapp.events.BudgetSyncCompleteEvent;
+import com.dash.dashapp.events.BudgetSyncFailedEvent;
 import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.models.BudgetSummary;
+import com.dash.dashapp.service.BudgetSyncService;
 import com.dash.dashapp.view.ExpandableFiltersView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.realm.Case;
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ProposalsFragment extends BaseFragment {
 
@@ -71,15 +77,9 @@ public class ProposalsFragment extends BaseFragment {
 
     private Unbinder unbinder;
 
+    private Realm realm;
+
     private Call<BudgetApiBudgetAnswer> budgetProposalsCall;
-
-    private ProposalAdapter proposalAdapter;
-
-    private EndlessRecyclerViewScrollListener endlessScrollListener;
-
-    private int currentPage = 0;
-
-    private boolean inSearchMode = false;
 
     public ProposalsFragment() {
     }
@@ -93,6 +93,18 @@ public class ProposalsFragment extends BaseFragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        realm = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -100,23 +112,6 @@ public class ProposalsFragment extends BaseFragment {
         unbinder = ButterKnife.bind(this, view);
 
         setHasOptionsMenu(true);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        proposalRecyclerView.setLayoutManager(layoutManager);
-        proposalRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        proposalRecyclerView.setHasFixedSize(true);
-        endlessScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                if (!inSearchMode) {
-//                    loadNextPage();
-//                }
-            }
-        };
-        proposalRecyclerView.addOnScrollListener(endlessScrollListener);
-
-        proposalAdapter = new ProposalAdapter();
-        proposalRecyclerView.setAdapter(proposalAdapter);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
         swipeRefreshLayout.canChildScrollUp();
@@ -133,119 +128,75 @@ public class ProposalsFragment extends BaseFragment {
     }
 
     private void onFilterChange(ExpandableFiltersView.Filter filter) {
-        ProposalAdapter proposalAdapter = (ProposalAdapter) proposalRecyclerView.getAdapter();
-        switch (filter) {
-            case CURRENT: {
-                proposalAdapter.setPropertyFilters(false, false);
-                break;
-            }
-            case ONGOING: {
-                proposalAdapter.setPropertyFilters(true, false);
-                break;
-            }
-            case PAST: {
-                proposalAdapter.setPropertyFilters(false, true);
-                break;
-            }
-        }
+        displayProposals(filter, null);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadFirstPage();
+        setupNewsRecycler();
     }
 
-    private void loadFirstPage() {
-        currentPage = 0;
-        swipeRefreshLayout.setRefreshing(true);
-        loadNextPage();
+    private void setupNewsRecycler() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        proposalRecyclerView.setLayoutManager(layoutManager);
+        proposalRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        proposalRecyclerView.setHasFixedSize(true);
+
+        displayProposals(filtersView.getSelectedFilter(), null);
     }
 
-    private void loadNextPage() {
-        budgetProposalsCall = DashControlClient.getInstance().getDashProposals();
-        budgetProposalsCall.enqueue(callback);
-    }
+    private void displayProposals(ExpandableFiltersView.Filter filter, String searchTerm) {
+        RealmQuery<BudgetProposal> proposalsQuery = realm.where(BudgetProposal.class);
 
-    Callback<BudgetApiBudgetAnswer> callback = new Callback<BudgetApiBudgetAnswer>() {
-        @Override
-        public void onResponse(@NonNull Call<BudgetApiBudgetAnswer> call, Response<BudgetApiBudgetAnswer> response) {
-            if (response.isSuccessful()) {
-                BudgetApiBudgetAnswer budgetApiAnswer = Objects.requireNonNull(response.body());
-                display(budgetApiAnswer.dashBudget);
-                List<DashProposal> proposalList = Objects.requireNonNull(budgetApiAnswer.proposals);
-                display(new ArrayList<BudgetProposal.Convertible>(proposalList));
-                persist(proposalList, budgetApiAnswer.dashBudget);
+        Date today = new Date();
+        switch (filter) {
+            case CURRENT: {
+                proposalsQuery = proposalsQuery.equalTo(BudgetProposal.Field.HISTORICAL, false);
+                break;
             }
-            swipeRefreshLayout.setRefreshing(false);
-        }
-
-        @Override
-        public void onFailure(@NonNull Call<BudgetApiBudgetAnswer> call, @NonNull Throwable t) {
-            if (!call.isCanceled()) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-                displayFromCache();
-                swipeRefreshLayout.setRefreshing(false);
+            case ONGOING: {
+                proposalsQuery = proposalsQuery
+                        .equalTo(BudgetProposal.Field.HISTORICAL, false)
+                        .greaterThan(BudgetProposal.Field.DATE_END, today)
+                        .greaterThan(BudgetProposal.Field.REMAINING_PAYMENT_COUNT, 0)
+                        .equalTo(BudgetProposal.Field.WILL_BE_FUNDED, true)
+                        .equalTo(BudgetProposal.Field.IN_NEXT_BUDGET, true);
+                break;
+            }
+            case PAST: {
+                proposalsQuery = proposalsQuery.equalTo(BudgetProposal.Field.HISTORICAL, true);
+                break;
             }
         }
-    };
+        proposalsQuery = proposalsQuery.sort(BudgetProposal.Field.DATE_ADDED, Sort.DESCENDING);
 
-    private void displayFromCache() {
-//        try (Realm realm = Realm.getDefaultInstance()) {
-//
-//            RealmQuery<DashBudget> budgetWhereQuery = realm.where(DashBudget.class);
-//            DashBudget budgetQueryResult = budgetWhereQuery.findFirst();
-//            if (budgetQueryResult != null) {
-//                display(budgetQueryResult);
-//            }
-//
-//            RealmQuery<DashProposal> proposalsWhereQuery = realm.where(DashProposal.class);
-//            RealmResults<DashProposal> proposalsQueryResult = proposalsWhereQuery.findAll();
-//            List<BudgetProposal.Convertible> proposalList = new ArrayList<BudgetProposal.Convertible>(proposalsQueryResult);
-//            display(proposalList);
-//        }
-    }
-
-    private void display(BudgetSummary.Convertible budgetSummary) {
-        BudgetSummary summary = budgetSummary.convert();
-        NumberFormat formatter = NumberFormat.getNumberInstance();
-        formatter.setMinimumFractionDigits(1);
-        formatter.setMaximumFractionDigits(1);
-        totalBudgetView.setText(formatter.format(summary.getTotalAmount()));
-        allocatedBudgetView.setText(formatter.format(summary.getAllotedAmount()));
-
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
-        String superblockSummary = getString(R.string.superblocks_summary, summary.getSuperblock(), summary.getPaymentDateHuman(), dateFormatter.format(summary.getPaymentDate()));
-        superblocksSummaryView.setText(superblockSummary);
-    }
-
-    private void display(List<BudgetProposal.Convertible> proposalList) {
-        if (currentPage == 1) {
-            proposalAdapter.clear();
-            endlessScrollListener.resetState();
+        boolean searchMode = (searchTerm != null);
+        if (searchMode) {
+            proposalsQuery = proposalsQuery.contains(BudgetProposal.Field.TITLE, searchTerm, Case.INSENSITIVE);
         }
-        List<BudgetProposal> list = new ArrayList<>();
-        for (BudgetProposal.Convertible item : proposalList) {
-            list.add(item.convert());
-        }
-        proposalAdapter.addAll(list);
+
+        RealmResults<BudgetProposal> proposalsResult = proposalsQuery.findAll();
+
+        ProposalAdapter proposalsRealmAdapter = new ProposalAdapter(proposalsResult);
+        proposalRecyclerView.setAdapter(proposalsRealmAdapter);
+
+        displayBudgetSummary();
     }
 
-    private void persist(final List<DashProposal> proposalList, final DashBudget dashBudget) {
-//        try (Realm realm = Realm.getDefaultInstance()) {
-//            realm.executeTransaction(new Realm.Transaction() {
-//                @Override
-//                public void execute(@NonNull Realm realm) {
-//                    if (currentPage == 1) {
-//                        realm.delete(DashProposal.class);
-//                    }
-//                    realm.insert(proposalList);
-//
-//                    realm.delete(DashBudget.class);
-//                    realm.insert(dashBudget);
-//                }
-//            });
-//        }
+    private void displayBudgetSummary() {
+        BudgetSummary summary = realm.where(BudgetSummary.class).findFirst();
+        if (summary != null) {
+            NumberFormat formatter = NumberFormat.getNumberInstance();
+            formatter.setMinimumFractionDigits(0);
+            formatter.setMaximumFractionDigits(0);
+            totalBudgetView.setText(formatter.format(summary.getTotalAmount()));
+            allocatedBudgetView.setText(formatter.format(summary.getAllotedAmount()));
+
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy", Locale.US);
+            String superblockSummary = getString(R.string.superblocks_summary, summary.getSuperblock(), summary.getPaymentDateHuman(), dateFormatter.format(summary.getPaymentDate()));
+            superblocksSummaryView.setText(superblockSummary);
+        }
     }
 
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
@@ -254,7 +205,12 @@ public class ProposalsFragment extends BaseFragment {
             if (searchMenuItem != null) {
                 searchMenuItem.collapseActionView();
             }
-            loadFirstPage();
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                Intent intent = new Intent(activity, BudgetSyncService.class);
+                activity.startService(intent);
+                swipeRefreshLayout.setRefreshing(true);
+            }
         }
     };
 
@@ -273,26 +229,24 @@ public class ProposalsFragment extends BaseFragment {
         searchMenuItem.setShowAsAction(searchMenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | searchMenuItem.SHOW_AS_ACTION_IF_ROOM);
         searchMenuItem.setActionView(searchView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            private boolean searching;
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                ((Filterable) proposalRecyclerView.getAdapter()).getFilter().filter(newText);
+            public boolean onQueryTextChange(String newQuery) {
+                if (searching || newQuery.length() > 2) {
+                    searching = true;
+                    displayProposals(filtersView.getSelectedFilter(), newQuery);
+                }
+                if (newQuery.length() == 0) {
+                    searching = false;
+                }
                 return false;
-            }
-        });
-        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewDetachedFromWindow(View arg0) {
-                inSearchMode = false;
-            }
-
-            @Override
-            public void onViewAttachedToWindow(View arg0) {
-                inSearchMode = true;
             }
         });
     }
@@ -310,6 +264,22 @@ public class ProposalsFragment extends BaseFragment {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBudgetSyncCompleteEvent(BudgetSyncCompleteEvent event) {
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+        displayBudgetSummary();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBudgetSyncFailedEvent(BudgetSyncFailedEvent event) {
+        Throwable cause = event.getCause();
+        if (cause != null) {
+            Toast.makeText(getContext(), cause.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
     public void onStop() {
         if (swipeRefreshLayout != null) {
@@ -317,6 +287,7 @@ public class ProposalsFragment extends BaseFragment {
             swipeRefreshLayout.destroyDrawingCache();
             swipeRefreshLayout.clearAnimation();
         }
+        EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
@@ -324,6 +295,7 @@ public class ProposalsFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         cancelRequest();
+        realm.close();
         unbinder.unbind();
     }
 

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
-public class DashBudget implements BudgetSummary.Convertible {
+public class DashBudget {
 
     @SerializedName("total_amount")
     private float totalAmount;
@@ -22,8 +22,6 @@ public class DashBudget implements BudgetSummary.Convertible {
     @SerializedName("superblock")
     private int superblock;
 
-
-    @Override
     public BudgetSummary convert() {
         BudgetSummary budgetSummary = new BudgetSummary();
         budgetSummary.setTotalAmount(totalAmount);

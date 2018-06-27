@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
-public class DashProposal implements BudgetProposal.Convertible {
+public class DashProposal {
 
     @SerializedName("hash")
     private String hash;
@@ -84,8 +84,7 @@ public class DashProposal implements BudgetProposal.Convertible {
     @SerializedName("description_base64_html")
     private String descriptionBase64Html;
 
-    @Override
-    public BudgetProposal convert() {
+    public BudgetProposal convert(boolean historical) {
         BudgetProposal budgetProposal = new BudgetProposal();
         budgetProposal.setHash(hash);
         budgetProposal.setName(name);
@@ -112,6 +111,7 @@ public class DashProposal implements BudgetProposal.Convertible {
         if (descriptionBase64Html != null) {
             budgetProposal.setDescriptionHtml(new String(Base64.decode(descriptionBase64Html, Base64.DEFAULT)));
         }
+        budgetProposal.setHistorical(historical);
         return budgetProposal;
     }
 }

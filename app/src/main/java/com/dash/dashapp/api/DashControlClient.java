@@ -1,19 +1,24 @@
 package com.dash.dashapp.api;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
+import com.dash.dashapp.api.data.BudgetApiBudgetHistoryAnswer;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
 import com.dash.dashapp.api.data.DashBlogNews;
 import com.dash.dashapp.api.data.DashControlChartDataAnswer;
 import com.dash.dashapp.api.data.DashControlExchange;
 import com.dash.dashapp.api.data.DashControlMarketsAnswer;
 import com.dash.dashapp.api.data.DashControlPricesAnswer;
+import com.dash.dashapp.api.data.DashProposal;
 import com.dash.dashapp.api.data.InsightResponse;
 import com.dash.dashapp.api.service.DashBlogService;
 import com.dash.dashapp.api.service.DashCentralService;
 import com.dash.dashapp.api.service.DashControlService;
 import com.dash.dashapp.api.service.DashInsightService;
+import com.dash.dashapp.models.BudgetProposal;
+import com.dash.dashapp.models.BudgetSummary;
 import com.dash.dashapp.models.Exchange;
 import com.dash.dashapp.models.Market;
 import com.dash.dashapp.models.PortfolioEntry;
@@ -113,8 +118,61 @@ public class DashControlClient {
         return dashBlogService.blogNews(page);
     }
 
-    public Call<BudgetApiBudgetAnswer> getDashProposals() {
-        return dashCentralService.budget();
+    public Call getBudget(final Callback<Pair<BudgetSummary, List<BudgetProposal>>> callback) {
+        Call<BudgetApiBudgetAnswer> budgetCall = dashCentralService.budget();
+        budgetCall.enqueue(new retrofit2.Callback<BudgetApiBudgetAnswer>() {
+            @Override
+            public void onResponse(@NonNull Call<BudgetApiBudgetAnswer> call,
+                                   @NonNull Response<BudgetApiBudgetAnswer> response) {
+                if (response.isSuccessful()) {
+                    BudgetApiBudgetAnswer budgetApiBudgetAnswer = Objects.requireNonNull(response.body());
+                    BudgetSummary budgetSummary = budgetApiBudgetAnswer.dashBudget.convert();
+                    List<DashProposal> dashProposalList = budgetApiBudgetAnswer.proposals;
+                    List<BudgetProposal> proposalList = new ArrayList<>();
+                    for (DashProposal dashProposal : dashProposalList) {
+                        proposalList.add(dashProposal.convert(false));
+                    }
+                    callback.onResponse(new Pair<>(budgetSummary, proposalList));
+                } else {
+                    callback.onFailure(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BudgetApiBudgetAnswer> call,
+                                  @NonNull Throwable t) {
+                callback.onFailure(t);
+            }
+        });
+        return budgetCall;
+    }
+
+    public Call getBudgetHistory(final Callback<List<BudgetProposal>> callback) {
+        Call<BudgetApiBudgetHistoryAnswer> budgetHistoryCall = dashCentralService.budgetHistory();
+        budgetHistoryCall.enqueue(new retrofit2.Callback<BudgetApiBudgetHistoryAnswer>() {
+            @Override
+            public void onResponse(@NonNull Call<BudgetApiBudgetHistoryAnswer> call,
+                                   @NonNull Response<BudgetApiBudgetHistoryAnswer> response) {
+                if (response.isSuccessful()) {
+                    BudgetApiBudgetHistoryAnswer budgetApiBudgetHistoryAnswer = Objects.requireNonNull(response.body());
+                    List<DashProposal> dashProposalList = budgetApiBudgetHistoryAnswer.proposals;
+                    List<BudgetProposal> proposalList = new ArrayList<>();
+                    for (DashProposal dashProposal : dashProposalList) {
+                        proposalList.add(dashProposal.convert(true));
+                    }
+                    callback.onResponse(proposalList);
+                } else {
+                    callback.onFailure(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BudgetApiBudgetHistoryAnswer> call,
+                                  @NonNull Throwable t) {
+                callback.onFailure(t);
+            }
+        });
+        return budgetHistoryCall;
     }
 
     public void getPrices(final Callback<List<Exchange>> callback) {
@@ -217,13 +275,6 @@ public class DashControlClient {
         return dashControlService.chartData(noLimit, exchange, market, startDateMs / 1000, endDateMs / 1000);
     }
 
-    public interface Callback<T> {
-
-        void onResponse(T t);
-
-        void onFailure(Throwable t);
-    }
-
     public Call<BudgetApiProposalAnswer> getProposalDetails(String proposalHash) {
         return dashCentralService.proposalDetails(proposalHash);
     }
@@ -238,5 +289,12 @@ public class DashControlClient {
         }
         String addrs = addrsBuilder.toString();
         return dashInsightService.utxos(addrs);
+    }
+
+    public interface Callback<T> {
+
+        void onResponse(T t);
+
+        void onFailure(Throwable t);
     }
 }

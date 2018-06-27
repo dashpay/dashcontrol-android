@@ -51,8 +51,4 @@ public class BudgetSummary extends RealmObject {
     public void setSuperblock(int superblock) {
         this.superblock = superblock;
     }
-
-    public interface Convertible {
-        BudgetSummary convert();
-    }
 }

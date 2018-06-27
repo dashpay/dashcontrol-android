@@ -8,6 +8,16 @@ import io.realm.RealmObject;
 public class BudgetProposal extends RealmObject
         implements Serializable {
 
+    public interface Field {
+        String TITLE = "title";
+        String DATE_ADDED = "dateAdded";
+        String DATE_END = "dateEnd";
+        String REMAINING_PAYMENT_COUNT = "remainingPaymentCount";
+        String WILL_BE_FUNDED = "willBeFunded";
+        String IN_NEXT_BUDGET = "inNextBudget";
+        String HISTORICAL = "historical";
+    }
+
     private String hash;
     private String name;
     private String url;
@@ -32,6 +42,7 @@ public class BudgetProposal extends RealmObject
     private int commentAmount;
     private String owner;
     private String descriptionHtml;
+    private boolean historical;
 
     public String getHash() {
         return hash;
@@ -240,7 +251,11 @@ public class BudgetProposal extends RealmObject
         return (int) ratioYes;
     }
 
-    public interface Convertible {
-        BudgetProposal convert();
+    public boolean isHistorical() {
+        return historical;
+    }
+
+    public void setHistorical(boolean historical) {
+        this.historical = historical;
     }
 }
