@@ -7,10 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
-import io.realm.RealmObject;
-
-public class DashProposal extends RealmObject
-        implements BudgetProposal.Convertible {
+public class DashProposal {
 
     @SerializedName("hash")
     private String hash;
@@ -87,34 +84,34 @@ public class DashProposal extends RealmObject
     @SerializedName("description_base64_html")
     private String descriptionBase64Html;
 
-    @Override
-    public BudgetProposal convert() {
+    public BudgetProposal convert(boolean historical) {
         BudgetProposal budgetProposal = new BudgetProposal();
-        budgetProposal.hash = hash;
-        budgetProposal.name = name;
-        budgetProposal.url = url;
-        budgetProposal.dwUrl = dwUrl;
-        budgetProposal.dwUrlComments = dwUrlComments;
-        budgetProposal.title = title;
-        budgetProposal.dateAdded = dateAdded;
-        budgetProposal.dateAddedHuman = dateAddedHuman;
-        budgetProposal.dateEnd = dateEnd;
-        budgetProposal.votingDeadlineHuman = votingDeadlineHuman;
-        budgetProposal.willBeFunded = willBeFunded;
-        budgetProposal.remainingYesVotesUntilFunding = remainingYesVotesUntilFunding;
-        budgetProposal.inNextBudget = inNextBudget;
-        budgetProposal.monthlyAmount = monthlyAmount;
-        budgetProposal.totalPaymentCount = totalPaymentCount;
-        budgetProposal.remainingPaymentCount = remainingPaymentCount;
-        budgetProposal.yesVotes = yesVotes;
-        budgetProposal.noVotes = noVotes;
-        budgetProposal.abstainVotes = abstainVotes;
-        budgetProposal.order = order;
-        budgetProposal.commentAmount = commentAmount;
-        budgetProposal.owner = owner;
+        budgetProposal.setHash(hash);
+        budgetProposal.setName(name);
+        budgetProposal.setUrl(url);
+        budgetProposal.setDwUrl(dwUrl);
+        budgetProposal.setDwUrlComments(dwUrlComments);
+        budgetProposal.setTitle(title);
+        budgetProposal.setDateAdded(dateAdded);
+        budgetProposal.setDateAddedHuman(dateAddedHuman);
+        budgetProposal.setDateEnd(dateEnd);
+        budgetProposal.setVotingDeadlineHuman(votingDeadlineHuman);
+        budgetProposal.setWillBeFunded(willBeFunded);
+        budgetProposal.setRemainingYesVotesUntilFunding(remainingYesVotesUntilFunding);
+        budgetProposal.setInNextBudget(inNextBudget);
+        budgetProposal.setMonthlyAmount(monthlyAmount);
+        budgetProposal.setTotalPaymentCount(totalPaymentCount);
+        budgetProposal.setRemainingPaymentCount(remainingPaymentCount);
+        budgetProposal.setYesVotes(yesVotes);
+        budgetProposal.setNoVotes(noVotes);
+        budgetProposal.setAbstainVotes(abstainVotes);
+        budgetProposal.setOrder(order);
+        budgetProposal.setCommentAmount(commentAmount);
+        budgetProposal.setOwner(owner);
         if (descriptionBase64Html != null) {
-            budgetProposal.descriptionHtml = new String(Base64.decode(descriptionBase64Html, Base64.DEFAULT));
+            budgetProposal.setDescriptionHtml(new String(Base64.decode(descriptionBase64Html, Base64.DEFAULT)));
         }
+        budgetProposal.setHistorical(historical);
         return budgetProposal;
     }
 }

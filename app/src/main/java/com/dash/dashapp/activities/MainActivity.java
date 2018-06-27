@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -22,11 +24,12 @@ public class MainActivity extends BaseActivity implements
         PortfolioFragment.OnFragmentInteractionListener,
         PriceFragment.OnFragmentInteractionListener {
 
-    private static final String TAG = "MainActivity";
     @BindView(R.id.content)
     FrameLayout content;
+
     @BindView(R.id.navigation)
     BottomNavigationView navigation;
+
     private NewsFragment newsFragment;
     private ProposalsFragment proposalFragment;
 
@@ -37,16 +40,16 @@ public class MainActivity extends BaseActivity implements
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_news:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
+                    switchFragment(newsFragment);
                     return true;
                 case R.id.navigation_proposals:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content, proposalFragment).commit();
+                    switchFragment(proposalFragment);
                     return true;
                 case R.id.navigation_prices:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content, PriceFragment.newInstance()).commit();
+                    switchFragment(PriceFragment.newInstance());
                     return true;
                 case R.id.navigation_portfolio:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content, PortfolioFragment.newInstance()).commit();
+                    switchFragment(PortfolioFragment.newInstance());
                     return true;
             }
             return false;
@@ -54,6 +57,13 @@ public class MainActivity extends BaseActivity implements
 
     };
 
+    private void switchFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.content, fragment)
+                .commit();
+    }
 
     @Override
     protected int getLayoutResourceId() {
@@ -68,7 +78,9 @@ public class MainActivity extends BaseActivity implements
 
         newsFragment = NewsFragment.newInstance();
         proposalFragment = ProposalsFragment.newInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newsFragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content, newsFragment)
+                .commit();
 
         ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar());
         supportActionBar.setDisplayShowHomeEnabled(true);

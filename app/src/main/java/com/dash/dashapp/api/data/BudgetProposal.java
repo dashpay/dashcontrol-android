@@ -9,7 +9,7 @@ public class BudgetProposal extends BudgetApiAnswer {
     @SerializedName("proposals")
     public Proposal[] proposals;
 
-    static class Proposal implements com.dash.dashapp.models.BudgetProposal.Convertible {
+    static class Proposal {
 
         @SerializedName("hash")
         public String hash;
@@ -80,31 +80,30 @@ public class BudgetProposal extends BudgetApiAnswer {
         @SerializedName("owner_username")
         public String owner;
 
-        @Override
         public com.dash.dashapp.models.BudgetProposal convert() {
             com.dash.dashapp.models.BudgetProposal budgetProposal = new com.dash.dashapp.models.BudgetProposal();
-            budgetProposal.hash = hash;
-            budgetProposal.name = name;
-            budgetProposal.url = url;
-            budgetProposal.dwUrl = dwUrl;
-            budgetProposal.dwUrlComments = dwUrlComments;
-            budgetProposal.title = title;
-            budgetProposal.dateAdded = dateAdded;
-            budgetProposal.dateAddedHuman = dateAddedHuman;
-            budgetProposal.dateEnd = dateEnd;
-            budgetProposal.votingDeadlineHuman = votingDeadlineHuman;
-            budgetProposal.willBeFunded = willBeFunded;
-            budgetProposal.remainingYesVotesUntilFunding = remainingYesVotesUntilFunding;
-            budgetProposal.inNextBudget = inNextBudget;
-            budgetProposal.monthlyAmount = monthlyAmount;
-            budgetProposal.totalPaymentCount = totalPaymentCount;
-            budgetProposal.remainingPaymentCount = remainingPaymentCount;
-            budgetProposal.yesVotes = yesVotes;
-            budgetProposal.noVotes = noVotes;
-            budgetProposal.abstainVotes = abstainVotes;
-            budgetProposal.order = order;
-            budgetProposal.commentAmount = commentAmount;
-            budgetProposal.owner = owner;
+            budgetProposal.setHash(hash);
+            budgetProposal.setName(name);
+            budgetProposal.setUrl(url);
+            budgetProposal.setDwUrl(dwUrl);
+            budgetProposal.setDwUrlComments(dwUrlComments);
+            budgetProposal.setTitle(title);
+            budgetProposal.setDateAdded(dateAdded);
+            budgetProposal.setDateAddedHuman(dateAddedHuman);
+            budgetProposal.setDateEnd(dateEnd);
+            budgetProposal.setVotingDeadlineHuman(votingDeadlineHuman);
+            budgetProposal.setWillBeFunded(willBeFunded);
+            budgetProposal.setRemainingYesVotesUntilFunding(remainingYesVotesUntilFunding);
+            budgetProposal.setInNextBudget(inNextBudget);
+            budgetProposal.setMonthlyAmount(monthlyAmount);
+            budgetProposal.setTotalPaymentCount(totalPaymentCount);
+            budgetProposal.setRemainingPaymentCount(remainingPaymentCount);
+            budgetProposal.setYesVotes(yesVotes);
+            budgetProposal.setNoVotes(noVotes);
+            budgetProposal.setAbstainVotes(abstainVotes);
+            budgetProposal.setOrder(order);
+            budgetProposal.setCommentAmount(commentAmount);
+            budgetProposal.setOwner(owner);
             return budgetProposal;
         }
     }

@@ -110,9 +110,14 @@ public class ExpandableFiltersView extends FrameLayout {
 
             Filter checkedFilter = (Filter) toggleView.getTag();
             if (onFilterChangeListener != null) {
+                selectedFilter = checkedFilter;
                 onFilterChangeListener.onFilterChange(this, checkedFilter);
             }
         }
+    }
+
+    public Filter getSelectedFilter() {
+        return selectedFilter;
     }
 
     @OnClick(R.id.filter_header_top)

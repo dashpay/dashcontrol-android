@@ -59,7 +59,7 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
     public void bind(BudgetProposal budgetProposal) {
         this.budgetProposal = budgetProposal;
 
-        titleView.setText(budgetProposal.title);
+        titleView.setText(budgetProposal.getTitle());
 
         int ratioYes = budgetProposal.getRatioYes();
         approvalProgressView.setProgress(ratioYes);
@@ -68,7 +68,7 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
         //TODO calculate the month
         Date startDate = new Date();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        int monthRemaining = DateUtil.monthDifference(startDate, budgetProposal.dateEnd);
+        int monthRemaining = DateUtil.monthDifference(startDate, budgetProposal.getDateEnd());
         if (monthRemaining == 1) {
             monthRemainingView.setText(context.getString(R.string.month_remaining, monthRemaining));
         } else {
@@ -78,13 +78,13 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
         NumberFormat formatter = NumberFormat.getNumberInstance();
 //        formatter.setMinimumFractionDigits(2);
         formatter.setMaximumFractionDigits(2);
-        dashAmountView.setText(formatter.format(budgetProposal.monthlyAmount));
+        dashAmountView.setText(formatter.format(budgetProposal.getMonthlyAmount()));
 
-        if (!TextUtils.isEmpty(budgetProposal.owner)) {
-            ownerView.setText(context.getString(R.string.by, budgetProposal.owner));
+        if (!TextUtils.isEmpty(budgetProposal.getOwner())) {
+            ownerView.setText(context.getString(R.string.by, budgetProposal.getOwner()));
         }
 
-        commentsNumberView.setText(String.valueOf(budgetProposal.commentAmount));
+        commentsNumberView.setText(String.valueOf(budgetProposal.getCommentAmount()));
     }
 
     @OnClick

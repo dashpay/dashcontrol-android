@@ -40,6 +40,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.realm.Case;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
@@ -132,7 +133,7 @@ public class NewsFragment extends Fragment {
 
         boolean searchMode = (searchTerm != null);
         if (searchMode) {
-            newsQuery = newsQuery.like(BlogNews.Field.TITLE, "*" + searchTerm + "*");
+            newsQuery = newsQuery.contains(BlogNews.Field.TITLE, searchTerm, Case.INSENSITIVE);
         }
 
         RealmResults<BlogNews> blogNewsResult = newsQuery.findAll();

@@ -90,6 +90,7 @@
         </service>
         <service android:name=".service.PriceDataService" />
         <service android:name=".service.NewsSyncService" />
+        <service android:name=".service.BudgetSyncService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
