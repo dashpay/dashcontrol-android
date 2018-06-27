@@ -109,8 +109,8 @@ public class ProposalDetailActivity extends BaseActivity {
             public void onResponse(@NonNull Call<BudgetApiProposalAnswer> call, @NonNull Response<BudgetApiProposalAnswer> response) {
                 if (response.isSuccessful()) {
                     BudgetApiProposalAnswer proposalAnswer = Objects.requireNonNull(response.body());
-//                    BudgetProposal proposal = proposalAnswer.proposal.convert();
-//                    displayDetails(proposal);
+                    BudgetProposal proposal = proposalAnswer.proposal.convert(false);
+                    displayDetails(proposal);
                 }
             }
 

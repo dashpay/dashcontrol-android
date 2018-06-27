@@ -14,8 +14,11 @@ import io.realm.RealmRecyclerViewAdapter;
 
 public class ProposalAdapter extends RealmRecyclerViewAdapter<BudgetProposal, ProposalHolder> {
 
-    public ProposalAdapter(@Nullable OrderedRealmCollection<BudgetProposal> data) {
+    private OnItemClickListener onItemClickListener;
+
+    public ProposalAdapter(@Nullable OrderedRealmCollection<BudgetProposal> data, OnItemClickListener onItemClickListener) {
         super(data, true);
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -23,12 +26,16 @@ public class ProposalAdapter extends RealmRecyclerViewAdapter<BudgetProposal, Pr
     public ProposalHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.proposal_view, parent, false);
-        return new ProposalHolder(view);
+        return new ProposalHolder(view, onItemClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProposalHolder holder, int position) {
         BudgetProposal budgetProposal = getItem(position);
         holder.bind(budgetProposal);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(BudgetProposal proposal);
     }
 }

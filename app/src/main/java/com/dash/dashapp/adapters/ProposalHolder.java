@@ -1,7 +1,5 @@
 package com.dash.dashapp.adapters;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,7 +7,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.dash.dashapp.R;
-import com.dash.dashapp.activities.ProposalDetailActivity;
 import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.utils.DateUtil;
 
@@ -46,13 +43,13 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.dash_amount)
     public TextView dashAmountView;
 
-    private Context context;
+    private ProposalAdapter.OnItemClickListener onItemClickListener;
 
     private BudgetProposal budgetProposal;
 
-    ProposalHolder(View itemView) {
+    ProposalHolder(View itemView, ProposalAdapter.OnItemClickListener onItemClickListener) {
         super(itemView);
-        context = itemView.getContext();
+        this.onItemClickListener = onItemClickListener;
         ButterKnife.bind(this, itemView);
     }
 
@@ -70,9 +67,9 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         int monthRemaining = DateUtil.monthDifference(startDate, budgetProposal.getDateEnd());
         if (monthRemaining == 1) {
-            monthRemainingView.setText(context.getString(R.string.month_remaining, monthRemaining));
+            monthRemainingView.setText(itemView.getContext().getString(R.string.month_remaining, monthRemaining));
         } else {
-            monthRemainingView.setText(context.getString(R.string.months_remaining, monthRemaining));
+            monthRemainingView.setText(itemView.getContext().getString(R.string.months_remaining, monthRemaining));
         }
 
         NumberFormat formatter = NumberFormat.getNumberInstance();
@@ -81,7 +78,7 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
         dashAmountView.setText(formatter.format(budgetProposal.getMonthlyAmount()));
 
         if (!TextUtils.isEmpty(budgetProposal.getOwner())) {
-            ownerView.setText(context.getString(R.string.by, budgetProposal.getOwner()));
+            ownerView.setText(itemView.getContext().getString(R.string.by, budgetProposal.getOwner()));
         }
 
         commentsNumberView.setText(String.valueOf(budgetProposal.getCommentAmount()));
@@ -89,7 +86,6 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
 
     @OnClick
     public void onClick() {
-        Intent intent = ProposalDetailActivity.createIntent(context, budgetProposal);
-        context.startActivity(intent);
+        onItemClickListener.onItemClick(budgetProposal);
     }
 }

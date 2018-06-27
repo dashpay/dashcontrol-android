@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dash.dashapp.R;
+import com.dash.dashapp.activities.ProposalDetailActivity;
 import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.adapters.ProposalAdapter;
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
@@ -178,7 +179,7 @@ public class ProposalsFragment extends BaseFragment {
 
         RealmResults<BudgetProposal> proposalsResult = proposalsQuery.findAll();
 
-        ProposalAdapter proposalsRealmAdapter = new ProposalAdapter(proposalsResult);
+        ProposalAdapter proposalsRealmAdapter = new ProposalAdapter(proposalsResult, onItemClickListener);
         proposalRecyclerView.setAdapter(proposalsRealmAdapter);
 
         displayBudgetSummary();
@@ -198,6 +199,16 @@ public class ProposalsFragment extends BaseFragment {
             superblocksSummaryView.setText(superblockSummary);
         }
     }
+
+    ProposalAdapter.OnItemClickListener onItemClickListener = new ProposalAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClick(BudgetProposal proposal) {
+            BudgetProposal unmanagedProposal = realm.copyFromRealm(proposal);
+            Context context = Objects.requireNonNull(getContext());
+            Intent intent = ProposalDetailActivity.createIntent(context, unmanagedProposal);
+            context.startActivity(intent);
+        }
+    };
 
     SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
