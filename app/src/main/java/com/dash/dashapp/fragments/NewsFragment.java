@@ -145,7 +145,7 @@ public class NewsFragment extends Fragment {
             public void onChange(@NonNull RealmResults<BlogNews> blogNews, @NonNull OrderedCollectionChangeSet changeSet) {
                 int lastCompletelyVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
                 // we don't want to scroll top automatically if user manually scrolled down
-                if (lastCompletelyVisibleItemPosition < 3) {
+                if (newsRecyclerView != null && lastCompletelyVisibleItemPosition < 3) {
                     newsRecyclerView.scrollToPosition(0);
                 }
             }

@@ -65,6 +65,9 @@ public class ProposalsFragment extends BaseFragment {
     @BindView(R.id.filters)
     ExpandableFiltersView filtersView;
 
+    @BindView(R.id.summary)
+    View summaryView;
+
     @BindView(R.id.total_budget)
     TextView totalBudgetView;
 
@@ -258,6 +261,19 @@ public class ProposalsFragment extends BaseFragment {
                     searching = false;
                 }
                 return false;
+            }
+        });
+        searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewDetachedFromWindow(View arg0) {
+                filtersView.setVisibility(View.VISIBLE);
+                summaryView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onViewAttachedToWindow(View arg0) {
+                summaryView.setVisibility(View.GONE);
+                filtersView.setVisibility(View.GONE);
             }
         });
     }
