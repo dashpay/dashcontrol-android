@@ -89,6 +89,7 @@
                 android:padding="16dp"
                 android:text="@string/add_portfolio_entry_payment_notification"
                 android:textColor="@color/white"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/input_layout_voting_key" />
 
             <Switch
