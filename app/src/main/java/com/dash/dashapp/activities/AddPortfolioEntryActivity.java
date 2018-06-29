@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.dash.dashapp.R;
 import com.dash.dashapp.models.PortfolioEntry;
+import com.dash.dashapp.utils.DashAddressValidator;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -129,6 +130,10 @@ public class AddPortfolioEntryActivity extends BaseActivity {
         String address = addressView.getText().toString().trim();
         if (TextUtils.isEmpty(address)) {
             Toast.makeText(this, R.string.add_portfolio_entry_empty_address, Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (!DashAddressValidator.isValid(address)) {
+            Toast.makeText(this, R.string.add_portfolio_entry_invalid_address, Toast.LENGTH_LONG).show();
             return;
         }
         String label = labelView.getText().toString().trim();

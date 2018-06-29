@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources>
     <string name="app_name">Dash control</string>
     <string name="title_news">News</string>
     <string name="title_proposals">Proposals</string>
@@ -98,6 +98,7 @@
     <string name="add_portfolio_entry_wallet_label_format">Wallet %d</string>
     <string name="add_portfolio_entry_masternode_label_format">Masternode %d</string>
     <string name="add_portfolio_entry_empty_address">Address cannot be empty</string>
+    <string name="add_portfolio_entry_invalid_address">Incorrect format of Address</string>
     <string name="add_portfolio_entry_public_key_already_added">Address already added as %s</string>
 
     <string name="hello_world">Hello world!</string>
