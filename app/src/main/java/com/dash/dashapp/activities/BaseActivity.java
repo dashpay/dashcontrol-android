@@ -1,10 +1,14 @@
 package com.dash.dashapp.activities;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.Objects;
 
@@ -50,6 +54,17 @@ public abstract class BaseActivity extends AppCompatActivity {
             default: {
                 return super.onOptionsItemSelected(item);
             }
+        }
+    }
+
+    protected void startActivityForResult(Uri requestUri, int requestCode, int actionChooserTitleResId, int errorMessageResId) {
+        Intent walletUriIntent = new Intent(Intent.ACTION_VIEW, requestUri);
+        ComponentName componentName = walletUriIntent.resolveActivity(getPackageManager());
+        if (componentName != null) {
+            Intent chooserIntent = Intent.createChooser(walletUriIntent, getString(actionChooserTitleResId));
+            startActivityForResult(chooserIntent, requestCode);
+        } else {
+            Toast.makeText(this, errorMessageResId, Toast.LENGTH_LONG).show();
         }
     }
 }

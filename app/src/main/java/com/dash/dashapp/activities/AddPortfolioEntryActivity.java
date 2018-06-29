@@ -1,7 +1,9 @@
 package com.dash.dashapp.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -31,6 +33,12 @@ public class AddPortfolioEntryActivity extends BaseActivity {
 
     private static String EXTRA_PORTFOLIO_ENTRY_TYPE = "extra_portfolio_entry_type";
     private static String EXTRA_PORTFOLIO_ENTRY_ID = "extra_portfolio_entry_id";
+
+    private static final int REQUEST_PUBLIC_KEY = 100;
+
+    private static final String WALLET_URI_SCHEME = "dashwallet";
+    private static final String WALLET_URI_REQUEST = "masterPublicKey";
+    private static final String WALLET_URI_RESULT = "masterPublicKeyBIP32";
 
     @BindView(R.id.input_label)
     EditText labelView;
@@ -97,7 +105,23 @@ public class AddPortfolioEntryActivity extends BaseActivity {
             includeEarningsView.setChecked(editedPortfolioEntry.includeEarnings);
         } else {
             labelView.setText(entryDefaultName());
+            if (!masternodeMode) {
+                requestPublicKeyFromWallet();
+            }
         }
+    }
+
+    private void requestPublicKeyFromWallet() {
+        Uri requestUri = new Uri.Builder()
+                .scheme(WALLET_URI_SCHEME)
+                .authority("")
+                .appendQueryParameter("request", WALLET_URI_REQUEST)
+                .appendQueryParameter("account", "0")
+                .appendQueryParameter("sender", getString(R.string.app_name))
+                .build();
+        startActivityForResult(requestUri, REQUEST_PUBLIC_KEY,
+                R.string.add_portfolio_entry_select_wallet,
+                R.string.add_portfolio_entry_wallet_not_installed);
     }
 
     private String entryDefaultName() {
@@ -239,6 +263,11 @@ public class AddPortfolioEntryActivity extends BaseActivity {
         if (scanningResult != null && !TextUtils.isEmpty(scanningResult.getContents())) {
             String scanContent = scanningResult.getContents();
             addressView.setText(scanContent);
+        }
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_PUBLIC_KEY) {
+            Uri resultData = Objects.requireNonNull(data.getData());
+            String masterPublicKeyBip32 = resultData.getQueryParameter(WALLET_URI_RESULT);
+            addressView.setText(masterPublicKeyBip32);
         }
     }
 

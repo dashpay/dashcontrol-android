@@ -95,6 +95,8 @@
     <string name="add_portfolio_entry_include_masternode_earnings">Include Masternode earnings</string>
     <string name="add_portfolio_entry_scan_qr_code">Scan QR code</string>
     <string name="add_portfolio_entry_import_using_qr_code">Import using QR code</string>
+    <string name="add_portfolio_entry_select_wallet">Select Wallet</string>
+    <string name="add_portfolio_entry_wallet_not_installed">Dash Wallet not installed</string>
     <string name="add_portfolio_entry_wallet_label_format">Wallet %d</string>
     <string name="add_portfolio_entry_masternode_label_format">Masternode %d</string>
     <string name="add_portfolio_entry_empty_address">Address cannot be empty</string>
