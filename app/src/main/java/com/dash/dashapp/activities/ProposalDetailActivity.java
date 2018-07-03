@@ -60,8 +60,17 @@ public class ProposalDetailActivity extends BaseActivity {
     @BindView(R.id.owner)
     TextView ownerView;
 
+    @BindView(R.id.payment_type)
+    TextView paymentTypeView;
+
+    @BindView(R.id.payment_type_value)
+    TextView paymentTypeValueView;
+
     @BindView(R.id.completed_payments)
     TextView completedPaymentsView;
+
+    @BindView(R.id.time_remaining)
+    TextView timeRemainingView;
 
     @BindView(R.id.proposal_description)
     WebView proposalDescriptionView;
@@ -121,20 +130,41 @@ public class ProposalDetailActivity extends BaseActivity {
         });
     }
 
-    private void displayBasicInfo(BudgetProposal budgetProposal) {
-        this.budgetProposal = budgetProposal;
-        yesVotesView.setText(String.valueOf(budgetProposal.getYesVotes()));
-        noVotesView.setText(String.valueOf(budgetProposal.getNoVotes()));
-        abstainVotesView.setText(String.valueOf(budgetProposal.getAbstainVotes()));
-        titleView.setText(String.valueOf(budgetProposal.getTitle()));
+    private void displayBasicInfo(BudgetProposal proposal) {
+        this.budgetProposal = proposal;
+        yesVotesView.setText(String.valueOf(proposal.getYesVotes()));
+        noVotesView.setText(String.valueOf(proposal.getNoVotes()));
+        abstainVotesView.setText(String.valueOf(proposal.getAbstainVotes()));
+        titleView.setText(String.valueOf(proposal.getTitle()));
 
-        yesVotesRatioView.setProgress(budgetProposal.getRatioYes());
-        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, budgetProposal.getRatioYes()));
+        yesVotesRatioView.setProgress(proposal.getRatioYes());
+        yesVotesRatioValueView.setText(getString(R.string.simple_percentage_value, proposal.getRatioYes()));
 
-        ownerView.setText(getString(R.string.owner_format, budgetProposal.getOwner()));
+        ownerView.setText(getString(R.string.owner_format, proposal.getOwner()));
 
-        int completedPayments = budgetProposal.getTotalPaymentCount() - budgetProposal.getRemainingPaymentCount();
-        completedPaymentsView.setText(getString(R.string.completed_payments_format, completedPayments, budgetProposal.getMonthlyAmount()));
+        String completedPaymentStr;
+        if (proposal.getTotalPaymentCount() == 1) {
+            paymentTypeView.setText(R.string.payment_type_one_time);
+            completedPaymentStr = getString(R.string.no_payments_occurred_yet);
+        } else {
+            paymentTypeView.setText(R.string.payment_type_monthly);
+            int completedPayments = proposal.getTotalPaymentCount() - proposal.getRemainingPaymentCount();
+            if (completedPayments == 0) {
+                completedPaymentStr = getString(R.string.no_payments_occurred_yet);
+            } else {
+                float spentAmount = completedPayments * proposal.getMonthlyAmount();
+                completedPaymentStr = getString(R.string.completed_payments_format, completedPayments, spentAmount);
+            }
+        }
+
+        String amountStr = getString(R.string.dash_amount_float, proposal.getMonthlyAmount());
+        paymentTypeValueView.setText(amountStr);
+
+        completedPaymentsView.setText(completedPaymentStr);
+
+        int remainingPaymentCount = proposal.getRemainingPaymentCount();
+        String monthsRemaining = getResources().getQuantityString(R.plurals.months_remaining, remainingPaymentCount, remainingPaymentCount);
+        timeRemainingView.setText(monthsRemaining);
     }
 
     private void displayDetails(BudgetProposal budgetProposal) {

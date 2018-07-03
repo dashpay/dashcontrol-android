@@ -33,9 +33,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -80,7 +80,10 @@
                     style="@style/text_title_small_grey"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dash_per_month" />
+                    android:drawablePadding="4dp"
+                    android:drawableStart="@drawable/ic_dash_d_unit"
+                    android:drawableTint="@color/grey"
+                    android:text="@string/per_month" />
 
             </LinearLayout>
 

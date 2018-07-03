@@ -5,8 +5,6 @@
     <string name="title_prices">Prices</string>
     <string name="title_portfolio">Portfolio</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alert_message">Network is not available. Loading Offline Data.</string>
     <string name="alert_title">Error</string>
     <string name="alert_positive">@android:string/ok</string>
@@ -31,9 +29,12 @@
     <string name="owner_format">Owner %1$s</string>
     <string name="total">Total</string>
     <string name="allocated">Allocated</string>
-    <string name="one_time_payment_tag">One-time payment</string>
+    <string name="payment_type_one_time">One-time\npayment</string>
+    <string name="payment_type_monthly">Monthly\namount</string>
+    <string name="no_payments_occurred_yet">no payments occurred yet</string>
     <string name="no_dash">0 DASH</string>
-    <string name="completed_payment_tag">Completed payments</string>
+    <string name="completed_payment_tag">Completed\npayments</string>
+    <string name="time_remaining_tag">Time\nremaining</string>
     <string name="no_month_remaining">No month remaining</string>
     <string name="no_dash_payment">0 totaling in 0 DASH</string>
     <string name="completed_payments_format">%1$d totaling in %2$.2f DASH</string>
@@ -50,9 +51,7 @@
     <string name="default_percentage">0%</string>
     <string name="no_title_entered_by_proposal_owner">No title entered by budgetProposal owner</string>
     <string name="textview_no_comments">No comments</string>
-    <string name="dash_per_month">Dash p/m</string>
-    <string name="month_remaining">%1$d month remaining</string>
-    <string name="months_remaining">%1$d months remaining</string>
+    <string name="per_month">p/m</string>
     <string name="comments">%1$d comments</string>
     <string name="join_the_discussion_title">Join the discussion!</string>
     <string name="join_the_discussion">Join the discussion</string>
@@ -61,8 +60,9 @@
     <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
     <string name="show_full_description">Show full description</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
+    <string name="dash_amount_float" translatable="false">%1$.2f DASH</string>
     <string name="by">by %1$s</string>
-    <string name="simple_percentage_value">%d\%%</string>
+    <string name="simple_percentage_value">"%d%%"</string>
 
     <string name="radio_5m">5m</string>
     <string name="radio_15m">15m</string>
@@ -134,10 +134,14 @@
     <string name="chart_marker_volume_dash">Vol1 : %f</string>
     <string name="chart_marker_volume">Vol2 : %f</string>
 
-    <plurals
-        name="comment_points">
+    <plurals name="comment_points">
         <item quantity="one">%d point, %s</item>
         <item quantity="other">%d points, %s</item>
+    </plurals>
+
+    <plurals name="months_remaining">
+        <item quantity="one">%1$d month remaining</item>
+        <item quantity="other">%1$d months remaining</item>
     </plurals>
 
 </resources>
