@@ -6,8 +6,8 @@ import android.util.Pair;
 import com.dash.dashapp.api.data.BudgetApiBudgetAnswer;
 import com.dash.dashapp.api.data.BudgetApiBudgetHistoryAnswer;
 import com.dash.dashapp.api.data.BudgetApiProposalAnswer;
+import com.dash.dashapp.api.data.ChartRecord;
 import com.dash.dashapp.api.data.DashBlogNews;
-import com.dash.dashapp.api.data.DashControlChartDataAnswer;
 import com.dash.dashapp.api.data.DashControlExchange;
 import com.dash.dashapp.api.data.DashControlMarketsAnswer;
 import com.dash.dashapp.api.data.DashControlPricesAnswer;
@@ -271,7 +271,7 @@ public class DashControlClient {
         });
     }
 
-    public Call<DashControlChartDataAnswer> getChartData(boolean noLimit, String exchange, String market, long startDateMs, long endDateMs) {
+    public Call<List<ChartRecord>> getChartData(boolean noLimit, String exchange, String market, long startDateMs, long endDateMs) {
         return dashControlService.chartData(noLimit, exchange, market, startDateMs / 1000, endDateMs / 1000);
     }
 
