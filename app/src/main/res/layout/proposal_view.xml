@@ -115,7 +115,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="2dp"
                 android:drawablePadding="2dp"
-                android:drawableStart="@drawable/ic_comment_semiwhite_12dp"
+                android:drawableStart="@drawable/ic_comments_12dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/textview_no_comments" />

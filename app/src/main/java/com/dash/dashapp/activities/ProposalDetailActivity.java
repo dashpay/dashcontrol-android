@@ -3,6 +3,7 @@ package com.dash.dashapp.activities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -176,18 +178,19 @@ public class ProposalDetailActivity extends BaseActivity {
     }
 
     @OnClick(R.id.show_more)
-    public void onShowMoreClick(View view) {
+    public void onShowMoreClick(Button button) {
         if (targetWebViewHeightDp == 0) {
             return;
         }
         int targetHeight;
         if (webViewExpanded) {
             targetHeight = DimenHelper.dpToPx(256);
+            button.setText(R.string.show_full_description);
             webViewExpanded = false;
         } else {
             targetHeight = DimenHelper.dpToPx(targetWebViewHeightDp);
             webViewExpanded = true;
-            view.setVisibility(View.GONE);
+            button.setText(R.string.hide_full_description);
         }
         proposalDescriptionView.setLayoutParams(
                 new LinearLayout.LayoutParams(getResources().getDisplayMetrics().widthPixels, targetHeight));
@@ -206,6 +209,16 @@ public class ProposalDetailActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 webView.loadUrl("javascript:SaveTargetHeightScript.saveHeight(document.body.getBoundingClientRect().height)");
                 super.onPageFinished(view, url);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null) {
+                    view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
         webView.addJavascriptInterface(this, "SaveTargetHeightScript");
