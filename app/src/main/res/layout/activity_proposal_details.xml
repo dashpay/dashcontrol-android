@@ -211,7 +211,7 @@
                     android:layout_marginStart="16dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/completed_payments_row" />
+                    app:layout_constraintTop_toBottomOf="@+id/time_remaining_row" />
 
             </android.support.constraint.ConstraintLayout>
 
