@@ -84,7 +84,6 @@ public class MainActivity extends BaseActivity implements
 
         ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar());
         supportActionBar.setDisplayShowHomeEnabled(true);
-        supportActionBar.setIcon(R.drawable.ic_dash_d_white_24dp);
 
         supportActionBar.setDisplayShowTitleEnabled(false);
     }

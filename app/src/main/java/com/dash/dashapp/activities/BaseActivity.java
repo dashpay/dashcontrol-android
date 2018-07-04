@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.dash.dashapp.R;
+
 import java.util.Objects;
 
 import butterknife.ButterKnife;
@@ -29,6 +31,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         actionBar = Objects.requireNonNull(getSupportActionBar());
         actionBar.setElevation(0);
+        actionBar.setTitle(null);
+        actionBar.setCustomView(R.layout.actionbar_logo);
+        actionBar.setDisplayShowCustomEnabled(true);
     }
 
     protected void showBackAction() {
@@ -37,11 +42,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void setTitle(int titleId) {
+        actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setTitle(titleId);
     }
 
     @Override
     public void setTitle(CharSequence title) {
+        actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setTitle(title);
     }
 
