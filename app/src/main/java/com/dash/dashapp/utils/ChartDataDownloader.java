@@ -25,7 +25,7 @@ public class ChartDataDownloader {
 
     private static final long SINGLE_RECORD_TIME = TimeUnit.MINUTES.toMillis(5);
     private long PACKAGE_TIME_WINDOW = TimeUnit.HOURS.toMillis(24);
-    private long COMPLETE_TIME_WINDOW = PACKAGE_TIME_WINDOW * 14;
+    private long COMPLETE_TIME_WINDOW = PACKAGE_TIME_WINDOW * 7 * 12;
 
     private DashControlClient dashControlClient;
     private long currentTimeUtc;
@@ -69,15 +69,14 @@ public class ChartDataDownloader {
 
         Log.d(TAG, String.format(Locale.getDefault(), "downloading records from %s to %s", new Date(startTime), new Date(endTime)));
 
-        Call<DashControlChartDataAnswer> chartDataCall = dashControlClient.getChartData(true, exchange, market, startTime, endTime);
-        chartDataCall.enqueue(new Callback<DashControlChartDataAnswer>() {
+        Call<List<ChartRecord>> chartDataCall = dashControlClient.getChartData(true, exchange, market, startTime, endTime);
+        chartDataCall.enqueue(new Callback<List<ChartRecord>>() {
             @Override
-            public void onResponse(@NonNull Call<DashControlChartDataAnswer> call,
-                                   @NonNull retrofit2.Response<DashControlChartDataAnswer> response) {
+            public void onResponse(@NonNull Call<List<ChartRecord>> call,
+                                   @NonNull retrofit2.Response<List<ChartRecord>> response) {
                 if (response.isSuccessful()) {
-                    DashControlChartDataAnswer responseBody = response.body();
-                    if (responseBody != null) {
-                        List<ChartRecord> responseBodyRecords = responseBody.getRecords();
+                    List<ChartRecord> responseBodyRecords = response.body();
+                    if (responseBodyRecords != null) {
                         Log.d(TAG, String.format(Locale.getDefault(), "downloaded %d records", responseBodyRecords.size()));
                         if (responseBodyRecords.size() > 0) {
                             saveChartData(exchange, market, startTime, endTime, responseBodyRecords, historical);
@@ -93,7 +92,7 @@ public class ChartDataDownloader {
             }
 
             @Override
-            public void onFailure(@NonNull Call<DashControlChartDataAnswer> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<ChartRecord>> call, @NonNull Throwable t) {
                 handleError(t);
             }
         });

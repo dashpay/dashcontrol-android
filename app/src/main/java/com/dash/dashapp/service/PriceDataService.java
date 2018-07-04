@@ -47,7 +47,7 @@ public class PriceDataService extends Service {
 
             @Override
             public void onFailure(Throwable t) {
-                logError(t);
+                onSyncFailure(t);
             }
         });
     }
@@ -84,7 +84,7 @@ public class PriceDataService extends Service {
 
             @Override
             public void onFailure(Throwable t) {
-                logError(t);
+                onSyncFailure(t);
             }
         });
     }
@@ -106,6 +106,8 @@ public class PriceDataService extends Service {
             String market = exchangeMarket.second;
             ChartDataDownloader chartDataDownloader = new ChartDataDownloader(chartDownloadCallback);
             chartDataDownloader.download(exchange, market);
+        } else {
+            stopSelf();
         }
     }
 
@@ -117,19 +119,17 @@ public class PriceDataService extends Service {
 
         @Override
         public void onFailure(Throwable t) {
-            if (t != null) {
-                Log.e(TAG, t.getMessage());
-            } else {
-                Log.e(TAG, "Error downloading chart data");
-            }
+            Log.e(TAG, "Error downloading chart data");
+            onSyncFailure(t);
         }
     };
 
-    private void logError(@Nullable Throwable t) {
+    private void onSyncFailure(@Nullable Throwable t) {
         Log.e(TAG, "Unable to get data from dash control API");
         if (t != null) {
             t.printStackTrace();
         }
+        stopSelf();
     }
 
     private void persist(final List<Exchange> exchanges) {
