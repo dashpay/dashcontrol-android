@@ -12,13 +12,12 @@
         android:id="@+id/filter_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:paddingBottom="16dp">
 
         <ImageView
             android:id="@+id/expand_arrow"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_centerVertical="true"
             android:layout_toStartOf="@id/filter_title"
             android:src="@drawable/ic_expand_more_24dp" />
 
