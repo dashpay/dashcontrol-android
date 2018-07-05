@@ -58,8 +58,13 @@
     <string name="submit_comments">Submit your comments and exchange your ideas on this proposal</string>
     <string name="in_replay_to">In replay to %s</string>
     <string name="in_replay_to_owner">In replay to %s (proposal owner)</string>
+    <string name="reply_button">Reply</string>
+    <string name="hide_reply_button">Hide reply</string>
+    <string name="add_reply_here">Add reply here…</string>
     <string name="show_full_description">Show full description</string>
     <string name="hide_full_description">Hide full description</string>
+    <string name="add_replay">Add Reply</string>
+    <string name="login_to_dashcentral">Login to your account using DashCentral\nOpen DashCentral.org &#x2192;\nMy Account &#x2192; Mobile Access\nand scan the QR code\n\n</string>
     <string name="dash_amount" translatable="false">%1$s DASH</string>
     <string name="dash_amount_float" translatable="false">%1$.2f DASH</string>
     <string name="by">by %1$s</string>

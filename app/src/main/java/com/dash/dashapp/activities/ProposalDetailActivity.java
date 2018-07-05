@@ -77,6 +77,9 @@ public class ProposalDetailActivity extends BaseActivity {
     @BindView(R.id.proposal_description)
     WebView proposalDescriptionView;
 
+    @BindView(R.id.comments_count)
+    TextView commentsCountView;
+
     BudgetProposal budgetProposal;
 
     private int targetWebViewHeightDp = -1;
@@ -167,6 +170,8 @@ public class ProposalDetailActivity extends BaseActivity {
         int remainingPaymentCount = proposal.getRemainingPaymentCount();
         String monthsRemaining = getResources().getQuantityString(R.plurals.months_remaining, remainingPaymentCount, remainingPaymentCount);
         timeRemainingView.setText(monthsRemaining);
+
+        commentsCountView.setText(String.valueOf(proposal.getCommentAmount()));
     }
 
     private void displayDetails(BudgetProposal budgetProposal) {
