@@ -26,6 +26,7 @@ import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +176,28 @@ public class DashControlClient {
         return budgetHistoryCall;
     }
 
+    public void postProposalComment(String apiKey, String proposalHash, String commentId, String replyContent,
+                            final Callback<String> callback) {
+        Call<JsonObject> postProposalCommentCall = dashCentralService.postProposalComment(apiKey, replyContent, proposalHash, commentId);
+        postProposalCommentCall.enqueue(new retrofit2.Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NonNull Call<JsonObject> call,
+                                   @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    callback.onResponse(null);
+                } else {
+                    callback.onFailure(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call,
+                                  @NonNull Throwable t) {
+                callback.onFailure(t);
+            }
+        });
+    }
+
     public void getPrices(final Callback<List<Exchange>> callback) {
         Call<DashControlPricesAnswer> pricesCall = dashControlService.prices();
         pricesCall.enqueue(new retrofit2.Callback<DashControlPricesAnswer>() {
@@ -293,7 +316,7 @@ public class DashControlClient {
 
     public interface Callback<T> {
 
-        void onResponse(T t);
+        void onResponse(T response);
 
         void onFailure(Throwable t);
     }

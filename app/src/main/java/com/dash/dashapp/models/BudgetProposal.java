@@ -236,16 +236,6 @@ public class BudgetProposal extends RealmObject
         this.descriptionHtml = descriptionHtml;
     }
 
-    public boolean isOngoing() {
-        Date today = new Date();
-        return getDateEnd().after(today) && (getRemainingPaymentCount() > 0) && isWillBeFunded() && isInNextBudget();
-    }
-
-    public boolean isPast() {
-        Date today = new Date();
-        return getDateEnd().before(today);
-    }
-
     public int getRatioYes() {
         float ratioYes = ((float) getYesVotes() / (getYesVotes() + getNoVotes())) * 100;
         return (int) ratioYes;

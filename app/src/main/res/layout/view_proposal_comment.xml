@@ -96,7 +96,52 @@
             android:textColor="@color/text_dark"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/reply_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/comment"
+            android:layout_gravity="center_vertical"
+            android:layout_toEndOf="@+id/vote_up"
+            android:foreground="@drawable/selectable_item_background_dark"
+            android:padding="8dp"
+            android:text="@string/reply_button"
+            android:textColor="@color/dash_blue"
+            android:textSize="18sp" />
+
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/reply_pane"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/reply_edit"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:hint="@string/add_reply_here"
+            android:inputType="textMultiLine|textCapSentences"
+            android:padding="4dp"
+            android:textColor="@color/dash_black"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/add_reply"
+            style="@style/text_content_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/dash_blue"
+            android:text="@string/add_replay"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
     <View
         android:id="@+id/separator"

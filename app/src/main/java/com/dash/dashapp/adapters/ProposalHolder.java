@@ -10,11 +10,8 @@ import com.dash.dashapp.R;
 import com.dash.dashapp.models.BudgetProposal;
 import com.dash.dashapp.utils.DateUtil;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,15 +59,11 @@ public class ProposalHolder extends RecyclerView.ViewHolder {
         approvalProgressView.setProgress(ratioYes);
         approvalProgressValueView.setText(ratioYes + "%");
 
-        //TODO calculate the month
-        Date startDate = new Date();
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        int monthRemaining = DateUtil.monthDifference(startDate, budgetProposal.getDateEnd());
-        if (monthRemaining == 1) {
-            monthRemainingView.setText(itemView.getContext().getString(R.string.month_remaining, monthRemaining));
-        } else {
-            monthRemainingView.setText(itemView.getContext().getString(R.string.months_remaining, monthRemaining));
-        }
+        Date today = new Date();
+        int monthRemaining = DateUtil.monthDifference(today, budgetProposal.getDateEnd());
+        int remainingPaymentCount = budgetProposal.getRemainingPaymentCount();
+        String monthsRemaining = itemView.getContext().getResources().getQuantityString(R.plurals.months_remaining, remainingPaymentCount, remainingPaymentCount);
+        monthRemainingView.setText(monthsRemaining);
 
         NumberFormat formatter = NumberFormat.getNumberInstance();
 //        formatter.setMinimumFractionDigits(2);
