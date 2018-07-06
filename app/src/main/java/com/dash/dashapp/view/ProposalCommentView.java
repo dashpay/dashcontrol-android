@@ -28,8 +28,8 @@ public class ProposalCommentView extends FrameLayout {
     @BindView(R.id.is_proposal_owner)
     View isProposalOwnerView;
 
-    @BindView(R.id.points)
-    TextView pointsView;
+    @BindView(R.id.date)
+    TextView dateView;
 
     @BindView(R.id.comment)
     TextView commentView;
@@ -94,7 +94,7 @@ public class ProposalCommentView extends FrameLayout {
         this.comment = comment;
         this.onAddReplyClickListener = listener;
         setAuthor(comment.username, comment.postedByOwner);
-        setPoints(0, comment.dateHuman);
+        setDate(comment.dateHuman);
         setComment(comment.content);
     }
 
@@ -126,9 +126,8 @@ public class ProposalCommentView extends FrameLayout {
         isProposalOwnerView.setVisibility(isProposalOwner ? VISIBLE : GONE);
     }
 
-    public void setPoints(int points, String added) {
-        String commentPoints = getResources().getQuantityString(R.plurals.comment_points, points, points, added);
-        pointsView.setText(commentPoints);
+    public void setDate(String date) {
+        dateView.setText(date);
     }
 
     public void setComment(String comment) {
