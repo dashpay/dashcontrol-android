@@ -10,6 +10,7 @@ import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.service.BudgetSyncService;
 import com.dash.dashapp.service.NewsSyncService;
 import com.dash.dashapp.service.PriceDataService;
+import com.dash.dashapp.service.WalletAppKitService;
 import com.dash.dashapp.utils.PrimaryKeyFactory;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 import com.dash.dashapp.utils.URLs;
@@ -44,7 +45,8 @@ public class DashControlApplication extends Application {
         mContext = getApplicationContext();
         pickDefaultLanguage();
         initRealm();
-        startDataSyncServices();
+//        startDataSyncServices();
+        startWalletAppKitService();
     }
 
     public void startDataSyncServices() {
@@ -56,6 +58,11 @@ public class DashControlApplication extends Application {
 
         Intent priceDataServiceIntent = new Intent(this, PriceDataService.class);
         startService(priceDataServiceIntent);
+    }
+
+    private void startWalletAppKitService() {
+        Intent walletAppKitServiceIntent = new Intent(this, WalletAppKitService.class);
+        startService(walletAppKitServiceIntent);
     }
 
     private void initRealm() {
