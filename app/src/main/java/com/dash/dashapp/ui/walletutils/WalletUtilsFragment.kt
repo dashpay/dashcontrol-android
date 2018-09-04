@@ -31,7 +31,12 @@ class WalletUtilsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(WalletUtilsViewModel::class.java)
         viewModel.peerList.observe(this, Observer { peerList ->
-            layoutView.message.text = "${peerList!!.size} \n $peerList"
+            layoutView.message1.text = "${peerList!!.size} \n $peerList"
+        })
+        viewModel.blockchainState.observe(this, Observer { blockchainState ->
+            blockchainState?.let {
+                layoutView.message2.text = "bestChainDate:\t${it.bestChainDate}\nbestChainHeight:\t${it.bestChainHeight}"
+            }
         })
     }
 
