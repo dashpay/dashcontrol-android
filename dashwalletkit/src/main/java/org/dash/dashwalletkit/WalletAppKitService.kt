@@ -1,4 +1,4 @@
-package com.dash.dashapp.service
+package org.dash.dashwalletkit
 
 import android.app.Service
 import android.arch.lifecycle.LifecycleService
@@ -8,15 +8,20 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.dash.dashapp.events.BlockchainStateEvent
-import com.dash.dashapp.events.NewTransactionEvent
-import com.dash.dashapp.events.PeerStateEvent
-import com.dash.dashapp.helpers.SimpleLogFormatter
-import com.dash.dashapp.ui.walletutils.*
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Peer
 import org.bitcoinj.core.Transaction
 import org.bitcoinj.kits.WalletAppKit
+import org.dash.dashwalletkit.config.KitConfigMainnet
+import org.dash.dashwalletkit.config.SimpleLogFormatter
+import org.dash.dashwalletkit.config.WalletAppKitConfig
+import org.dash.dashwalletkit.data.BlockchainState
+import org.dash.dashwalletkit.data.BlocksDownloadedLiveData
+import org.dash.dashwalletkit.data.NewTransactionLiveData
+import org.dash.dashwalletkit.data.PeerConnectivityLiveData
+import org.dash.dashwalletkit.event.BlockchainStateEvent
+import org.dash.dashwalletkit.event.NewTransactionEvent
+import org.dash.dashwalletkit.event.PeerStateEvent
 import org.greenrobot.eventbus.EventBus
 
 class WalletAppKitService : LifecycleService() {
@@ -43,8 +48,9 @@ class WalletAppKitService : LifecycleService() {
             val chainHead = kit.chain().chainHead
             val bestChainDate = chainHead.header.time
             val bestChainHeight = chainHead.height
+            val blocksLeft = kit.peerGroup().mostCommonChainHeight - chainHead.height
 
-            return BlockchainState(bestChainDate, bestChainHeight)
+            return BlockchainState(bestChainDate, bestChainHeight, blocksLeft)
         }
 
     inner class LocalBinder : Binder() {
@@ -101,8 +107,8 @@ class WalletAppKitService : LifecycleService() {
 
     private fun bindLiveData() {
         peerConnectivityLiveData = PeerConnectivityLiveData(kit.peerGroup())
-        peerConnectivityLiveData.observe(this, Observer { data ->
-            broadcastPeerState(data!!.second)
+        peerConnectivityLiveData.observe(this, Observer {
+            broadcastPeerState(it!!.second)
         })
 
         blocksDownloadedLiveData = BlocksDownloadedLiveData(kit.peerGroup())
@@ -111,8 +117,8 @@ class WalletAppKitService : LifecycleService() {
         })
 
         newTransactionLiveData = NewTransactionLiveData(kit.wallet())
-        newTransactionLiveData.observe(this, Observer { data ->
-            broadcastNewTransaction(data!!)
+        newTransactionLiveData.observe(this, Observer {
+            broadcastNewTransaction(it!!)
         })
     }
 
@@ -129,7 +135,7 @@ class WalletAppKitService : LifecycleService() {
     }
 
     private fun broadcastNewTransaction(transaction: Transaction) {
-        if (eventBus.hasSubscriberForEvent(BlockchainStateEvent::class.java)) {
+        if (eventBus.hasSubscriberForEvent(NewTransactionEvent::class.java)) {
             eventBus.post(NewTransactionEvent(transaction))
         }
     }

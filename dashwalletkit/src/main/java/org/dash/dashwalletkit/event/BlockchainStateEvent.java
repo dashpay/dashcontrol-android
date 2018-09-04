@@ -1,6 +1,6 @@
-package com.dash.dashapp.events;
+package org.dash.dashwalletkit.event;
 
-import com.dash.dashapp.service.BlockchainState;
+import org.dash.dashwalletkit.data.BlockchainState;
 
 public class BlockchainStateEvent {
 

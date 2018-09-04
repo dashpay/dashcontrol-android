@@ -1,4 +1,4 @@
-package com.dash.dashapp.events;
+package org.dash.dashwalletkit.event;
 
 import org.bitcoinj.core.Transaction;
 

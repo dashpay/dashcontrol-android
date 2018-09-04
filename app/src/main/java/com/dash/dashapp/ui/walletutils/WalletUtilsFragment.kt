@@ -35,7 +35,7 @@ class WalletUtilsFragment : Fragment() {
         })
         viewModel.blockchainState.observe(this, Observer { blockchainState ->
             blockchainState?.let {
-                layoutView.message2.text = "bestChainDate:\t${it.bestChainDate}\nbestChainHeight:\t${it.bestChainHeight}"
+                layoutView.message2.text = "bestChainDate:\t${it.bestChainDate}\nbestChainHeight:\t${it.bestChainHeight}\nblocksLeft:\t${it.blocksLeft}"
             }
         })
     }

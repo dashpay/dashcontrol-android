@@ -10,12 +10,13 @@ import com.dash.dashapp.activities.SettingsActivity;
 import com.dash.dashapp.service.BudgetSyncService;
 import com.dash.dashapp.service.NewsSyncService;
 import com.dash.dashapp.service.PriceDataService;
-import com.dash.dashapp.service.WalletAppKitService;
 import com.dash.dashapp.utils.PrimaryKeyFactory;
 import com.dash.dashapp.utils.SharedPreferencesManager;
 import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.Stetho;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
+
+import org.dash.dashwalletkit.WalletAppKitService;
 
 import java.util.Locale;
 import java.util.Map;

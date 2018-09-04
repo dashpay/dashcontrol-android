@@ -1,4 +1,4 @@
-package com.dash.dashapp.helpers;
+package org.dash.dashwalletkit.config;
 
 import android.content.Context;
 

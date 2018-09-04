@@ -1,4 +1,4 @@
-package com.dash.dashapp.ui.walletutils
+package org.dash.dashwalletkit.config
 
 import android.content.ContextWrapper
 

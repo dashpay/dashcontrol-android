@@ -1,4 +1,4 @@
-package com.dash.dashapp.ui.walletutils
+package org.dash.dashwalletkit.data
 
 import android.arch.lifecycle.LiveData
 import org.bitcoinj.core.Peer

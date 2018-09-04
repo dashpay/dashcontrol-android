@@ -1,4 +1,4 @@
-package com.dash.dashapp.ui.walletutils
+package org.dash.dashwalletkit.data
 
 import android.app.Application
 import android.arch.lifecycle.LiveData
@@ -7,9 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.dash.dashapp.events.BlockchainStateEvent
-import com.dash.dashapp.service.BlockchainState
-import com.dash.dashapp.service.WalletAppKitService
+import org.dash.dashwalletkit.WalletAppKitService
+import org.dash.dashwalletkit.event.BlockchainStateEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -40,7 +39,9 @@ class BlockchainStateLiveData(private val application: Application) : LiveData<B
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPeerListUpdateEvent(event: BlockchainStateEvent) {
-        updateValue()
+        walletAppKitService?.blockchainState?.let {
+            value = event.blockchainState
+        }
     }
 
     private fun updateValue() {
