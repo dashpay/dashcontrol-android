@@ -31,11 +31,26 @@ class WalletUtilsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(WalletUtilsViewModel::class.java)
         viewModel.peerList.observe(this, Observer { peerList ->
-            layoutView.message1.text = "${peerList!!.size} \n $peerList"
+            layoutView.message1.text = "peers:\t${peerList!!.size}\n$peerList\n"
         })
         viewModel.blockchainState.observe(this, Observer { blockchainState ->
             blockchainState?.let {
-                layoutView.message2.text = "bestChainDate:\t${it.bestChainDate}\nbestChainHeight:\t${it.bestChainHeight}\nblocksLeft:\t${it.blocksLeft}"
+                layoutView.message2.text = "bestChainDate: ${it.bestChainDate}\nbestChainHeight: ${it.bestChainHeight}\nblocksLeft: ${it.blocksLeft}\n"
+            }
+        })
+        viewModel.blockchainState.observe(this, Observer { blockchainState ->
+            blockchainState?.let {
+                layoutView.message2.text = "bestChainDate: ${it.bestChainDate}\nbestChainHeight: ${it.bestChainHeight}\nblocksLeft: ${it.blocksLeft}\n"
+            }
+        })
+        viewModel.masternodes.observe(this, Observer { masternodes ->
+            masternodes?.let {
+                layoutView.message3.text = "masternodes: ${it.size}"//\n$masternodes\n"
+            }
+        })
+        viewModel.governanceObjects.observe(this, Observer { governanceObjects ->
+            governanceObjects?.let {
+                layoutView.message4.text = "governanceObjects:\t${it.size}"//\n$masternodes\n"
             }
         })
     }

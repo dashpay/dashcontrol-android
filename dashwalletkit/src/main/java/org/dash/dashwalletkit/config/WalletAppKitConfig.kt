@@ -12,5 +12,5 @@ interface WalletAppKitConfig {
 
     val filesPrefix: String
 
-    fun getCheckpoints(context: ContextWrapper): InputStream
+    fun getCheckpoints(context: ContextWrapper): InputStream?
 }
