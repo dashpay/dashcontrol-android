@@ -1,11 +1,20 @@
 package com.dash.dashapp.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class DateUtil {
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+
+    public static String format(Date date) {
+        return DATE_FORMAT.format(date);
+    }
 
     public static int monthDifference(Date startDate, Date endDate) {
         Calendar startCalendar = new GregorianCalendar();

@@ -14,25 +14,25 @@
     <application
         android:name=".application.DashControlApplication"
         android:allowBackup="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/dash_launcher"
         android:label="@string/app_name"
         android:logo="@drawable/ic_dash_d_white_24dp"
         android:roundIcon="@mipmap/dash_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Dash_theme">
+        android:theme="@style/Dash_theme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="layoutDirection|locale"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
@@ -62,21 +62,18 @@
             android:configChanges="layoutDirection|locale"
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".activities.AuthenticationActivity"
             android:configChanges="layoutDirection|locale|orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashStyle">
-
-        </activity>
-
+            android:theme="@style/SplashStyle"></activity>
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
-            tools:replace="android:screenOrientation"
-            android:stateNotNeeded="true"/>
+            android:stateNotNeeded="true"
+            tools:replace="android:screenOrientation" />
 
         <service android:name=".service.fcm.DashControlFirebaseMessagingService">
             <intent-filter>
@@ -92,9 +89,21 @@
         <service android:name=".service.NewsSyncService" />
         <service android:name=".service.BudgetSyncService" />
 
+        <service android:name="org.dash.dashwalletkit.WalletAppKitService" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/dash_launcher" />
+
+        <activity android:name=".WalletUtilsActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

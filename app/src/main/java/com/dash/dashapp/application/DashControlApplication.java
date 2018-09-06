@@ -16,6 +16,8 @@ import com.dash.dashapp.utils.URLs;
 import com.facebook.stetho.Stetho;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
+import org.dash.dashwalletkit.WalletAppKitService;
+
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,7 +46,8 @@ public class DashControlApplication extends Application {
         mContext = getApplicationContext();
         pickDefaultLanguage();
         initRealm();
-        startDataSyncServices();
+//        startDataSyncServices();
+        startWalletAppKitService();
     }
 
     public void startDataSyncServices() {
@@ -56,6 +59,11 @@ public class DashControlApplication extends Application {
 
         Intent priceDataServiceIntent = new Intent(this, PriceDataService.class);
         startService(priceDataServiceIntent);
+    }
+
+    private void startWalletAppKitService() {
+        Intent walletAppKitServiceIntent = new Intent(this, WalletAppKitService.class);
+        startService(walletAppKitServiceIntent);
     }
 
     private void initRealm() {
