@@ -10,18 +10,15 @@ import android.os.IBinder
 import android.util.Log
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Peer
+import org.bitcoinj.core.Sha256Hash
 import org.bitcoinj.core.Transaction
+import org.bitcoinj.governance.GovernanceObject
 import org.bitcoinj.kits.WalletAppKit
 import org.dash.dashwalletkit.config.KitConfigMainnet
 import org.dash.dashwalletkit.config.SimpleLogFormatter
 import org.dash.dashwalletkit.config.WalletAppKitConfig
-import org.dash.dashwalletkit.data.BlockchainState
-import org.dash.dashwalletkit.data.BlocksDownloadedLiveData
-import org.dash.dashwalletkit.data.NewTransactionLiveData
-import org.dash.dashwalletkit.data.PeerConnectivityLiveData
-import org.dash.dashwalletkit.event.BlockchainStateEvent
-import org.dash.dashwalletkit.event.NewTransactionEvent
-import org.dash.dashwalletkit.event.PeerStateEvent
+import org.dash.dashwalletkit.data.*
+import org.dash.dashwalletkit.event.*
 import org.greenrobot.eventbus.EventBus
 
 class WalletAppKitService : LifecycleService() {
@@ -36,6 +33,8 @@ class WalletAppKitService : LifecycleService() {
 
     private lateinit var peerConnectivityLiveData: PeerConnectivityLiveData
     private lateinit var blocksDownloadedLiveData: BlocksDownloadedLiveData
+    private lateinit var masternodesLiveData: MasternodesLiveData
+    private lateinit var governanceLiveData: GovernanceLiveData
     private lateinit var newTransactionLiveData: NewTransactionLiveData
 
     private val mBinder = LocalBinder()
@@ -116,6 +115,16 @@ class WalletAppKitService : LifecycleService() {
             broadcastBlockchainState()
         })
 
+        masternodesLiveData = MasternodesLiveData(kit.wallet().context.masternodeManager)
+        masternodesLiveData.observe(this, Observer {
+            broadcastMasternodesEvent(it!!)
+        })
+
+        governanceLiveData = GovernanceLiveData(kit.wallet().context.governanceManager)
+        governanceLiveData.observe(this, Observer {
+            broadcastGovernanceEvent(it!!.first, it.second)
+        })
+
         newTransactionLiveData = NewTransactionLiveData(kit.wallet())
         newTransactionLiveData.observe(this, Observer {
             broadcastNewTransaction(it!!)
@@ -131,6 +140,18 @@ class WalletAppKitService : LifecycleService() {
     private fun broadcastBlockchainState() {
         if (eventBus.hasSubscriberForEvent(BlockchainStateEvent::class.java)) {
             eventBus.post(BlockchainStateEvent(blockchainState))
+        }
+    }
+
+    private fun broadcastMasternodesEvent(newCount: Int) {
+        if (eventBus.hasSubscriberForEvent(MasternodesEvent::class.java)) {
+            eventBus.post(MasternodesEvent(newCount))
+        }
+    }
+
+    private fun broadcastGovernanceEvent(hash: Sha256Hash, governanceObject: GovernanceObject) {
+        if (eventBus.hasSubscriberForEvent(GovernanceEvent::class.java)) {
+            eventBus.post(GovernanceEvent(hash, governanceObject))
         }
     }
 
