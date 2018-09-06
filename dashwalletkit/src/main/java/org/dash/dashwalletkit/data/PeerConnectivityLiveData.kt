@@ -1,30 +1,30 @@
 package org.dash.dashwalletkit.data
 
-import android.arch.lifecycle.LiveData
+import android.app.Application
 import org.bitcoinj.core.Peer
-import org.bitcoinj.core.PeerGroup
 import org.bitcoinj.core.listeners.PeerConnectedEventListener
 import org.bitcoinj.core.listeners.PeerDisconnectedEventListener
 import org.bitcoinj.utils.Threading
+import org.dash.dashwalletkit.WalletAppKitService
 
-class PeerConnectivityLiveData(private val peerGroup: PeerGroup) :
-        LiveData<Pair<Peer, Int>>(), PeerConnectedEventListener, PeerDisconnectedEventListener {
+class PeerConnectivityLiveData(application: Application) :
+        WalletAppKitServiceLiveData<List<Peer>>(application), PeerConnectedEventListener, PeerDisconnectedEventListener {
 
-    override fun onActive() {
-        peerGroup.addConnectedEventListener(Threading.SAME_THREAD, this)
-        peerGroup.addDisconnectedEventListener(Threading.SAME_THREAD, this)
+    override fun onActive(walletAppKitService: WalletAppKitService) {
+        walletAppKitService.peerGroup.addConnectedEventListener(Threading.SAME_THREAD, this)
+        walletAppKitService.peerGroup.addDisconnectedEventListener(Threading.SAME_THREAD, this)
     }
 
-    override fun onInactive() {
-        peerGroup.removeConnectedEventListener(this)
-        peerGroup.removeDisconnectedEventListener(this)
+    override fun onInactive(walletAppKitService: WalletAppKitService) {
+        walletAppKitService.peerGroup.removeConnectedEventListener(this)
+        walletAppKitService.peerGroup.removeDisconnectedEventListener(this)
     }
 
     override fun onPeerConnected(peer: Peer, peerCount: Int) {
-        postValue(Pair(peer, peerCount))
+        postValue(walletAppKitService!!.peerGroup.connectedPeers)
     }
 
     override fun onPeerDisconnected(peer: Peer, peerCount: Int) {
-        postValue(Pair(peer, peerCount))
+        postValue(walletAppKitService!!.peerGroup.connectedPeers)
     }
 }
